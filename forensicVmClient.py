@@ -1,11 +1,16 @@
 import os
 import re
 import json
+import sys
 import PySimpleGUI as sg
 import socket
 
 # Define the filename for the JSON file
 filename = "config.json"
+icon_path = "forensicVMCLient.ico"
+
+# Get the first command line argument, if any
+image_path_arg = sys.argv[1] if len(sys.argv) > 1 else ""
 
 # Save the values as a json file
 def save_config(values):
@@ -39,7 +44,19 @@ def ForensicVMForm():
 
     # Load the configuration from the JSON file if it exists
     config = load_config()
-    
+
+    # Define the layout of the virtualize tab
+    virtualize_layout = [
+        [sg.Button("Virtualize", key="open_vm_button",
+                   size=(25, 1), tooltip="Connect to Forensic VM Server and "
+                                         "virtualize the forensic Image")],
+        [sg.Button("Import Data", key="import_data_button", size=(25, 1))],
+        [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 1))],
+        [sg.Button("Configure", key="configure_button", size=(25, 1))],
+        [sg.Button("Close", key="close_button", size=(25, 1))]
+    ]
+    virtualize_tab = sg.Tab("Virtualize", virtualize_layout, element_justification="center")
+
     # Create the layout for the configuration tab
     config_layout = [
         [sg.Text("Forensic VM server address:"), sg.InputText(key="server_address", default_text=config.get("server_address", ""))],
@@ -49,10 +66,11 @@ def ForensicVMForm():
         [sg.Text("Share password:"), sg.InputText(key="share_password", password_char="*", default_text=config.get("share_password", ""))],
         [sg.Text("Forensic image local path:"), sg.InputText(key="forensic_image_path", default_text=config.get("forensic_image_path", ""))],
         [sg.Text("Equivalence:"),sg.InputText(key="equivalence", default_text=config.get("equivalence", ""))],
+        [sg.Text("Forensic Image Path:"), sg.InputText(key="forensic_image_path", default_text=image_path_arg)],
         [sg.Button("Save", key="save_button"), sg.Button("Connect", key="connect_button")],
         [sg.Text("", key="output_text")]
     ]
-    config_tab = sg.Tab("Configuration", config_layout)
+    config_tab = sg.Tab("Configuration", config_layout, element_justification="center")
 
     # Create the about tab
     about_layout = [
@@ -63,19 +81,19 @@ def ForensicVMForm():
         [sg.Text("This software is provided as-is, without warranty of any kind. Use at your own risk.")],
         [sg.Multiline(default_text="Copyright (c) 2023 Nuno Mourinho - This software was created as "
                                    "part of a Master's degree in Cybersecurity Engineering at Escola Superior de "
-                                   "Tecnogia e Gestão de Beja. All rights reserved.", size=(65, 3), disabled=True)],
+                                   "Tecnologia e Gestão de Beja. All rights reserved.", size=(65, 3), disabled=True)],
     ]
-    about_tab = sg.Tab("About", about_layout)
+    about_tab = sg.Tab("About", about_layout, element_justification="center")
 
     # Create the layout for the window
     layout = [
         [sg.TabGroup([
-            [sg.TabGroup([[config_tab, about_tab]])],
+            [sg.TabGroup([[virtualize_tab, config_tab, about_tab]])],
         ])]
     ]
 
     # Create the window
-    window = sg.Window("Autopsy ForensicVM Client", layout)
+    window = sg.Window("Autopsy ForensicVM Client", layout, element_justification="center", icon=icon_path)
 
     # Event loop
     while True:
@@ -105,6 +123,11 @@ def ForensicVMForm():
             save_config(values)
             print("Configuration saved successfully!")
             sg.popup("Configuration saved successfully!")
+        elif event == "open_vm_button":
+            # Show two new buttons for virtualization
+            virtualize_layout[0].extend([sg.Button("Convert to VM", key="convert_to_vm_button"),
+                                         sg.Button("Link to VM", key="link_to_vm_button")])
+            window["Virtualize"].update(virtualize_layout)
 
 if __name__ == '__main__':
     ForensicVMForm()

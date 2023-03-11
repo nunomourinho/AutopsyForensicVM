@@ -144,8 +144,6 @@ class RunVMIngestModule(DataSourceIngestModule):
         cmd = ArrayList()
         # Add each argument in its own line.  I.e. "-f foo" would be two calls to .add()
         cmd.add(self.pathToBAT.toString())
-        cmd.add(self.pathToEXE.toString())
-        cmd.add(self.pathToQEMUIMG.toString())        
         cmd.add(imagePaths[0])
         self.log(Level.INFO, imagePaths[0])
         self.log(Level.INFO, cmd.toString())
