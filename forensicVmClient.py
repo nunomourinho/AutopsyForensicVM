@@ -61,7 +61,9 @@ def ForensicVMForm():
         [sg.Image("forensicVMClient.png")],
         [sg.Text("Version 1.0", justification="center")],
         [sg.Text("This software is provided as-is, without warranty of any kind. Use at your own risk.")],
-        [sg.Text("Created by Your Name Here", font=("Helvetica", 10), justification="center")],
+        [sg.Multiline(default_text="Copyright (c) 2023 Nuno Mourinho - This software was created as "
+                                   "part of a Master's degree in Cybersecurity Engineering at Escola Superior de "
+                                   "Tecnogia e Gestão de Beja. All rights reserved.", size=(65, 3), disabled=True)],
     ]
     about_tab = sg.Tab("About", about_layout)
 
@@ -73,7 +75,7 @@ def ForensicVMForm():
     ]
 
     # Create the window
-    window = sg.Window("Forensic VM Connection Form", layout)
+    window = sg.Window("Autopsy ForensicVM Client", layout)
 
     # Event loop
     while True:
