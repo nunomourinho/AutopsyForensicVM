@@ -107,15 +107,6 @@ class RunVMIngestModule(DataSourceIngestModule):
         # Get path to EXE based on where this script is run from.
         # Assumes EXE is in same folder as script
         # Verify it is there before any ingest starts
-        exe_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qemu/qemu-system-x86_64.exe")
-        self.pathToEXE = File(exe_path)
-        if not self.pathToEXE.exists():
-            raise IngestModuleException("QEMU was not found in module folder " + exe_path)
-        
-        qemuimg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qemu/qemu-img.exe")
-        self.pathToQEMUIMG = File(qemuimg_path)
-        if not self.pathToQEMUIMG.exists():
-            raise IngestModuleException("QEMU-IMG was not found in module folder " + qemuimg_path)
             
         bat_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mesi.bat")
         self.pathToBAT = File(bat_path)
