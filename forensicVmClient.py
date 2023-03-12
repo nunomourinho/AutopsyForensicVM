@@ -95,9 +95,14 @@ def ForensicVMForm():
         [sg.Text("Windows folder share server:"), sg.InputText(key="folder_share_server", default_text=config.get("folder_share_server", ""))],
         [sg.Text("Share login:"), sg.InputText(key="share_login", default_text=config.get("share_login", ""))],
         [sg.Text("Share password:"), sg.InputText(key="share_password", password_char="*", default_text=config.get("share_password", ""))],
-        [sg.Text("Forensic image local path:"), sg.InputText(key="forensic_image_path", default_text=config.get("forensic_image_path", ""))],
+        [sg.Text("Forensic image local path:"), sg.InputText(key="forensic_image_path",
+                default_text=config.get("forensic_image_path", "")),
+         sg.FolderBrowse(key="forensic_image_path_folder_browse",target="forensic_image_path")],
         [sg.Text("Equivalence:"),sg.InputText(key="equivalence", default_text=config.get("equivalence", ""))],
         [sg.Text("Forensic Image Path:"), sg.InputText(key="forensic_image_path", default_text=image_path_arg)],
+
+
+
         [sg.Button("Save", key="save_button"), sg.Button("Connect", key="connect_button")],
         [sg.Text("", key="output_text")]
     ]
