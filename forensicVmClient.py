@@ -2,8 +2,8 @@ import os
 import re
 import json
 import sys
+import paramiko
 import PySimpleGUI as sg
-import socket
 
 # Define the filename for the JSON file
 filename = "config.json"
@@ -11,6 +11,30 @@ icon_path = "forensicVMCLient.ico"
 
 # Get the first command line argument, if any
 image_path_arg = sys.argv[1] if len(sys.argv) > 1 else ""
+
+
+
+def connect_to_server(address, port):
+    # Connect to the server
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(address, port, username="forensic", password="forensic")
+
+    # Get an available remote port
+    transport = ssh.get_transport()
+    remote_port = transport.request_port_forward("", 0)
+
+    # Open a new TCP channel and forward traffic from the remote port to the local port
+    channel = transport.open_channel("direct-tcpip", ("localhost", 445), ("localhost", remote_port))
+
+    # Close the connection
+    ssh.close()
+
+    # Return the remote port number
+    return remote_port
+
+
+
 
 # Save the values as a json file
 def save_config(values):
@@ -37,6 +61,7 @@ def validate_server_address(address):
     else:
         return False
 
+# Form: All fields in the form
 
 def ForensicVMForm():
     # Set the theme
@@ -47,11 +72,14 @@ def ForensicVMForm():
 
     # Define the layout of the virtualize tab
     virtualize_layout = [
-        [sg.Button("Virtualize", key="open_vm_button",
-                   size=(25, 1), tooltip="Connect to Forensic VM Server and "
-                                         "virtualize the forensic Image")],
-        [sg.Button("Import Data", key="import_data_button", size=(25, 1))],
-        [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 1))],
+        [sg.Button("Virtualize - a) Convert to VM",
+                   tooltip="Connect to Forensic VM Server and "
+                                         "virtualize the forensic Image", key="convert_to_vm_button", size=(25, 1), visible=True)],
+        [sg.Button("Virtualize - b) Link to VM",
+                   tooltip="Connect to Forensic VM Server and "
+                                         "virtualize the forensic Image", key="link_to_vm_button", size=(25, 1), visible=True)],
+        [sg.Button("Import Data", key="import_data_button", size=(25, 1), visible=False)],
+        [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 1), visible=False)],
         [sg.Button("Configure", key="configure_button", size=(25, 1))],
         [sg.Button("Close", key="close_button", size=(25, 1))]
     ]
@@ -70,7 +98,7 @@ def ForensicVMForm():
         [sg.Button("Save", key="save_button"), sg.Button("Connect", key="connect_button")],
         [sg.Text("", key="output_text")]
     ]
-    config_tab = sg.Tab("Configuration", config_layout, element_justification="center")
+    config_tab = sg.Tab("Configuration", config_layout)
 
     # Create the about tab
     about_layout = [
@@ -123,11 +151,16 @@ def ForensicVMForm():
             save_config(values)
             print("Configuration saved successfully!")
             sg.popup("Configuration saved successfully!")
-        elif event == "open_vm_button":
-            # Show two new buttons for virtualization
-            virtualize_layout[0].extend([sg.Button("Convert to VM", key="convert_to_vm_button"),
-                                         sg.Button("Link to VM", key="link_to_vm_button")])
-            window["Virtualize"].update(virtualize_layout)
+        elif event == "convert_to_vm_button":
+            window["convert_to_vm_button"].update(visible=False)
+            window["link_to_vm_button"].update(visible=False)
+            window["import_data_button"].update(visible=True)
+            window["open_forensic_vm_button"].update(visible=True)
+        elif event == "link_to_vm_button":
+            window["convert_to_vm_button"].update(visible=False)
+            window["link_to_vm_button"].update(visible=False)
+            window["import_data_button"].update(visible=True)
+            window["open_forensic_vm_button"].update(visible=True)
 
 if __name__ == '__main__':
     ForensicVMForm()
