@@ -72,16 +72,15 @@ def ForensicVMForm():
 
     # Define the layout of the virtualize tab
     virtualize_layout = [
+        [sg.Button("Configure", key="configure_button", size=(25, 1))],
         [sg.Button("Virtualize - a) Convert to VM",
                    tooltip="Connect to Forensic VM Server and "
-                                         "virtualize the forensic Image", key="convert_to_vm_button", size=(25, 1), visible=True)],
+                                         "virtualize the forensic Image", key="convert_to_vm_button", size=(25, 2), visible=True)],
         [sg.Button("Virtualize - b) Link to VM",
                    tooltip="Connect to Forensic VM Server and "
-                                         "virtualize the forensic Image", key="link_to_vm_button", size=(25, 1), visible=True)],
-        [sg.Button("Import Data", key="import_data_button", size=(25, 1), visible=False)],
+                                         "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2), visible=True)],
         [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 1), visible=False)],
-        [sg.Button("Configure", key="configure_button", size=(25, 1))],
-        [sg.Button("Close", key="close_button", size=(25, 1))]
+        [sg.Button("Import Data", key="import_data_button", size=(25, 1), visible=False)]
     ]
     virtualize_tab = sg.Tab("Virtualize", virtualize_layout, element_justification="center")
 
@@ -89,6 +88,10 @@ def ForensicVMForm():
     config_layout = [
         [sg.Text("Forensic VM server address:"), sg.InputText(key="server_address", default_text=config.get("server_address", ""))],
         [sg.Text("Forensic API:"), sg.InputText(key="forensic_api", default_text=config.get("forensic_api", ""))],
+        [sg.Text("SSH Server Address and port:"),
+         sg.InputText(key="ssh_server_address", default_text=config.get("ssh_server_address", ""))],
+        [sg.Text("SSH user Public Key:"),
+         sg.InputText(key="ssh_public_key", default_text=config.get("ssh_user_key", ""))],
         [sg.Text("Windows folder share server:"), sg.InputText(key="folder_share_server", default_text=config.get("folder_share_server", ""))],
         [sg.Text("Share login:"), sg.InputText(key="share_login", default_text=config.get("share_login", ""))],
         [sg.Text("Share password:"), sg.InputText(key="share_password", password_char="*", default_text=config.get("share_password", ""))],
@@ -98,7 +101,7 @@ def ForensicVMForm():
         [sg.Button("Save", key="save_button"), sg.Button("Connect", key="connect_button")],
         [sg.Text("", key="output_text")]
     ]
-    config_tab = sg.Tab("Configuration", config_layout)
+    config_tab = sg.Tab("Configuration", config_layout, key="config_tab")
 
     # Create the about tab
     about_layout = [
@@ -152,15 +155,23 @@ def ForensicVMForm():
             print("Configuration saved successfully!")
             sg.popup("Configuration saved successfully!")
         elif event == "convert_to_vm_button":
+            print("Convert")
             window["convert_to_vm_button"].update(visible=False)
             window["link_to_vm_button"].update(visible=False)
             window["import_data_button"].update(visible=True)
             window["open_forensic_vm_button"].update(visible=True)
         elif event == "link_to_vm_button":
+            print("Link...")
             window["convert_to_vm_button"].update(visible=False)
             window["link_to_vm_button"].update(visible=False)
             window["import_data_button"].update(visible=True)
             window["open_forensic_vm_button"].update(visible=True)
+            # on configure_button click, change to tab config_tab and set visible to True
+        elif event == "configure_button":
+            window['config_tab'].SetFocus
+            window['server_address'].SetFocus
+            print("Configure...")
+
 
 if __name__ == '__main__':
     ForensicVMForm()
