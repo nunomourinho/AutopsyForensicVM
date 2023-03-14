@@ -72,7 +72,7 @@ def ForensicVMForm():
 
     # Define the layout of the virtualize tab
     virtualize_layout = [
-        [sg.Button("Configure", key="configure_button", size=(25, 1))],
+        #[sg.Button("Configure", key="configure_button", size=(25, 1))],
         [sg.Button("Virtualize - a) Convert to VM",
                    tooltip="Connect to Forensic VM Server and "
                                          "virtualize the forensic Image", key="convert_to_vm_button", size=(25, 2), visible=True)],
