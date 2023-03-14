@@ -4,6 +4,8 @@ import json
 import sys
 import paramiko
 import PySimpleGUI as sg
+import webbrowser
+
 
 # Define the filename for the JSON file
 filename = "config.json"
@@ -79,7 +81,9 @@ def ForensicVMForm():
         [sg.Button("Virtualize - b) Link to VM",
                    tooltip="Connect to Forensic VM Server and "
                                          "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2), visible=True)],
-        [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 1), visible=False)],
+        [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 2), visible=False)],
+        [sg.Button("Open ForensicVM WebShell", key="open_forensic_shell_button", size=(25, 1), visible=False)],
+        [sg.Button("Analyse ForensicVM performance", key="open_forensic_netdata_button", size=(25, 1), visible=False)],
         [sg.Button("Import Data", key="import_data_button", size=(25, 1), visible=False)]
     ]
     virtualize_tab = sg.Tab("Virtualize", virtualize_layout, element_justification="center")
@@ -87,7 +91,8 @@ def ForensicVMForm():
     # Create the layout for the configuration tab
     config_layout = [
         [sg.Frame("Forensic VM Server Configuration",
-                 [[sg.Text("Forensic VM server address:"),
+                 [
+                     [sg.Text("Forensic VM server address:"),
                                     sg.InputText(key="server_address",
                                                  default_text=config.get("server_address", ""))],
                   [sg.Text("Forensic API:"), sg.InputText(key="forensic_api",
@@ -195,17 +200,33 @@ def ForensicVMForm():
             window["link_to_vm_button"].update(visible=False)
             window["import_data_button"].update(visible=True)
             window["open_forensic_vm_button"].update(visible=True)
+            window["open_forensic_shell_button"].update(visible=True)
+            window["open_forensic_netdata_button"].update(visible=True)
         elif event == "link_to_vm_button":
             print("Link...")
             window["convert_to_vm_button"].update(visible=False)
             window["link_to_vm_button"].update(visible=False)
             window["import_data_button"].update(visible=True)
             window["open_forensic_vm_button"].update(visible=True)
-            # on configure_button click, change to tab config_tab and set visible to True
-        elif event == "configure_button":
-            window['config_tab'].SetFocus
-            window['server_address'].SetFocus
-            print("Configure...")
+            window["open_forensic_shell_button"].update(visible=True)
+            window["open_forensic_netdata_button"].update(visible=True)
+        elif event == "open_forensic_vm_button":
+            # get server address value
+            print("Open ForensicVM Webserver...")
+            server_address = "http://" + values["server_address"]
+            webbrowser.open(server_address)
+        elif event == "open_forensic_shell_button":
+            # get server address value
+            print("Open ForensicVM Webserver...")
+            server_address = "http://" + values["server_address"] + "/shell"
+            webbrowser.open(server_address)
+        elif event == "open_forensic_netdata_button":
+            # get server address value
+            print("Open ForensicVM Webserver...")
+            server_address = "http://" + values["server_address"] + "/netdata"
+            webbrowser.open(server_address)
+
+
 
 
 if __name__ == '__main__':
