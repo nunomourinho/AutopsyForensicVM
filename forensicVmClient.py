@@ -86,13 +86,43 @@ def ForensicVMForm():
 
     # Create the layout for the configuration tab
     config_layout = [
-        [sg.Text("Forensic VM server address:"), sg.InputText(key="server_address", default_text=config.get("server_address", ""))],
-        [sg.Text("Forensic API:"), sg.InputText(key="forensic_api", default_text=config.get("forensic_api", ""))],
-        [sg.Text("SSH Server Address and port:"),
-         sg.InputText(key="ssh_server_address", default_text=config.get("ssh_server_address", ""))],
-        [sg.Text("SSH user Public Key:"),
-         sg.InputText(key="ssh_public_key", default_text=config.get("ssh_user_key", ""))],
-        [sg.Text("Windows folder share server:"), sg.InputText(key="folder_share_server", default_text=config.get("folder_share_server", ""))],
+        [sg.Frame("Forensic VM Server Configuration",
+                 [[sg.Text("Forensic VM server address:"),
+                                    sg.InputText(key="server_address",
+                                                 default_text=config.get("server_address", ""))],
+                  [sg.Text("Forensic API:"), sg.InputText(key="forensic_api",
+                                                default_text=config.get("forensic_api", ""))]]
+                 )
+         ],
+        [sg.Frame("Windows Share over Forensic SSH Server Redirection",
+                  [
+                  [sg.Text("SSH Server Address and port:"),
+                    sg.InputText(key="ssh_server_address",
+                                 default_text=config.get("ssh_server_address", ""))],
+
+                   [sg.Text("SSH Username:"),
+                     sg.InputText(key="ssh_username", password_char="*",
+                                  default_text=config.get("ssh_username", ""))],
+
+                   [sg.Text("SSH Password:"),
+                      sg.InputText(key="ssh_password", password_char="*",
+                                   default_text=config.get("ssh_password", ""))],
+
+                   [sg.Text("SSH 2FA:"),
+                      sg.InputText(key="ssh_2fa", password_char="*",
+                                   default_text=config.get("ssh_2fa", ""))],
+
+                   [sg.Text("SSH user Public Key:"),
+                    sg.InputText(key="ssh_public_key", password_char="*",
+                                 default_text=config.get("ssh_public_key", ""))]
+                  ]
+                  )],
+
+        [sg.Frame("Forensic Image source and windows share",
+                  [
+
+                      [sg.Text("Windows folder share server:"), sg.InputText(key="folder_share_server",
+                                                               default_text=config.get("folder_share_server", ""))],
         [sg.Text("Share login:"), sg.InputText(key="share_login", default_text=config.get("share_login", ""))],
         [sg.Text("Share password:"), sg.InputText(key="share_password", password_char="*", default_text=config.get("share_password", ""))],
         [sg.Text("Forensic image local path:"), sg.InputText(key="forensic_image_path",
@@ -100,10 +130,10 @@ def ForensicVMForm():
          sg.FolderBrowse(key="forensic_image_path_folder_browse",target="forensic_image_path")],
         [sg.Text("Equivalence:"),sg.InputText(key="equivalence", default_text=config.get("equivalence", ""))],
         [sg.Text("Forensic Image Path:"), sg.InputText(key="forensic_image_path", default_text=image_path_arg)],
+                  ]
+                  )],
 
-
-
-        [sg.Button("Save", key="save_button"), sg.Button("Connect", key="connect_button")],
+        [sg.Button("Test Connection", key="connect_button"), sg.Button("Save", key="save_button")],
         [sg.Text("", key="output_text")]
     ]
     config_tab = sg.Tab("Configuration", config_layout, key="config_tab")
