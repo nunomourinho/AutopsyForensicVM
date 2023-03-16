@@ -17,7 +17,7 @@ print(private_key_path)
 # Connect to remote host using SSH key authentication
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect('192.168.1.112', username='forensicinvestigator', key_filename=private_key_path, port=22)
+ssh.connect('85.240.2.211', username='forensicinvestigator', key_filename=private_key_path, port=8228)
 
 # Run a command on the remote host and print the output
 stdin, stdout, stderr = ssh.exec_command('ls -al')
