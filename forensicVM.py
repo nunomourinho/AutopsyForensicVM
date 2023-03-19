@@ -1,37 +1,4 @@
-# Sample module in the public domain. Feel free to use this as a template
-# for your modules (and you can remove this header and take complete credit
-# and liability)
-#
-# Contact: Brian Carrier [carrier <at> sleuthkit [dot] org]
-#
-# This is free and unencumbered software released into the public domain.
-#
-# Anyone is free to copy, modify, publish, use, compile, sell, or
-# distribute this software, either in source code form or as a compiled
-# binary, for any purpose, commercial or non-commercial, and by any
-# means.
-#
-# In jurisdictions that recognize copyright laws, the author or authors
-# of this software dedicate any and all copyright interest in the
-# software to the public domain. We make this dedication for the benefit
-# of the public at large and to the detriment of our heirs and
-# successors. We intend this dedication to be an overt act of
-# relinquishment in perpetuity of all present and future rights to this
-# software under copyright law.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-# OTHER DEALINGS IN THE SOFTWARE.
 
-# Simple data source-level ingest module for Autopsy.
-# Used as part of Python tutorials from Basis Technology - August 2015
-# 
-# Runs img_stat tool from The Sleuth Kit on each data source, saves the
-# output, and adds a report to the Case for the output
 
 import jarray
 import inspect
@@ -63,6 +30,9 @@ from org.sleuthkit.autopsy.casemodule import Case
 from org.sleuthkit.autopsy.casemodule.services import Services
 from org.sleuthkit.autopsy.datamodel import ContentUtils
 from org.sleuthkit.autopsy.coreutils import ExecUtil
+
+# Add filemanager capabilities
+from org.sleuthkit.autopsy.casemodule.services import FileManager
 
 
 # Factory that defines the name and details of the module and allows Autopsy
@@ -112,7 +82,22 @@ class RunVMIngestModule(DataSourceIngestModule):
         self.pathToBAT = File(bat_path)
         if not self.pathToBAT.exists():
             raise IngestModuleException("MESI.BAT was not found in module folder " + bat_path)
-            
+    
+    def add_new_datasource(qcow_file_path):
+        
+        # Get the file manager
+        file_manager = Case.getCurrentCase().getServices().getFileManager()
+        
+        # Create a new File object for the qcow2 file
+        qcow_file = File(qcow_file_path)
+
+        # Create a new file in the case for the QCOW file
+        new_file = file_manager.addFile(qcow_file)
+
+        # Set the file type to "Disk Image"
+        ContentUtils.setFileType(new_file, ContentUtils.TYPE_DISK_IMAGE)
+    
+    
     # Where the analysis is done.
     # The 'dataSource' object being passed in is of type org.sleuthkit.datamodel.Content.
     # See: http://www.sleuthkit.org/sleuthkit/docs/jni-docs/latest/interfaceorg_1_1sleuthkit_1_1datamodel_1_1_content.html
@@ -137,6 +122,9 @@ class RunVMIngestModule(DataSourceIngestModule):
         
         # We'll save our output to a file in the reports folder, named based on EXE and data source ID
         reportFile = File(Case.getCurrentCase().getCaseDirectory() + "\\Reports" + "\\img_stat-" + str(dataSource.getId()) + ".txt")
+
+        # Test add datasource
+        #self.add_new_datasource("D:/convertidos/MUS-CT19-DESKTOP.V2.qcow2-sda")
         
         # Run the EXE, saving output to reportFile
         # We use ExecUtil because it will deal with the user cancelling the job
@@ -151,9 +139,11 @@ class RunVMIngestModule(DataSourceIngestModule):
         processBuilder.redirectOutput(reportFile)
         ExecUtil.execute(processBuilder, DataSourceIngestModuleProcessTerminator(self.context))
         
+        
         # Add the report to the case, so it shows up in the tree
         # Do not add report to the case tree if the ingest is cancelled before finish.
         if not self.context.dataSourceIngestIsCancelled():
+            #self.add_new_datasource("D:/convertidos/MUS-CT19-DESKTOP.V2.qcow2-sda")
             Case.getCurrentCase().addReport(reportFile.toString(), "Mesi VM", "Qemu output")
         else:
             if reportFile.exists():
