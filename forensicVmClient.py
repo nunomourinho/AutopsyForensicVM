@@ -11,9 +11,7 @@ import webbrowser
 filename = "config.json"
 icon_path = "forensicVMCLient.ico"
 
-sg.popup(sys.argv)
-
-# Get the first command line argument, if any
+#sg.popup(sys.argv)
 image_path_arg = sys.argv[1] if len(sys.argv) > 1 else ""
 case_directory_arg = sys.argv[2] if len(sys.argv) > 2 else ""
 case_name_arg = sys.argv[3] if len(sys.argv) > 3 else ""
@@ -141,11 +139,11 @@ def ForensicVMForm():
                  [
                      [sg.Text("Forensic Image Path:"),
                       # multiline textbox with size 20,
-                      sg.Multiline(key="forensic_image_path",
+                      sg.InputText(key="forensic_image_path",
                                    default_text=image_path_arg, size=(50,3), disabled=True)],
 
                      [sg.Text("Case Path:"),
-                      sg.Multiline(key="case_image_path",
+                      sg.InputText(key="case_image_path",
                                    default_text=case_directory_arg, size=(50, 3), disabled=True)],
 
                      [sg.Text("Case Name:"),

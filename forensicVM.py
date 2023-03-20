@@ -137,6 +137,15 @@ class RunVMIngestModule(DataSourceIngestModule):
         cmd.add(Case.getCurrentCase().getName())
         cmd.add(Case.getCurrentCase().getNumber())
         cmd.add(Case.getCurrentCase().getExaminer())
+        #tags_manager = Case.getServices().getTagsManager()
+
+        #all_tags = tags_manager.getAllContentTags()
+
+        #for tag in all_tags:
+            #content = tag.getContent()
+            #tag_name = tag.getName().getDisplayName()
+            #cmd.add(tag_name)
+            #comment = tag.getComment()
 
         self.log(Level.INFO, imagePaths[0])
         self.log(Level.INFO, cmd.toString())
