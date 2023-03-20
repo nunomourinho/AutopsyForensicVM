@@ -11,8 +11,14 @@ import webbrowser
 filename = "config.json"
 icon_path = "forensicVMCLient.ico"
 
+sg.popup(sys.argv)
+
 # Get the first command line argument, if any
 image_path_arg = sys.argv[1] if len(sys.argv) > 1 else ""
+case_directory_arg = sys.argv[2] if len(sys.argv) > 2 else ""
+case_name_arg = sys.argv[3] if len(sys.argv) > 3 else ""
+case_number_arg = sys.argv[4] if len(sys.argv) > 4 else ""
+case_examiner_arg = sys.argv[5] if len(sys.argv) > 5 else ""
 
 
 
@@ -135,7 +141,25 @@ def ForensicVMForm():
                  [
                      [sg.Text("Forensic Image Path:"),
                       # multiline textbox with size 20,
-                      sg.Multiline(key="forensic_image_path", default_text=image_path_arg, size=(50,5), disabled=True)]
+                      sg.Multiline(key="forensic_image_path",
+                                   default_text=image_path_arg, size=(50,3), disabled=True)],
+
+                     [sg.Text("Case Path:"),
+                      sg.Multiline(key="case_image_path",
+                                   default_text=case_directory_arg, size=(50, 3), disabled=True)],
+
+                     [sg.Text("Case Name:"),
+                      sg.InputText(key="case_name",
+                                   default_text=case_name_arg, size=(50, 3), disabled=True)],
+
+                     [sg.Text("Case Number:"),
+                      sg.InputText(key="case_number",
+                                   default_text=case_number_arg, size=(50, 3), disabled=True)],
+
+                     [sg.Text("Case Examiner:"),
+                      sg.InputText(key="case_examiner",
+                                   default_text=case_examiner_arg, size=(50, 3), disabled=True)]
+
                  ])
     ]]
     autopsy_tab = sg.Tab("Autopsy case", autopsy_layout, key="autopsy_tab")

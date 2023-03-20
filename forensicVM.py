@@ -133,6 +133,11 @@ class RunVMIngestModule(DataSourceIngestModule):
         # Add each argument in its own line.  I.e. "-f foo" would be two calls to .add()
         cmd.add(self.pathToBAT.toString())
         cmd.add(imagePaths[0])
+        cmd.add(Case.getCurrentCase().getCaseDirectory())
+        cmd.add(Case.getCurrentCase().getName())
+        cmd.add(Case.getCurrentCase().getNumber())
+        cmd.add(Case.getCurrentCase().getExaminer())
+
         self.log(Level.INFO, imagePaths[0])
         self.log(Level.INFO, cmd.toString())
         processBuilder = ProcessBuilder(cmd);
