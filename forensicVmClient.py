@@ -88,7 +88,7 @@ def ForensicVMForm():
     ]
     virtualize_tab = sg.Tab("Virtualize", virtualize_layout, element_justification="center")
 
-    # Create the layout for the configuration tab
+    # layout for the configuration tab
     config_layout = [
         [sg.Frame("Forensic VM Server Configuration",
                  [
@@ -103,23 +103,9 @@ def ForensicVMForm():
                   [
                   [sg.Text("SSH Server Address and port:"),
                     sg.InputText(key="ssh_server_address",
-                                 default_text=config.get("ssh_server_address", ""))],
-
-                   [sg.Text("SSH Username:"),
-                     sg.InputText(key="ssh_username", password_char="*",
-                                  default_text=config.get("ssh_username", ""))],
-
-                   [sg.Text("SSH Password:"),
-                      sg.InputText(key="ssh_password", password_char="*",
-                                   default_text=config.get("ssh_password", ""))],
-
-                   [sg.Text("SSH 2FA:"),
-                      sg.InputText(key="ssh_2fa", password_char="*",
-                                   default_text=config.get("ssh_2fa", ""))],
-
-                   [sg.Text("SSH user Public Key:"),
-                    sg.InputText(key="ssh_public_key", password_char="*",
-                                 default_text=config.get("ssh_public_key", ""))]
+                                 default_text=config.get("ssh_server_address", ""), size=(20,1)),
+                   sg.InputText(key="ssh_server_port",
+                                 default_text=config.get("ssh_server_port", ""),size=(8,1))],
                   ]
                   )],
 
@@ -134,7 +120,6 @@ def ForensicVMForm():
                 default_text=config.get("forensic_image_path", "")),
          sg.FolderBrowse(key="forensic_image_path_folder_browse",target="forensic_image_path")],
         [sg.Text("Equivalence:"),sg.InputText(key="equivalence", default_text=config.get("equivalence", ""))],
-        [sg.Text("Forensic Image Path:"), sg.InputText(key="forensic_image_path", default_text=image_path_arg)],
                   ]
                   )],
 
@@ -142,6 +127,20 @@ def ForensicVMForm():
         [sg.Text("", key="output_text")]
     ]
     config_tab = sg.Tab("Configuration", config_layout, key="config_tab")
+
+
+    # Layout for the configuration tab
+    autopsy_layout = [
+        [sg.Frame("Case data",
+                 [
+                     [sg.Text("Forensic Image Path:"),
+                      # multiline textbox with size 20,
+                      sg.Multiline(key="forensic_image_path", default_text=image_path_arg, size=(50,5), disabled=True)]
+                 ])
+    ]]
+    autopsy_tab = sg.Tab("Autopsy case", autopsy_layout, key="autopsy_tab")
+
+
 
     # Create the about tab
     about_layout = [
@@ -159,7 +158,7 @@ def ForensicVMForm():
     # Create the layout for the window
     layout = [
         [sg.TabGroup([
-            [sg.TabGroup([[virtualize_tab, config_tab, about_tab]])],
+            [sg.TabGroup([[virtualize_tab, autopsy_tab, config_tab, about_tab]])],
         ])]
     ]
 
