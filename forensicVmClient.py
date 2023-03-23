@@ -52,28 +52,33 @@ def connect_to_server(address, port):
     return remote_port
 
 def test_ssh(address, port):
-    # Save private key to disk
-    private_key_path = os.path.expanduser("mykey")
-    print(private_key_path)
-    ###ssh_key.write_private_key_file(private_key_path)
 
-    # Save public key to disk
-    ###public_key_path = f"{private_key_path}.pub"
-    ###with open(public_key_path, "w") as public_key_file:
-    ###public_key_file.write(f"{ssh_key.get_name()} {ssh_key.get_base64()}")
+    try:
+        private_key_path = os.path.expanduser("mykey")
 
-    # Connect to remote host using SSH key authentication
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(address, username='forensicinvestigator', key_filename=private_key_path, port=port)
+        ###ssh_key.write_private_key_file(private_key_path)
 
-    # Run a command on the remote host and print the output
-    stdin, stdout, stderr = ssh.exec_command('ls -al')
-    for line in stdout:
-        print(line.strip())
+        # Save public key to disk
+        ###public_key_path = f"{private_key_path}.pub"
+        ###with open(public_key_path, "w") as public_key_file:
+        ###public_key_file.write(f"{ssh_key.get_name()} {ssh_key.get_base64()}")
 
-    # Close the SSH connection
-    ssh.close()
+        # Connect to remote host using SSH key authentication
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(address, username='forensicinvestigator', key_filename=private_key_path, port=port)
+
+        # Run a command on the remote host and print the output
+        stdin, stdout, stderr = ssh.exec_command('ls -al')
+        for line in stdout:
+            print(line.strip())
+
+        # Close the SSH connection
+        ssh.close()
+        return True
+    except Exception as e:
+        print(e)
+        return False
 
 
 # Save the values as a json file
@@ -292,8 +297,12 @@ def ForensicVMForm():
             webbrowser.open(server_address)
         elif event == "test_ssh_connect":
             # get server address value
-            test_ssh(values['ssh_server_address'], values['ssh_server_port'])
-            
+            if test_ssh(values['ssh_server_address'], values['ssh_server_port']):
+                sg.popup("Connected successfully!")
+            else:
+                sg.popup_error("Could not connect to the server")
+
+
 
 
 
