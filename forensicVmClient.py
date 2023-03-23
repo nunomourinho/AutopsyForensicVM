@@ -2,6 +2,7 @@ import os
 import re
 import json
 import sys
+import uuid
 import paramiko
 import PySimpleGUI as sg
 import webbrowser
@@ -17,6 +18,17 @@ case_directory_arg = sys.argv[2] if len(sys.argv) > 2 else ""
 case_name_arg = sys.argv[3] if len(sys.argv) > 3 else ""
 case_number_arg = sys.argv[4] if len(sys.argv) > 4 else ""
 case_examiner_arg = sys.argv[5] if len(sys.argv) > 5 else ""
+
+
+
+def string_to_uuid(input_string):
+    # Use a namespace for your application (change the string as needed)
+    namespace = uuid.uuid5(uuid.NAMESPACE_DNS, 'forensic.vm.mesi.ninja')
+
+    # Generate a UUID based on the namespace and the input string
+    unique_uuid = uuid.uuid5(namespace, input_string)
+
+    return unique_uuid
 
 
 
@@ -100,7 +112,10 @@ def ForensicVMForm():
                                     sg.InputText(key="server_address",
                                                  default_text=config.get("server_address", ""))],
                   [sg.Text("Forensic API:"), sg.InputText(key="forensic_api",
-                                                default_text=config.get("forensic_api", ""))]]
+                                                default_text=config.get("forensic_api", "")),
+                   sg.Button("Test Connection", key="test_forensicServer_connect")
+                   ]
+                 ]
                  )
          ],
         [sg.Frame("Windows Share over Forensic SSH Server Redirection",
@@ -109,7 +124,9 @@ def ForensicVMForm():
                     sg.InputText(key="ssh_server_address",
                                  default_text=config.get("ssh_server_address", ""), size=(20,1)),
                    sg.InputText(key="ssh_server_port",
-                                 default_text=config.get("ssh_server_port", ""),size=(8,1))],
+                                 default_text=config.get("ssh_server_port", ""),size=(8,1)),
+                   sg.Button("Test Connection", key="test_ssh_connect")
+                   ],
                   ]
                   )],
 
@@ -142,6 +159,10 @@ def ForensicVMForm():
                       sg.InputText(key="forensic_image_path",
                                    default_text=image_path_arg, size=(50,3), disabled=True)],
 
+
+
+
+
                      [sg.Text("Case Path:"),
                       sg.InputText(key="case_image_path",
                                    default_text=case_directory_arg, size=(50, 3), disabled=True)],
@@ -159,7 +180,8 @@ def ForensicVMForm():
                                    default_text=case_examiner_arg, size=(50, 3), disabled=True)]
 
                  ])
-    ]]
+    ], [sg.Frame("Generated UUID",   [[sg.Text(string_to_uuid(image_path_arg))]])]
+    ]
     autopsy_tab = sg.Tab("Autopsy case", autopsy_layout, key="autopsy_tab")
 
 
