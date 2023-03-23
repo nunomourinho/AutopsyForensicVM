@@ -51,7 +51,29 @@ def connect_to_server(address, port):
     # Return the remote port number
     return remote_port
 
+def test_ssh(address, port):
+    # Save private key to disk
+    private_key_path = os.path.expanduser("mykey")
+    print(private_key_path)
+    ###ssh_key.write_private_key_file(private_key_path)
 
+    # Save public key to disk
+    ###public_key_path = f"{private_key_path}.pub"
+    ###with open(public_key_path, "w") as public_key_file:
+    ###public_key_file.write(f"{ssh_key.get_name()} {ssh_key.get_base64()}")
+
+    # Connect to remote host using SSH key authentication
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(address, username='forensicinvestigator', key_filename=private_key_path, port=port)
+
+    # Run a command on the remote host and print the output
+    stdin, stdout, stderr = ssh.exec_command('ls -al')
+    for line in stdout:
+        print(line.strip())
+
+    # Close the SSH connection
+    ssh.close()
 
 
 # Save the values as a json file
@@ -180,7 +202,7 @@ def ForensicVMForm():
                                    default_text=case_examiner_arg, size=(50, 3), disabled=True)]
 
                  ])
-    ], [sg.Frame("Generated UUID",   [[sg.Text(string_to_uuid(image_path_arg))]])]
+    ], [sg.Frame("Generated UUID",   [[sg.Text("Unique Path and Case UUID"), sg.Text(string_to_uuid(image_path_arg+case_name_arg))]])]
     ]
     autopsy_tab = sg.Tab("Autopsy case", autopsy_layout, key="autopsy_tab")
 
@@ -268,7 +290,10 @@ def ForensicVMForm():
             print("Open ForensicVM Webserver...")
             server_address = "http://" + values["server_address"] + "/netdata"
             webbrowser.open(server_address)
-
+        elif event == "test_ssh_connect":
+            # get server address value
+            test_ssh(values['ssh_server_address'], values['ssh_server_port'])
+            
 
 
 
