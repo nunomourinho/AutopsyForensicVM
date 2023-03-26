@@ -6,7 +6,7 @@ import uuid
 import paramiko
 import PySimpleGUI as sg
 import webbrowser
-
+import subprocess
 
 # Define the filename for the JSON file
 filename = "config.json"
@@ -81,6 +81,26 @@ def test_ssh(address, port):
         return False
 
 
+
+import os
+import subprocess
+
+def test_windows_share(server_address, username, password):
+    # Use the 'net use' command to map a drive to the share
+    cmd = 'net use {} /user:{} {}'.format(server_address, username, password)
+    try:
+        subprocess.check_output(cmd, shell=True)
+    except subprocess.CalledProcessError:
+        return False
+
+    # Disconnect the mapped drive
+    cmd = 'net use {} /delete'.format(server_address)
+    subprocess.check_output(cmd, shell=True)
+
+    return True
+
+
+
 # Save the values as a json file
 def save_config(values):
     # Save the configuration to the JSON file
@@ -140,7 +160,7 @@ def ForensicVMForm():
                                                  default_text=config.get("server_address", ""))],
                   [sg.Text("Forensic API:"), sg.InputText(key="forensic_api",
                                                 default_text=config.get("forensic_api", "")),
-                   sg.Button("Test Connection", key="test_forensicServer_connect")
+                   sg.Button("Test Server Connection", key="test_forensicServer_connect")
                    ]
                  ]
                  )
@@ -152,7 +172,7 @@ def ForensicVMForm():
                                  default_text=config.get("ssh_server_address", ""), size=(20,1)),
                    sg.InputText(key="ssh_server_port",
                                  default_text=config.get("ssh_server_port", ""),size=(8,1)),
-                   sg.Button("Test Connection", key="test_ssh_connect")
+                   sg.Button("Test Ssh connection", key="test_ssh_connect")
                    ],
                   ]
                   )],
@@ -164,10 +184,9 @@ def ForensicVMForm():
                                                                default_text=config.get("folder_share_server", ""))],
         [sg.Text("Share login:"), sg.InputText(key="share_login", default_text=config.get("share_login", ""))],
         [sg.Text("Share password:"), sg.InputText(key="share_password", password_char="*", default_text=config.get("share_password", ""))],
-        [sg.Text("Forensic image local path:"), sg.InputText(key="forensic_image_path",
-                default_text=config.get("forensic_image_path", "")),
-         sg.FolderBrowse(key="forensic_image_path_folder_browse",target="forensic_image_path")],
-        [sg.Text("Equivalence:"),sg.InputText(key="equivalence", default_text=config.get("equivalence", ""))],
+        [sg.Text("Equivalence:"),sg.InputText(key="equivalence", default_text=config.get("equivalence", "")),
+         sg.Button("Test windows share", key="test_windows_share")],
+
                   ]
                   )],
 
@@ -301,6 +320,12 @@ def ForensicVMForm():
                 sg.popup("Connected successfully!")
             else:
                 sg.popup_error("Could not connect to the server")
+        elif event == "test_windows_share":
+                # get server address value
+                if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):
+                    sg.popup("Connected successfully!")
+                else:
+                    sg.popup_error("Could not connect to the server")
 
 
 
