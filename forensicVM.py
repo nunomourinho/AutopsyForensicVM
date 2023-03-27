@@ -4,11 +4,13 @@ import jarray
 import inspect
 import os
 import java.util.ArrayList as ArrayList
+from java.util import ArrayList, List, UUID, logging
 from java.lang import Class
 from java.lang import System
 from java.lang import ProcessBuilder
 from java.io import File
 from java.util.logging import Level
+from org.sleuthkit.datamodel import AbstractFile, Content, Image, SleuthkitCase, TskCoreException, TskDataException
 from org.sleuthkit.datamodel import SleuthkitCase
 from org.sleuthkit.datamodel import AbstractFile
 from org.sleuthkit.datamodel import ReadContentInputStream
@@ -83,20 +85,20 @@ class RunVMIngestModule(DataSourceIngestModule):
         if not self.pathToBAT.exists():
             raise IngestModuleException("MESI.BAT was not found in module folder " + bat_path)
     
-    def add_new_datasource(qcow_file_path):
-        
-        # Get the file manager
-        file_manager = Case.getCurrentCase().getServices().getFileManager()
-        
-        # Create a new File object for the qcow2 file
-        qcow_file = File(qcow_file_path)
+    def add_new_datasource(self, imagePath):
+        print("ola")
+        sk = Case.getCurrentCase()
 
-        # Create a new file in the case for the QCOW file
-        new_file = file_manager.addFile(qcow_file)
+        # Add a new data source to the case
+        timezone = ""
+        #process = makeAddImageProcess(timezone, True, False, "")
+        #paths = ArrayList()
+        #paths.add(imagePath)
+        #try:
+        #    process.run(UUID.randomUUID().toString(), paths.toArray([None] * paths.size()), 0)
+        #except TskDataException, ex:
+        #    logging.Logger.getLogger(Sample.__name__).log(logging.Level.SEVERE, None, ex)
 
-        # Set the file type to "Disk Image"
-        ContentUtils.setFileType(new_file, ContentUtils.TYPE_DISK_IMAGE)
-    
     
     # Where the analysis is done.
     # The 'dataSource' object being passed in is of type org.sleuthkit.datamodel.Content.
@@ -147,17 +149,20 @@ class RunVMIngestModule(DataSourceIngestModule):
             #cmd.add(tag_name)
             #comment = tag.getComment()
 
+        self.add_new_datasource('C:/tmp/drive1.E01')
+
         self.log(Level.INFO, imagePaths[0])
         self.log(Level.INFO, cmd.toString())
         processBuilder = ProcessBuilder(cmd);
         processBuilder.redirectOutput(reportFile)
         ExecUtil.execute(processBuilder, DataSourceIngestModuleProcessTerminator(self.context))
-        
-        
+
+
+
         # Add the report to the case, so it shows up in the tree
         # Do not add report to the case tree if the ingest is cancelled before finish.
         if not self.context.dataSourceIngestIsCancelled():
-            #self.add_new_datasource("D:/convertidos/MUS-CT19-DESKTOP.V2.qcow2-sda")
+
             Case.getCurrentCase().addReport(reportFile.toString(), "Mesi VM", "Qemu output")
         else:
             if reportFile.exists():

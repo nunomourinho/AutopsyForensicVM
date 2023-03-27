@@ -81,9 +81,42 @@ def test_ssh(address, port):
         return False
 
 
+def ssh_run(address, port, mnt_point, login, password, image_path):
+    try:
+        private_key_path = os.path.expanduser("mykey")
+        # Connect to remote host using SSH key authentication
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(address, username='forensicinvestigator', key_filename=private_key_path, port=port)
 
-import os
-import subprocess
+
+        # Get an available remote port
+        transport = ssh.get_transport()
+        remote_port = transport.request_port_forward("", 0)
+
+
+        # Open a new TCP channel and forward traffic from the remote port to the local port
+        channel = transport.open_channel("direct-tcpip", ("192.168.1.111", 445), ("localhost", remote_port))
+
+        sg.popup_ok("SSH connection established. Remote port to samba:" + str(remote_port))
+
+        # Run a command on the remote host and print the output
+        #stdin, stdout, stderr = ssh.exec_command("sudo /forensicVM/bin/forensicv2v.sh")
+        stdin, stdout, stderr = ssh.exec_command("netstat -tupl")
+
+        for line in stdout:
+            sg.popup(line.strip())
+
+        # Close the SSH connection
+        ssh.close()
+        return True
+    except Exception as e:
+        sg.popup(e)
+        return False
+
+
+
+
 
 def test_windows_share(server_address, username, password):
     # Use the 'net use' command to map a drive to the share
@@ -299,6 +332,17 @@ def ForensicVMForm():
             window["open_forensic_vm_button"].update(visible=True)
             window["open_forensic_shell_button"].update(visible=True)
             window["open_forensic_netdata_button"].update(visible=True)
+            sg.popup("Linking to Forensic VM...")
+            server_address = values["ssh_server_address"]
+            server_port = values["ssh_server_port"]
+            folder_share_server = values["folder_share_server"]
+            share_login = values["share_login"]
+            share_password = values["share_password"]
+            forensic_image_path = values["forensic_image_path"]
+            equivalence = values["equivalence"]
+            ssh_run(server_address, server_port, folder_share_server, share_login, share_password, forensic_image_path)
+
+
         elif event == "open_forensic_vm_button":
             # get server address value
             print("Open ForensicVM Webserver...")
