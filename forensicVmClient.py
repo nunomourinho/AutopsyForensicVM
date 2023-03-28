@@ -7,6 +7,9 @@ import paramiko
 import PySimpleGUI as sg
 import webbrowser
 import subprocess
+import threading
+import time
+
 
 # Define the filename for the JSON file
 filename = "config.json"
@@ -81,7 +84,7 @@ def test_ssh(address, port):
         return False
 
 
-def ssh_run(address, port, mnt_point, login, password, image_path):
+def ssh_connect_and_run(address, port, mnt_point, login, password, image_path, uuid_folder, window2):
     try:
         private_key_path = os.path.expanduser("mykey")
         # Connect to remote host using SSH key authentication
@@ -94,28 +97,50 @@ def ssh_run(address, port, mnt_point, login, password, image_path):
         transport = ssh.get_transport()
         remote_port = transport.request_port_forward("", 0)
 
+        parts = mnt_point.split('\\')
+        samba_address = parts[2]
+        samba_folder = parts[3]
+
+
+        #samba_address = samba_address.replace(image_path, "")
 
         # Open a new TCP channel and forward traffic from the remote port to the local port
-        channel = transport.open_channel("direct-tcpip", ("192.168.1.111", 445), ("localhost", remote_port))
+        channel = transport.open_channel("direct-tcpip", (samba_address, 445), ("localhost", remote_port))
 
-        sg.popup_ok("SSH connection established. Remote port to samba:" + str(remote_port))
-
-        # Run a command on the remote host and print the output
-        #stdin, stdout, stderr = ssh.exec_command("sudo /forensicVM/bin/forensicv2v.sh")
-        stdin, stdout, stderr = ssh.exec_command("netstat -tupl")
-
-        for line in stdout:
-            sg.popup(line.strip())
+        print("sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder))
+        run_command_ssh(ssh, window2, "sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder))
+        run_command_ssh(ssh, window2, "ls -alh /forensicVM/mnt/vm/*")
 
         # Close the SSH connection
         ssh.close()
         return True
     except Exception as e:
-        sg.popup(e)
+        #sg.popup(e)
         return False
 
 
+def run_command_ssh(ssh, window2, cmd):
+    # Run a command on the remote host and print the output
+    # stdin, stdout, stderr = ssh.exec_command("sudo /forensicVM/bin/forensicv2v.sh")
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    while not stdout.channel.exit_status_ready():
 
+        # show command output in real time
+        output = ""
+        while stdout.channel.recv_ready():
+            output += stdout.channel.recv(1024).decode("utf-8")
+            print(output)
+            # window2.read()
+            current_output = window2['-OUTPUT-'].get()
+            window2['-OUTPUT-'].update(current_output+output, text_color='white')
+
+        output = ""
+        while stderr.channel.recv_stderr_ready():
+            output += stderr.channel.recv_stderr(1024).decode("utf-8")
+            print(output)
+            # window2.read()
+            current_output = window2['-OUTPUT-'].get()
+            window2['-OUTPUT-'].update(current_output+"e:"+output, text_color='white')
 
 
 def test_windows_share(server_address, username, password):
@@ -217,7 +242,7 @@ def ForensicVMForm():
                                                                default_text=config.get("folder_share_server", ""))],
         [sg.Text("Share login:"), sg.InputText(key="share_login", default_text=config.get("share_login", ""))],
         [sg.Text("Share password:"), sg.InputText(key="share_password", password_char="*", default_text=config.get("share_password", ""))],
-        [sg.Text("Equivalence:"),sg.InputText(key="equivalence", default_text=config.get("equivalence", "")),
+        [sg.Text("Local ou remote path to share:"),sg.InputText(key="equivalence", default_text=config.get("equivalence", "")),
          sg.Button("Test windows share", key="test_windows_share")],
 
                   ]
@@ -288,6 +313,13 @@ def ForensicVMForm():
     # Create the window
     window = sg.Window("Autopsy ForensicVM Client", layout, element_justification="center", icon=icon_path)
 
+    # define a janela para exibir a saída
+    layout2 = [[sg.Multiline(size=(80, 20), key='-OUTPUT-', font='Courier 10', background_color='black', text_color='white')]]
+
+    window2 = sg.Window('Migration output', layout2)
+
+
+
     # Event loop
     while True:
         event, values = window.read()
@@ -339,8 +371,26 @@ def ForensicVMForm():
             share_login = values["share_login"]
             share_password = values["share_password"]
             forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(image_path_arg + case_name_arg)
             equivalence = values["equivalence"]
-            ssh_run(server_address, server_port, folder_share_server, share_login, share_password, forensic_image_path)
+
+            # Start the ssh connection in a thread
+            thread = threading.Thread(target=ssh_connect_and_run, args=(server_address, server_port, folder_share_server,
+                                                                        share_login, share_password, forensic_image_path,
+                                                                        uuid_folder, window2))
+            thread.start()
+
+
+            # wait until the thread is finished
+            while thread.is_alive():
+                event, values = window2.read(timeout=100)
+
+                if event == sg.WIN_CLOSED:
+                    break
+
+            #window2.close()
+
+
 
 
         elif event == "open_forensic_vm_button":
