@@ -109,7 +109,7 @@ def ssh_connect_and_run(address, port, mnt_point, login, password, image_path, u
 
         print("sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder))
         run_command_ssh(ssh, window2, "sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder))
-        run_command_ssh(ssh, window2, "ls -alh /forensicVM/mnt/vm/*")
+        run_command_ssh(ssh, window2, "ls -alh /forensicVM/mnt/vm/")
 
         # Close the SSH connection
         ssh.close()
