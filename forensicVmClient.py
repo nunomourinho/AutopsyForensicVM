@@ -175,7 +175,7 @@ def ssh_connect_and_run(address, port, mnt_point, login, password, image_path, u
         run_command_ssh(ssh, window2, "sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder))
         run_command_ssh(ssh, window2, "sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder) + "/mnt")
 
-        #mount - o username = qemu, pass=qemu, nobrl, ro, port = 4450 - t cifs //127.0.0.1 /convertidos /mnt/destino/
+        #mount -o username=qemu, pass=qemu,nobrl,ro,port=4450 - t cifs //127.0.0.1/images /forensicVM/mnt/vm/
         run_command_ssh(ssh, window2, "ls -alh /forensicVM/mnt/vm/")
 
         # Close the SSH connection
