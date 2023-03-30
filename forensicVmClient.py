@@ -25,7 +25,7 @@ case_examiner_arg = sys.argv[5] if len(sys.argv) > 5 else ""
 
 
 def string_to_uuid(input_string):
-    # Use a namespace for your application (change the string as needed)
+    # Use a namespace for your application (theoretical site)
     namespace = uuid.uuid5(uuid.NAMESPACE_DNS, 'forensic.vm.mesi.ninja')
 
     # Generate a UUID based on the namespace and the input string
@@ -81,8 +81,69 @@ def test_ssh(address, port):
         return True
     except Exception as e:
         print(e)
+        if not os.path.exists(private_key_path):
+            ssh_key = paramiko.rsakey.RSAKey.generate(2048)
+            ssh_key.write_private_key_file(private_key_path)
+            public_key_path = f"{private_key_path}.pub"
+            with open(public_key_path, "w") as public_key_file:
+                public_key_file.write(f"{ssh_key.get_name()} {ssh_key.get_base64()}")
+
+        # Save public key to disk
+
         return False
 
+        ssh_key.write_private_key_file(private_key_path)
+
+        # Save public key to disk
+        ###public_key_path = f"{private_key_path}.pub"
+        ###with open(public_key_path, "w") as public_key_file:
+        ###public_key_file.write(f"{ssh_key.get_name()} {ssh_key.get_base64()}")
+
+        return False
+
+
+# Functions imported from: https://github.com/paramiko/paramiko/blob/main/demos/rforward.py
+
+def handler(chan, host, port):
+    sock = socket.socket()
+    try:
+        sock.connect((host, port))
+    except Exception as e:
+        verbose("Forwarding request to %s:%d failed: %r" % (host, port, e))
+        return
+
+    verbose(
+        "Connected!  Tunnel open %r -> %r -> %r"
+        % (chan.origin_addr, chan.getpeername(), (host, port))
+    )
+    while True:
+        r, w, x = select.select([sock, chan], [], [])
+        if sock in r:
+            data = sock.recv(1024)
+            if len(data) == 0:
+                break
+            chan.send(data)
+        if chan in r:
+            data = chan.recv(1024)
+            if len(data) == 0:
+                break
+            sock.send(data)
+    chan.close()
+    sock.close()
+    verbose("Tunnel closed from %r" % (chan.origin_addr,))
+
+
+def reverse_forward_tunnel(server_port, remote_host, remote_port, transport):
+    transport.request_port_forward("", server_port)
+    while True:
+        chan = transport.accept(1000)
+        if chan is None:
+            continue
+        thr = threading.Thread(
+            target=handler, args=(chan, remote_host, remote_port)
+        )
+        thr.setDaemon(True)
+        thr.start()
 
 def ssh_connect_and_run(address, port, mnt_point, login, password, image_path, uuid_folder, window2):
     try:
@@ -105,10 +166,16 @@ def ssh_connect_and_run(address, port, mnt_point, login, password, image_path, u
         #samba_address = samba_address.replace(image_path, "")
 
         # Open a new TCP channel and forward traffic from the remote port to the local port
-        channel = transport.open_channel("direct-tcpip", (samba_address, 445), ("localhost", remote_port))
+        #channel = transport.open_channel("direct-tcpip", (samba_address, 445), ("localhost", remote_port))
+
+        ####reverse_forward_tunnel(remote_port, samba_address, 445, transport)
+
 
         print("sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder))
         run_command_ssh(ssh, window2, "sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder))
+        run_command_ssh(ssh, window2, "sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder) + "/mnt")
+
+        #mount - o username = qemu, pass=qemu, nobrl, ro, port = 4450 - t cifs //127.0.0.1 /convertidos /mnt/destino/
         run_command_ssh(ssh, window2, "ls -alh /forensicVM/mnt/vm/")
 
         # Close the SSH connection
