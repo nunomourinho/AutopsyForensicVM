@@ -15,38 +15,43 @@ def read_output(proc, window):
         else:
             break
 
-shell = subprocess.Popen('ssh-test.bat', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1)
 
-layout = [
-    [sg.Text('Interactive Command Prompt')],
-    [sg.Output(size=(80, 20))],
-    [sg.InputText(key='input', size=(80, 1)), sg.Button('Execute')],
-    [sg.Button('Exit')],
-]
+def run_command(command):
+    global shell
+    shell = subprocess.Popen(
+        'ssh -i mykey -oStrictHostKeyChecking=no forensicinvestigator@85.240.2.211 -p 8228 -R 4451:localhost:445 ' +
+        command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1)
+    layoutCommand = [
+        [sg.Text('Interactive Command Prompt')],
+        [sg.Output(size=(80, 20))],
+        [sg.InputText(key='input', size=(80, 1)), sg.Button('Execute')],
+        [sg.Button('Exit')],
+    ]
+    windowCommand = sg.Window('Interactive Command Prompt', layoutCommand, finalize=True)
+    # Redirect stderr to stdout for the shell process
+    shell.stderr.close()
+    shell.stderr = shell.stdout
+    # Create a thread to read output from the shell process
+    output_thread = threading.Thread(target=read_output, args=(shell, windowCommand), daemon=True)
+    output_thread.start()
+    while True:
+        event, values = windowCommand.read()
 
-window = sg.Window('Interactive Command Prompt', layout, finalize=True)
+        if event in (sg.WIN_CLOSED, 'Exit'):
+            break
+        elif event == 'Execute':
+            cmd = values['input']
+            if cmd:
+                send_command(shell, cmd)
+        elif event == 'output':
+            print(values[event])
+    # Close the shell process before closing the windowCommand
+    send_command(shell, 'exit')
+    shell.wait()
+    windowCommand.close()
+    windowCommand.__del__()
 
-# Redirect stderr to stdout for the shell process
-shell.stderr.close()
-shell.stderr = shell.stdout
 
-# Create a thread to read output from the shell process
-output_thread = threading.Thread(target=read_output, args=(shell, window), daemon=True)
-output_thread.start()
 
-while True:
-    event, values = window.read()
-
-    if event in (sg.WIN_CLOSED, 'Exit'):
-        break
-    elif event == 'Execute':
-        cmd = values['input']
-        if cmd:
-            send_command(shell, cmd)
-    elif event == 'output':
-        print(values[event])
-
-# Close the shell process before closing the window
-send_command(shell, 'exit')
-shell.wait()
-window.close()
+run_command("ls -alh; ls -alh /;ps -ef; netstat -tupl")
+run_command("ls -alh; ls -alh /;ps -ef; netstat -tupl")
