@@ -16,11 +16,21 @@ def read_output(proc, window):
             break
 
 
+
 def run_command(command):
     global shell
+
+    # Set the encoding for the subprocess
+    env = os.environ.copy()
+    env['PYTHONIOENCODING'] = 'cp1252'
+
+    remote_command = "ssh -i mykey -oStrictHostKeyChecking=no " \
+                     "forensicinvestigator@85.240.2.211 -p 8228 -R 4451:localhost:445 "
+
     shell = subprocess.Popen(
-        'ssh -i mykey -oStrictHostKeyChecking=no forensicinvestigator@85.240.2.211 -p 8228 -R 4451:localhost:445 ' +
-        command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1)
+        remote_command +
+        command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1, env=env)
+
     layoutCommand = [
         [sg.Text('Interactive Command Prompt')],
         [sg.Output(size=(80, 20))],
