@@ -42,6 +42,14 @@ def run_ssh_commands(ssh_details, commands, output_callback, stop_event):
             if output:
                 output_callback(stream_type, output.strip())
 
+        # Process commands from the command_queue
+        try:
+            cmd = command_queue.get(block=False)
+            p.stdin.write((cmd + '\n').encode())
+            p.stdin.flush()
+        except queue.Empty:
+            pass
+
     # Read any remaining output and error output after the process has ended
     while not output_queue.empty():
         stream_type, output = output_queue.get_nowait()

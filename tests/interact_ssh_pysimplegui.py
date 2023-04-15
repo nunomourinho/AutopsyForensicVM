@@ -9,15 +9,17 @@ ssh_details = {
     "port": 8228
 }
 
-# Function to execute the entered commands
-def execute_commands(commands, output_callback, stop_event):
+def execute_commands(output_callback, stop_event):
+    commands = window["COMMANDS"].get().strip().split('\n')
     run_ssh_commands(ssh_details, commands, output_callback, stop_event)
 
-def handle_output(stream, output):
-    if stream == "stdout":
-        print(f"O: {output}")
-    elif stream == "stderr":
-        print(f"E: {output}")
+
+def handle_output(stream_type, output):
+    if stream_type == "stdout":
+        window.write_event_value("UPDATE_OUTPUT", output)
+    elif stream_type == "stderr":
+        window.write_event_value("UPDATE_ERROR_OUTPUT", output)
+
 
 # Create the GUI layout
 layout = [
@@ -30,7 +32,6 @@ layout = [
 
 # Create the window
 window = sg.Window("SSH Command Runner", layout)
-
 
 # Event loop
 output_thread = None
@@ -59,7 +60,13 @@ while True:
         print("Running commands...")
 
         # Run the execute_commands function in a separate thread
-        output_thread = threading.Thread(target=execute_commands, args=(commands, handle_output, stop_event))
+        output_thread = threading.Thread(target=execute_commands, args=(handle_output, stop_event))
         output_thread.start()
-        
-window.close()
+
+    if event == "UPDATE_OUTPUT":
+        output = values["UPDATE_OUTPUT"]
+        window["OUTPUT"].print(output)
+
+    if event == "UPDATE_ERROR_OUTPUT":
+        error_output = values["UPDATE_ERROR_OUTPUT"]
+        window["OUTPUT"].print(error_output, text_color="red")
