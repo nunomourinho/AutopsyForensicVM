@@ -11,4 +11,9 @@ then
 else
   sudo ./forensic2v.sh 
   echo "The forensicVM already exists. Mounting folder if necessary"
+  if mount | grep -q "/forensicVM/mnt/vm/directory/mnt"; then
+    echo "/forensicVM/mnt/vm/directory/mnt is mounted"
+  else
+    echo "/forensicVM/mnt/vm/directory/mnt is not mounted"
+  fi
 fi
