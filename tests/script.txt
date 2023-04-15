@@ -1,0 +1,14 @@
+pwd
+cd /forensicVM
+pwd
+cd bin
+pwd
+if ! [ -e "/forensicVM/bin/forensic2v.sh" ]
+then
+  echo "File does not exist. Running commands..."
+  # Run your commands here
+  echo "Done."
+else
+  sudo ./forensic2v.sh 
+  echo "The forensicVM already exists. Mounting folder if necessary"
+fi

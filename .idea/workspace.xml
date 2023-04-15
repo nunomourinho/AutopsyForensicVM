@@ -8,7 +8,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/interact_ssh_pysimplegui.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/interact_ssh_pysimplegui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/run_ssh_commands.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/run_ssh_commands.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/shell.bat" beforeDir="false" afterPath="$PROJECT_DIR$/tests/shell.bat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -24,9 +24,9 @@ def handle_output(stream_type, output):
 # Create the GUI layout
 layout = [
     [sg.Text("Enter commands (one per line):")],
-    [sg.Multiline(size=(60, 10), key="COMMANDS")],
+    [sg.Multiline(size=(80, 10), key="COMMANDS")],
     [sg.Text("Output:")],
-    [sg.Output(size=(60, 20), key="OUTPUT")],
+    [sg.Output(size=(80, 20), font=('Courier New', 10), background_color='black', text_color='white', key='OUTPUT')],
     [sg.Button("Run Commands", key="RUN"), sg.Button("Exit")]
 ]
 
