@@ -6,10 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="d310cea7-15a2-46f5-bd36-ce493092a5e3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/shell.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/shell.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/interact_ssh_pysimplegui.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/interact_ssh_pysimplegui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/run_ssh_commands.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/run_ssh_commands.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

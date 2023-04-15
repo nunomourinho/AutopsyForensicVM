@@ -13,6 +13,12 @@ ssh_details = {
 def execute_commands(commands, output_callback):
     run_ssh_commands(ssh_details, commands, output_callback)
 
+def handle_output(stream, output):
+    if stream == "stdout":
+        print(f"O: {output}")
+    elif stream == "stderr":
+        print(f"E: {output}")
+
 # Create the GUI layout
 layout = [
     [sg.Text("Enter commands (one per line):")],
@@ -24,6 +30,7 @@ layout = [
 
 # Create the window
 window = sg.Window("SSH Command Runner", layout)
+
 
 # Event loop
 while True:
@@ -37,7 +44,8 @@ while True:
         print("Running commands...")
 
         # Run the execute_commands function in a separate thread
-        output_thread = threading.Thread(target=execute_commands, args=(commands, print))
+        output_thread = threading.Thread(target=execute_commands, args=(commands, handle_output))
         output_thread.start()
 
+output_thread.stop()
 window.close()
