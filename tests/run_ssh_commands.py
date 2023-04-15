@@ -7,7 +7,7 @@ def enqueue_output(stream_type, stream, out_queue):
         out_queue.put((stream_type, line.decode()))
     stream.close()
 
-def run_ssh_commands(ssh_details, commands, output_callback):
+def run_ssh_commands(ssh_details, commands, output_callback, stop_event):
     # Prepare the ssh command
     ssh_cmd = f'ssh -i {ssh_details["key"]} -oStrictHostKeyChecking=no {ssh_details["user"]}@{ssh_details["host"]} -p {ssh_details["port"]}'
 
@@ -35,8 +35,19 @@ def run_ssh_commands(ssh_details, commands, output_callback):
             if output:
                 output_callback(stream_type, output.strip())
 
+    # Read and call output_callback with the output and error output
+    while not stop_event.is_set() and (p.poll() is None or stdout_thread.is_alive() or stderr_thread.is_alive()):
+        while not output_queue.empty():
+            stream_type, output = output_queue.get_nowait()
+            if output:
+                output_callback(stream_type, output.strip())
+
     # Read any remaining output and error output after the process has ended
     while not output_queue.empty():
         stream_type, output = output_queue.get_nowait()
         if output:
             output_callback(stream_type, output.strip())
+
+    # Terminate the process if the stop_event is set
+    if stop_event.is_set():
+        p.terminate()
