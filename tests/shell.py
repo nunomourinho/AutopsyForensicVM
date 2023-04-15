@@ -63,5 +63,7 @@ def run_command(command):
 
 
 
-run_command("ls -alh; ls -alh /;ps -ef; netstat -tupl")
-run_command("ls -alh; ls -alh /;ps -ef; netstat -tupl")
+run_command("ls -alh")
+run_command("ps -ef")
+run_command("netstat -tupl")
+run_command("ls -alh")
