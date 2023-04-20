@@ -34,25 +34,60 @@ def string_to_uuid(input_string):
     return unique_uuid
 
 
+def run_openssh(server_address, server_port, windows_share,
+            share_login, share_password, replacement_share,
+            forensic_image_path, uuid_folder, copy):
+    try:
 
-def connect_to_server(address, port):
-    # Connect to the server
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(address, port, username="forensic", password="forensic")
 
-    # Get an available remote port
-    transport = ssh.get_transport()
-    remote_port = transport.request_port_forward("", 0)
+        private_key_path = os.path.expanduser("mykey")
 
-    # Open a new TCP channel and forward traffic from the remote port to the local port
-    channel = transport.open_channel("direct-tcpip", ("localhost", 445), ("localhost", remote_port))
+        # Connect to remote host using SSH key authentication
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(server_address, username='forensicinvestigator', key_filename=private_key_path, port=server_port)
+        # Get an available remote port
+        transport = ssh.get_transport()
+        remote_port = transport.request_port_forward("", 0)
+        # Close the connection
+        ssh.close()
 
-    # Close the connection
-    ssh.close()
+        # Replacing the common path with an empty string and replacing backslashes with forward slashes
+        new_path = forensic_image_path.replace(replacement_share, "").replace("\\", "/")
 
-    # Return the remote port number
-    return remote_port
+
+        print(windows_share)
+        # Removing the backslashes and splitting the address into host and share components
+        temp = windows_share.replace("\\\\", "")
+        print(temp)
+        samba_host, samba_share = temp.split("\\")
+
+        # Creating the port forwarding string and assigning it to result
+        reverse_ssh_foward = f"-R {remote_port}:{samba_host}:445"
+        print(reverse_ssh_foward)
+
+
+        # Prepare the command to run the convertor
+        command = f'sudo /forensicVM/bin/run-or-convert.sh ' \
+                  f'--windows-share {samba_share} ' \
+                  f'--share-login {share_login} ' \
+                  f'--share-password {share_password} ' \
+                  f'--forensic-image-path {new_path} ' \
+                  f'--folder-uuid {uuid_folder} ' \
+                  f'--copy {copy} ' \
+                  f'--share-port {remote_port}'
+
+        ssh_command ="start /wait cmd /k ssh -i mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+                     + str(server_address)\
+                     + " -p " + str(server_port)\
+                     + " " + reverse_ssh_foward + " " + command
+
+        print(ssh_command)
+        # Run the command redirecting local samba port to a free open port remote\ly
+        os.system(ssh_command)
+    except Exception as e:
+        print(e)
+
 
 def test_ssh(address, port):
 
@@ -101,120 +136,6 @@ def test_ssh(address, port):
 
         return False
 
-
-# Functions imported from: https://github.com/paramiko/paramiko/blob/main/demos/rforward.py
-
-def handler(chan, host, port):
-    sock = socket.socket()
-    try:
-        sock.connect((host, port))
-    except Exception as e:
-        verbose("Forwarding request to %s:%d failed: %r" % (host, port, e))
-        return
-
-    verbose(
-        "Connected!  Tunnel open %r -> %r -> %r"
-        % (chan.origin_addr, chan.getpeername(), (host, port))
-    )
-    while True:
-        r, w, x = select.select([sock, chan], [], [])
-        if sock in r:
-            data = sock.recv(1024)
-            if len(data) == 0:
-                break
-            chan.send(data)
-        if chan in r:
-            data = chan.recv(1024)
-            if len(data) == 0:
-                break
-            sock.send(data)
-    chan.close()
-    sock.close()
-    verbose("Tunnel closed from %r" % (chan.origin_addr,))
-
-
-def reverse_forward_tunnel(server_port, remote_host, remote_port, transport):
-    transport.request_port_forward("", server_port)
-    while True:
-        chan = transport.accept(1000)
-        if chan is None:
-            continue
-        thr = threading.Thread(
-            target=handler, args=(chan, remote_host, remote_port)
-        )
-        thr.setDaemon(True)
-        thr.start()
-
-# def ssh_connect_and_run(address, port, mnt_point, login, password, image_path, uuid_folder, window2):
-#     try:
-#         private_key_path = os.path.expanduser("mykey")
-#         # Connect to remote host using SSH key authentication
-#         ssh = paramiko.SSHClient()
-#         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-#         ssh.connect(address, username='forensicinvestigator', key_filename=private_key_path, port=port)
-#
-#
-#         # Get an available remote port
-#         transport = ssh.get_transport()
-#         remote_port = transport.request_port_forward("", 0)
-#
-#         parts = mnt_point.split('\\')
-#         samba_address = parts[2]
-#         samba_folder = parts[3]
-#
-#
-#         #samba_address = samba_address.replace(image_path, "")
-#
-#         # Open a new TCP channel and forward traffic from the remote port to the local port
-#         #channel = transport.open_channel("direct-tcpip", (samba_address, 445), ("localhost", remote_port))
-#
-#         ####reverse_forward_tunnel(remote_port, samba_address, 445, transport)
-#
-#
-#         print("sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder))
-#         run_command_ssh(ssh, window2, "sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder))
-#         run_command_ssh(ssh, window2, "sudo mkdir /forensicVM/mnt/vm/" + str(uuid_folder) + "/mnt")
-#
-#         #mount -o username=qemu, pass=qemu,nobrl,ro,port=4450 - t cifs //127.0.0.1/images /forensicVM/mnt/vm/
-#         run_command_ssh(ssh, window2, "ls -alh /forensicVM/mnt/vm/")
-#
-#         # Close the SSH connection
-#         ssh.close()
-#         return True
-#     except Exception as e:
-#         #sg.popup(e)
-#         return False
-def ssh_connect_and_run(address, port, windows_share, share_login, share_password, replacement_share, image_path, uuid_folder, copy):
-    try:
-        private_key_path = os.path.expanduser("mykey")
-        # Connect to remote host using SSH key authentication
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(address, username='forensicinvestigator', key_filename=private_key_path, port=port)
-
-        # Mount the Windows share
-        #command = f'sudo mount -t cifs {windows_share} /mnt -o username={share_login},password={share_password}'
-        #run_command_ssh(ssh, window2, command)
-
-        # Run the script
-        command = f'sudo /forensicVM/bin/run-or-convert.sh --windows-share {windows_share} --share-login {share_login} --share-password {share_password} --replacement-share {replacement_share} --forensic-image-path {image_path} --folder-uuid {uuid_folder} --copy {copy}'
-        print(command)
-        run_command_ssh(ssh, window2, command)
-
-        # # Unmount the Windows share
-        # command = 'sudo umount /mnt'
-        # run_command_ssh(ssh, window2, command)
-
-        # Close the SSH connection
-        ssh.close()
-        return True
-    except Exception as e:
-        #sg.popup(e)
-        return False
-
-def run_or_convert_ssh(host, window2, windows_share, share_login, share_password, replacement_share, forensic_image_path, folder_uuid, copy):
-    command = f'bash run-or-convert --windows-share {windows_share} --share-login {share_login} --share-password {share_password} --replacement-share {replacement_share} --forensic-image-path {forensic_image_path} --folder-uuid {folder_uuid} --copy {copy}'
-    return run_command_ssh(host, window2, command)
 
 def run_command_ssh(ssh, window2, cmd):
     # Run a command on the remote host and print the output
@@ -454,31 +375,7 @@ def ForensicVMForm():
             window["open_forensic_netdata_button"].update(visible=True)
         elif event == "link_to_vm_button":
             print("Link...")
-            window["convert_to_vm_button"].update(visible=False)
-            window["link_to_vm_button"].update(visible=False)
-            window["import_data_button"].update(visible=True)
-            window["open_forensic_vm_button"].update(visible=True)
-            window["open_forensic_shell_button"].update(visible=True)
-            window["open_forensic_netdata_button"].update(visible=True)
-            # sg.popup("Linking to Forensic VM...")
-            # server_address = values["ssh_server_address"]
-            # server_port = values["ssh_server_port"]
-            # folder_share_server = values["folder_share_server"]
-            # share_login = values["share_login"]
-            # share_password = values["share_password"]
-            # forensic_image_path = values["forensic_image_path"]
-            # uuid_folder = string_to_uuid(image_path_arg + case_name_arg)
-            # equivalence = values["equivalence"]
-            #
-            # #run_or_convert_ssh(server_address, server_port, window2, windows_share, share_login,
-            # # share_password, replacement_share,
-            # #                   forensic_image_path, folder_uuid, copy):
-            #
-            # # Start the ssh connection in a thread
-            # thread = threading.Thread(target=ssh_connect_and_run, args=(server_address, server_port, folder_share_server,
-            #                                                             share_login, share_password, forensic_image_path,
-            #                                                             uuid_folder, window2))
-            #sg.popup("Linking to Forensic VM...")
+
             server_address = values["ssh_server_address"]
             server_port = values["ssh_server_port"]
             windows_share = values["folder_share_server"]
@@ -489,25 +386,23 @@ def ForensicVMForm():
             copy = "snap"
             replacement_share = values["equivalence"]
 
-            # Start the ssh connection in a thread
-            thread = threading.Thread(target=ssh_connect_and_run, args=(server_address, server_port, windows_share,
-                                                                        share_login, share_password, replacement_share,
-                                                                        forensic_image_path, uuid_folder, copy))
+            # Run the remote openssh command
+            run_openssh(server_address,
+                        server_port,
+                        windows_share,
+                        share_login,
+                        share_password,
+                        replacement_share,
+                        forensic_image_path,
+                        uuid_folder,
+                        copy)
 
-            thread.start()
-
-
-            # wait until the thread is finished
-            while thread.is_alive():
-                event, values = window2.read(timeout=100)
-
-                if event == sg.WIN_CLOSED:
-                    break
-
-            #window2.close()
-
-
-
+            window["convert_to_vm_button"].update(visible=False)
+            window["link_to_vm_button"].update(visible=False)
+            window["import_data_button"].update(visible=True)
+            window["open_forensic_vm_button"].update(visible=True)
+            window["open_forensic_shell_button"].update(visible=True)
+            window["open_forensic_netdata_button"].update(visible=True)
 
         elif event == "open_forensic_vm_button":
             # get server address value
