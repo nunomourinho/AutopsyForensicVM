@@ -193,16 +193,17 @@ def ssh_connect_and_run(address, port, windows_share, share_login, share_passwor
         ssh.connect(address, username='forensicinvestigator', key_filename=private_key_path, port=port)
 
         # Mount the Windows share
-        command = f'sudo mount -t cifs {windows_share} /mnt -o username={share_login},password={share_password}'
-        run_command_ssh(ssh, window2, command)
+        #command = f'sudo mount -t cifs {windows_share} /mnt -o username={share_login},password={share_password}'
+        #run_command_ssh(ssh, window2, command)
 
         # Run the script
-        command = f'sudo bash {image_path}/run-or-convert --windows-share {windows_share} --share-login {share_login} --share-password {share_password} --replacement-share {replacement_share} --forensic-image-path {image_path} --folder-uuid {uuid_folder} --copy {copy}'
+        command = f'sudo /forensicVM/bin/run-or-convert.sh --windows-share {windows_share} --share-login {share_login} --share-password {share_password} --replacement-share {replacement_share} --forensic-image-path {image_path} --folder-uuid {uuid_folder} --copy {copy}'
+        print(command)
         run_command_ssh(ssh, window2, command)
 
-        # Unmount the Windows share
-        command = 'sudo umount /mnt'
-        run_command_ssh(ssh, window2, command)
+        # # Unmount the Windows share
+        # command = 'sudo umount /mnt'
+        # run_command_ssh(ssh, window2, command)
 
         # Close the SSH connection
         ssh.close()
@@ -389,7 +390,6 @@ def ForensicVMForm():
     # Create the about tab
     about_layout = [
         [sg.Text("Forensic VM Client", font=("Helvetica", 20), justification="center")],
-        #[sg.Image(os.path.join(os.path.dirname(__file__), "forensicVMClient.jpg"))],
         [sg.Image("forensicVMClient.png")],
         [sg.Text("Version 1.0", justification="center")],
         [sg.Text("This software is provided as-is, without warranty of any kind. Use at your own risk.")],
@@ -478,7 +478,7 @@ def ForensicVMForm():
             # thread = threading.Thread(target=ssh_connect_and_run, args=(server_address, server_port, folder_share_server,
             #                                                             share_login, share_password, forensic_image_path,
             #                                                             uuid_folder, window2))
-            sg.popup("Linking to Forensic VM...")
+            #sg.popup("Linking to Forensic VM...")
             server_address = values["ssh_server_address"]
             server_port = values["ssh_server_port"]
             windows_share = values["folder_share_server"]
@@ -486,7 +486,8 @@ def ForensicVMForm():
             share_password = values["share_password"]
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
-            copy = values["equivalence"]
+            copy = "snap"
+            replacement_share = values["equivalence"]
 
             # Start the ssh connection in a thread
             thread = threading.Thread(target=ssh_connect_and_run, args=(server_address, server_port, windows_share,
