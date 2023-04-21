@@ -77,7 +77,7 @@ def run_openssh(server_address, server_port, windows_share,
                   f'--copy {copy} ' \
                   f'--share-port {remote_port}'
 
-        ssh_command ="start /wait cmd /k \"set TERM=xterm & ssh -i mykey -o \"SendEnv TERM\" -oStrictHostKeyChecking=no forensicinvestigator@" \
+        ssh_command ="start /wait cmd /k \"set SSH_TERM_CONHOST_PARSER=0 & set TERM=xterm & ssh -i mykey -o \"SendEnv TERM\" -oStrictHostKeyChecking=no forensicinvestigator@" \
                      + str(server_address)\
                      + " -p " + str(server_port)\
                      + " " + reverse_ssh_foward + " " + command + "\""
