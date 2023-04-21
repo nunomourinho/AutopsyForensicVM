@@ -77,10 +77,10 @@ def run_openssh(server_address, server_port, windows_share,
                   f'--copy {copy} ' \
                   f'--share-port {remote_port}'
 
-        ssh_command ="start /wait cmd /k ssh -i mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+        ssh_command ="start /wait cmd /k \"set TERM=xterm & ssh -i mykey -o \"SendEnv TERM\" -oStrictHostKeyChecking=no forensicinvestigator@" \
                      + str(server_address)\
                      + " -p " + str(server_port)\
-                     + " " + reverse_ssh_foward + " " + command
+                     + " " + reverse_ssh_foward + " " + command + "\""
 
         print(ssh_command)
         # Run the command redirecting local samba port to a free open port remote\ly
@@ -216,7 +216,8 @@ def ForensicVMForm():
         #[sg.Button("Configure", key="configure_button", size=(25, 1))],
         [sg.Button("Virtualize - a) Convert to VM",
                    tooltip="Connect to Forensic VM Server and "
-                                         "virtualize the forensic Image", key="convert_to_vm_button", size=(25, 2), visible=True)],
+                                         "virtualize the forensic Image", key="convert_to_vm_button", size=(25, 2),
+                   visible=True)],
         [sg.Button("Virtualize - b) Link to VM",
                    tooltip="Connect to Forensic VM Server and "
                                          "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2), visible=True)],
@@ -366,6 +367,30 @@ def ForensicVMForm():
             print("Configuration saved successfully!")
             sg.popup("Configuration saved successfully!")
         elif event == "convert_to_vm_button":
+
+            print("Copy and convert...")
+
+            server_address = values["ssh_server_address"]
+            server_port = values["ssh_server_port"]
+            windows_share = values["folder_share_server"]
+            share_login = values["share_login"]
+            share_password = values["share_password"]
+            forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+            copy = "copy"
+            replacement_share = values["equivalence"]
+
+            # Run the remote openssh command
+            run_openssh(server_address,
+                        server_port,
+                        windows_share,
+                        share_login,
+                        share_password,
+                        replacement_share,
+                        forensic_image_path,
+                        uuid_folder,
+                        copy)
+
             print("Convert")
             window["convert_to_vm_button"].update(visible=False)
             window["link_to_vm_button"].update(visible=False)
