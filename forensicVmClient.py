@@ -77,14 +77,15 @@ def run_openssh(server_address, server_port, windows_share,
                   f'--copy {copy} ' \
                   f'--share-port {remote_port}'
 
-        ssh_command ="start /wait cmd /k \"set SSH_TERM_CONHOST_PARSER=0 & set TERM=xterm & ssh -i mykey -o \"SendEnv TERM\" -oStrictHostKeyChecking=no forensicinvestigator@" \
+        ssh_command ="start /wait cmd /k ssh.exe -t -i mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
                      + str(server_address)\
                      + " -p " + str(server_port)\
-                     + " " + reverse_ssh_foward + " " + command + "\""
+                     + " " + reverse_ssh_foward + " " + command
 
         print(ssh_command)
         # Run the command redirecting local samba port to a free open port remote\ly
         os.system(ssh_command)
+
     except Exception as e:
         print(e)
 
