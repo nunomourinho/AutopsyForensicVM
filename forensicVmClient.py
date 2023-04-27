@@ -11,16 +11,54 @@ import threading
 import time
 
 
+# Save the values as a json file
+def save_config(values, filename):
+    # Save the configuration to the JSON file
+    with open(filename, "w") as f:
+        json.dump(values, f)
+
+# Load json file as values
+def load_config(filename):
+    # Load the configuration from the JSON file if it exists
+    if os.path.isfile(filename):
+        with open(filename, "r") as f:
+            return json.load(f)
+    else:
+        return {}
+
 # Define the filename for the JSON file
 filename = "config.json"
 icon_path = "forensicVMCLient.ico"
 
-#sg.popup(sys.argv)
-image_path_arg = sys.argv[1] if len(sys.argv) > 1 else ""
-case_directory_arg = sys.argv[2] if len(sys.argv) > 2 else ""
-case_name_arg = sys.argv[3] if len(sys.argv) > 3 else ""
-case_number_arg = sys.argv[4] if len(sys.argv) > 4 else ""
-case_examiner_arg = sys.argv[5] if len(sys.argv) > 5 else ""
+# Check if there are enough command line arguments
+if len(sys.argv) >= 5:
+    image_path_arg = sys.argv[1]
+    case_directory_arg = sys.argv[2]
+    case_name_arg = sys.argv[3]
+    case_number_arg = sys.argv[4]
+    case_examiner_arg = sys.argv[5] if len(sys.argv) > 5 else ""
+
+    # Save the values as a JSON file
+    values = {
+        "image_path_arg": image_path_arg,
+        "case_directory_arg": case_directory_arg,
+        "case_name_arg": case_name_arg,
+        "case_number_arg": case_number_arg,
+        "case_examiner_arg": case_examiner_arg
+    }
+
+    save_config(values, "case-config.json")
+else:
+    # Load the configuration from the JSON file
+    config = load_config("case-config.json")
+    image_path_arg = config.get("image_path_arg", "")
+    case_directory_arg = config.get("case_directory_arg", "")
+    case_name_arg = config.get("case_name_arg", "")
+    case_number_arg = config.get("case_number_arg", "")
+    case_examiner_arg = config.get("case_examiner_arg", "")
+
+
+# Rest of the code using the values
 
 
 
@@ -77,7 +115,7 @@ def run_openssh(server_address, server_port, windows_share,
                   f'--copy {copy} ' \
                   f'--share-port {remote_port}'
 
-        ssh_command ="start /wait cmd /k ssh.exe -t -i mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+        ssh_command ="start /wait cmd /c ssh.exe -t -i mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
                      + str(server_address)\
                      + " -p " + str(server_port)\
                      + " " + reverse_ssh_foward + " " + command
@@ -178,20 +216,7 @@ def test_windows_share(server_address, username, password):
 
 
 
-# Save the values as a json file
-def save_config(values):
-    # Save the configuration to the JSON file
-    with open(filename, "w") as f:
-        json.dump(values, f)
 
-# Load json file as values
-def load_config():
-    # Load the configuration from the JSON file if it exists
-    if os.path.isfile(filename):
-        with open(filename, "r") as f:
-            return json.load(f)
-    else:
-        return {}
 
 def validate_server_address(address):
     ip_regex = r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b"
@@ -210,7 +235,7 @@ def ForensicVMForm():
     sg.theme("DefaultNoMoreNagging")
 
     # Load the configuration from the JSON file if it exists
-    config = load_config()
+    config = load_config(filename)
 
     # Define the layout of the virtualize tab
     virtualize_layout = [
@@ -357,14 +382,14 @@ def ForensicVMForm():
                 sg.popup_error("Please enter a valid server address")
                 # Validate the server port
             else:
-                save_config(values)
+                save_config(values, filename)
                 # Your connection code goes here
                 print("Connecting to Forensic VM...")
                 print("Connected successfully!")
                 window["output_text"].update("Connecting to Forensic VM...\nConnected successfully!")
         elif event == "save_button":
             # Save the configuration to the JSON file
-            save_config(values)
+            save_config(values, filename)
             print("Configuration saved successfully!")
             sg.popup("Configuration saved successfully!")
         elif event == "convert_to_vm_button":
