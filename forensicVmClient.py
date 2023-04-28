@@ -30,34 +30,33 @@ def load_config(filename):
 # Define the filename for the JSON file
 filename = "config.json"
 icon_path = "forensicVMCLient.ico"
-
 # Check if there are enough command line arguments
-if len(sys.argv) >= 5:
-    image_path_arg = sys.argv[1]
-    case_directory_arg = sys.argv[2]
-    case_name_arg = sys.argv[3]
-    case_number_arg = sys.argv[4]
-    case_examiner_arg = sys.argv[5] if len(sys.argv) > 5 else ""
-
-    # Save the values as a JSON file
-    values = {
-        "image_path_arg": image_path_arg,
-        "case_directory_arg": case_directory_arg,
-        "case_name_arg": case_name_arg,
-        "case_number_arg": case_number_arg,
-        "case_examiner_arg": case_examiner_arg
-    }
-
-    save_config(values, "case-config.json")
-else:
-    # Load the configuration from the JSON file
-    config = load_config("case-config.json")
-    image_path_arg = config.get("image_path_arg", "")
-    case_directory_arg = config.get("case_directory_arg", "")
-    case_name_arg = config.get("case_name_arg", "")
-    case_number_arg = config.get("case_number_arg", "")
-    case_examiner_arg = config.get("case_examiner_arg", "")
-
+try:
+    if len(sys.argv) >= 4:
+        image_path_arg = sys.argv[1]
+        case_directory_arg = sys.argv[2]
+        case_name_arg = sys.argv[3]
+        case_number_arg = sys.argv[4] if len(sys.argv) > 4 else "-"
+        case_examiner_arg = sys.argv[5] if len(sys.argv) > 4 else "-"
+        # Save the values as a JSON file
+        values = {
+            "image_path_arg": image_path_arg,
+            "case_directory_arg": case_directory_arg,
+            "case_name_arg": case_name_arg,
+            "case_number_arg": case_number_arg,
+            "case_examiner_arg": case_examiner_arg
+        }
+        save_config(values, "case-config.json")
+    else:
+        # Load the configuration from the JSON file
+        config = load_config("case-config.json")
+        image_path_arg = config.get("image_path_arg", "")
+        case_directory_arg = config.get("case_directory_arg", "")
+        case_name_arg = config.get("case_name_arg", "")
+        case_number_arg = config.get("case_number_arg", "")
+        case_examiner_arg = config.get("case_examiner_arg", "")
+except Exception as e:
+    sg.popup(e)
 
 # Rest of the code using the values
 
@@ -404,7 +403,7 @@ def ForensicVMForm():
     # define a janela para exibir a saída
     layout2 = [[sg.Multiline(size=(80, 20), key='-OUTPUT-', font='Courier 10', background_color='black', text_color='white')]]
 
-    window2 = sg.Window('Migration output', layout2)
+    #window2 = sg.Window('Migration output', layout2)
 
 
 
