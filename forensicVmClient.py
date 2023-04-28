@@ -10,6 +10,22 @@ import subprocess
 import threading
 import ctypes
 import time
+import os
+import sys
+import subprocess
+
+
+
+def create_login_and_share(username, password, sharename, folderpath):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    batch_file = os.path.join(script_dir, 'create_user_and_share.bat')
+    share_name = sharename.split('\\')[-1]  # extract the share_name part
+
+    cmd = 'nircmdc elevate "cmd /c {} {} {} {} {}"'.format(batch_file, username,
+                                                                    password, share_name,
+                                                                    folderpath)
+    print(cmd)
+    os.system('powershell -Command "{}"'.format(cmd))
 
 
 # Save the values as a json file
@@ -227,49 +243,6 @@ def validate_server_address(address):
     else:
         return False
 
-import ctypes
-import os
-import sys
-
-def create_login_and_share(username, password, sharename, folderpath):
-    # Define the batch code as a string
-    batch_code = '@echo off\n'
-    batch_code += 'setlocal\n'
-    batch_code += 'set "username={}"\n'.format(username)
-    batch_code += 'set "password={}"\n'.format(password)
-    batch_code += 'set "sharename={}"\n'.format(sharename)
-    batch_code += 'set "folderpath={}"\n'.format(folderpath)
-    batch_code += 'echo Checking if user already exists...\n'
-    batch_code += 'net user %username% >nul 2>&1\n'
-    batch_code += 'if %errorlevel% equ 0 (\n'
-    batch_code += '    echo User %username% already exists.\n'
-    batch_code += ') else (\n'
-    batch_code += '    echo User %username% does not exist. Creating user...\n'
-    batch_code += '    net user %username% %password% /add >nul\n'
-    batch_code += '    net localgroup Administrators %username% /add >nul\n'
-    batch_code += ')\n'
-    batch_code += 'echo Checking if folder already exists...\n'
-    batch_code += 'if exist %folderpath% (\n'
-    batch_code += '    echo Folder %folderpath% already exists.\n'
-    batch_code += ') else (\n'
-    batch_code += '    echo Folder %folderpath% does not exist.\n'
-    batch_code += ')\n'
-    batch_code += 'echo Setting permissions on folder...\n'
-    batch_code += 'icacls %folderpath% /grant %username%:(RX) /inheritance:r >nul\n'
-    batch_code += 'echo Creating share...\n'
-    batch_code += 'net share %sharename%=%folderpath% /remark:"Shared folder" /cache:none /grant:%username%,read >nul\n'
-    batch_code += 'echo Share created successfully.\n'
-    batch_code += 'endlocal\n'
-
-    # Write the batch code to a temporary file
-    temp_dir = os.environ['TEMP']
-    temp_batch_file = os.path.join(temp_dir, 'create_login_and_share.bat')
-    with open(temp_batch_file, 'w') as f:
-        f.write(batch_code)
-
-    # Execute the temporary batch file with elevated privileges
-    ctypes.windll.shell32.ShellExecuteW(None, "runas", temp_batch_file, '', None, 1)
-
 
 # Form: All fields in the form
 
@@ -329,9 +302,12 @@ def ForensicVMForm():
                       [sg.Text("Windows folder share server:"), sg.InputText(key="folder_share_server",
                                                                default_text=config.get("folder_share_server", ""))],
         [sg.Text("Share login:"), sg.InputText(key="share_login", default_text=config.get("share_login", ""))],
-        [sg.Text("Share password:"), sg.InputText(key="share_password", password_char="*", default_text=config.get("share_password", ""))],
-        [sg.Text("Local ou remote path to share:"),sg.InputText(key="equivalence", default_text=config.get("equivalence", "")),
-         sg.Button("Test windows share", key="test_windows_share")],
+        [sg.Text("Share password:"), sg.InputText(key="share_password", password_char="*",
+                                                  default_text=config.get("share_password", ""))],
+        [sg.Text("Local ou remote path to share:"),sg.InputText(key="equivalence",
+                                                                default_text=config.get("equivalence", "")),
+         sg.Button("Test windows share", key="test_windows_share"),
+         sg.Button("Create share", key="create_windows_share")],
 
                   ]
                   )],
@@ -372,7 +348,8 @@ def ForensicVMForm():
                                    default_text=case_examiner_arg, size=(50, 3), disabled=True)]
 
                  ])
-    ], [sg.Frame("Generated UUID",   [[sg.Text("Unique Path and Case UUID"), sg.Text(string_to_uuid(image_path_arg+case_name_arg))]])]
+    ], [sg.Frame("Generated UUID",   [[sg.Text("Unique Path and Case UUID"),
+                                       sg.Text(string_to_uuid(image_path_arg+case_name_arg))]])]
     ]
     autopsy_tab = sg.Tab("Autopsy case", autopsy_layout, key="autopsy_tab")
 
@@ -520,14 +497,23 @@ def ForensicVMForm():
             else:
                 sg.popup_error("Could not connect to the server")
         elif event == "test_windows_share":
-                # get server address value
-                if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):
-                    sg.popup("Connected successfully!")
-                else:
-                    sg.popup_error("Could not connect to the server")
+            # get server address value
+            if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):
+                sg.popup("Connected successfully!")
+            else:
+                sg.popup_error("Could not connect to the server")
+        elif event == "create_windows_share":
+            try:
+                # Get the values from the PySimpleGUI window
+                username = values['share_login']
+                password = values['share_password']
+                sharename = values['folder_share_server']
+                folderpath = values['equivalence']
 
-
-
+                # Call the create_login_and_share function with the entered values
+                create_login_and_share(username, password, sharename, folderpath)
+            except Exception as e:
+                sg.popup_error(e)
 
 
 if __name__ == '__main__':

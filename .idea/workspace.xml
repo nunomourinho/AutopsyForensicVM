@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="d310cea7-15a2-46f5-bd36-ce493092a5e3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/forensicVmClient.py" beforeDir="false" afterPath="$PROJECT_DIR$/forensicVmClient.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
