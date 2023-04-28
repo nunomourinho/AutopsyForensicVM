@@ -8,6 +8,7 @@ import PySimpleGUI as sg
 import webbrowser
 import subprocess
 import threading
+import ctypes
 import time
 
 
@@ -199,7 +200,6 @@ def run_command_ssh(ssh, window2, cmd):
             current_output = window2['-OUTPUT-'].get()
             window2['-OUTPUT-'].update(current_output+"e:"+output, text_color='white')
 
-
 def test_windows_share(server_address, username, password):
     # Use the 'net use' command to map a drive to the share
     cmd = 'net use {} /user:{} {}'.format(server_address, username, password)
@@ -227,6 +227,50 @@ def validate_server_address(address):
         return True
     else:
         return False
+
+import ctypes
+import os
+import sys
+
+def create_login_and_share(username, password, sharename, folderpath):
+    # Define the batch code as a string
+    batch_code = '@echo off\n'
+    batch_code += 'setlocal\n'
+    batch_code += 'set "username={}"\n'.format(username)
+    batch_code += 'set "password={}"\n'.format(password)
+    batch_code += 'set "sharename={}"\n'.format(sharename)
+    batch_code += 'set "folderpath={}"\n'.format(folderpath)
+    batch_code += 'echo Checking if user already exists...\n'
+    batch_code += 'net user %username% >nul 2>&1\n'
+    batch_code += 'if %errorlevel% equ 0 (\n'
+    batch_code += '    echo User %username% already exists.\n'
+    batch_code += ') else (\n'
+    batch_code += '    echo User %username% does not exist. Creating user...\n'
+    batch_code += '    net user %username% %password% /add >nul\n'
+    batch_code += '    net localgroup Administrators %username% /add >nul\n'
+    batch_code += ')\n'
+    batch_code += 'echo Checking if folder already exists...\n'
+    batch_code += 'if exist %folderpath% (\n'
+    batch_code += '    echo Folder %folderpath% already exists.\n'
+    batch_code += ') else (\n'
+    batch_code += '    echo Folder %folderpath% does not exist.\n'
+    batch_code += ')\n'
+    batch_code += 'echo Setting permissions on folder...\n'
+    batch_code += 'icacls %folderpath% /grant %username%:(RX) /inheritance:r >nul\n'
+    batch_code += 'echo Creating share...\n'
+    batch_code += 'net share %sharename%=%folderpath% /remark:"Shared folder" /cache:none /grant:%username%,read >nul\n'
+    batch_code += 'echo Share created successfully.\n'
+    batch_code += 'endlocal\n'
+
+    # Write the batch code to a temporary file
+    temp_dir = os.environ['TEMP']
+    temp_batch_file = os.path.join(temp_dir, 'create_login_and_share.bat')
+    with open(temp_batch_file, 'w') as f:
+        f.write(batch_code)
+
+    # Execute the temporary batch file with elevated privileges
+    ctypes.windll.shell32.ShellExecuteW(None, "runas", temp_batch_file, '', None, 1)
+
 
 # Form: All fields in the form
 
