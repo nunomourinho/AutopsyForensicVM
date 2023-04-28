@@ -21,7 +21,7 @@ def create_login_and_share(username, password, sharename, folderpath):
     batch_file = os.path.join(script_dir, 'create_user_and_share.bat')
     share_name = sharename.split('\\')[-1]  # extract the share_name part
 
-    cmd = 'nircmdc elevate "cmd /c {} {} {} {} {}"'.format(batch_file, username,
+    cmd = '{}\\nircmdc elevate "cmd /c {} {} {} {} {}"'.format(os.getcwd(),batch_file, username,
                                                                     password, share_name,
                                                                     folderpath)
     print(cmd)
@@ -505,10 +505,15 @@ def ForensicVMForm():
         elif event == "create_windows_share":
             try:
                 # Get the values from the PySimpleGUI window
+                new_equivalence=os.path.dirname(os.path.realpath(image_path_arg))
+                window.Element('equivalence').update(value=new_equivalence)
+                new_share_folder = "\\\\127.0.0.1\\" + os.path.basename(new_equivalence)
+                window.Element('folder_share_server').update(value=new_share_folder)
+
                 username = values['share_login']
                 password = values['share_password']
-                sharename = values['folder_share_server']
-                folderpath = values['equivalence']
+                sharename = new_share_folder
+                folderpath = new_equivalence
 
                 # Call the create_login_and_share function with the entered values
                 create_login_and_share(username, password, sharename, folderpath)
