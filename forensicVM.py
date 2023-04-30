@@ -80,7 +80,7 @@ class RunVMIngestModule(DataSourceIngestModule):
         # Assumes EXE is in same folder as script
         # Verify it is there before any ingest starts
             
-        bat_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mesi.bat")
+        bat_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mesi-debug.bat")
         self.pathToBAT = File(bat_path)
         if not self.pathToBAT.exists():
             raise IngestModuleException("MESI.BAT was not found in module folder " + bat_path)
@@ -133,6 +133,11 @@ class RunVMIngestModule(DataSourceIngestModule):
         self.log(Level.INFO, "Running program on data source")
         cmd = ArrayList()
         # Add each argument in its own line.  I.e. "-f foo" would be two calls to .add()
+
+
+        cmd.add("cmd")
+        cmd.add("/c")
+        cmd.add("start")
         cmd.add(self.pathToBAT.toString())
         cmd.add(imagePaths[0])
         cmd.add(Case.getCurrentCase().getCaseDirectory())

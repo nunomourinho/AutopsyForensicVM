@@ -131,7 +131,7 @@ def run_openssh(server_address, server_port, windows_share,
                   f'--copy {copy} ' \
                   f'--share-port {remote_port}'
 
-        ssh_command ="start /wait cmd /c ssh.exe -t -i mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+        ssh_command ="start /wait cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
                      + str(server_address)\
                      + " -p " + str(server_port)\
                      + " " + reverse_ssh_foward + " " + command
