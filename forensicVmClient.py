@@ -15,6 +15,9 @@ import sys
 import subprocess
 
 
+# Define the filename for the JSON file
+filename = "config.json"
+icon_path = "forensicVMCLient.ico"
 
 def create_login_and_share(username, password, sharename, folderpath):
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -43,9 +46,6 @@ def load_config(filename):
     else:
         return {}
 
-# Define the filename for the JSON file
-filename = "config.json"
-icon_path = "forensicVMCLient.ico"
 # Check if there are enough command line arguments
 try:
     if len(sys.argv) >= 4:
