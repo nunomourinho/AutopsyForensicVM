@@ -27,7 +27,44 @@ def test_api_key(api_key, baseurl):
     except Exception as e:
         return 1, str(e)
 
+def generate_and_send_public_key(baseurl, api_key, ssh_dir):
+    # Generate SSH key pair
 
+    if not os.path.exists(ssh_dir):
+        os.makedirs(ssh_dir)
+
+    private_key_path = os.path.join(ssh_dir, 'mykey')
+    public_key_path = os.path.join(ssh_dir, 'mykey.pub')
+
+    if not os.path.exists(private_key_path) or not os.path.exists(public_key_path):
+        key = paramiko.RSAKey.generate(2048)
+        key.write_private_key_file(private_key_path)
+        #key.write_public_key_file(public_key_path)
+        # Save public key to disk
+        public_key_path = f"{private_key_path}.pub"
+        with open(public_key_path, "w") as public_key_file:
+            public_key_file.write(f"{key.get_name()} {key.get_base64()}")
+
+    with open(public_key_path, 'r') as f:
+        public_key = f.read().strip()
+
+    # Send public key to server
+    url = baseurl + '/api/create-ssh-keys/'
+    headers = {
+        'X-Api-Key': api_key
+    }
+
+    data = {
+        'public_key': public_key
+    }
+
+    response = requests.post(url, headers=headers, data=data)
+
+    # if response.status_code == 200:
+    #     return 'Public key added to authorized keys'
+    # else:
+    #     return 'Failed to add public key to authorized keys'
+    return response.json().get('message'), response.status_code
 # Define the filename for the JSON file
 filename = "config.json"
 icon_path = "forensicVMCLient.ico"
@@ -304,7 +341,8 @@ def ForensicVMForm():
                                  default_text=config.get("ssh_server_address", ""), size=(20,1)),
                    sg.InputText(key="ssh_server_port",
                                  default_text=config.get("ssh_server_port", ""),size=(8,1)),
-                   sg.Button("Test Ssh connection", key="test_ssh_connect")
+                   sg.Button("Test Ssh connection", key="test_ssh_connect"),
+                   sg.Button("Copy ssh key to server", key="copy-ssh-key-to-server")
                    ],
                   ]
                   )],
@@ -521,6 +559,14 @@ def ForensicVMForm():
                 sg.popup_error("Could not connect to the server:\n" +  message)
             else:
                 sg.popup("Connected successfully!\n" + message)
+        elif event == "copy-ssh-key-to-server":
+            ssh_dir = os.path.dirname(os.path.abspath(__file__))
+            message, status_code = generate_and_send_public_key(values["server_address"], values["forensic_api"],
+                                                                ssh_dir)
+            if status_code!= 200:
+                sg.popup_error(message)
+            else:
+                sg.popup(message)
         elif event == "create_windows_share":
             try:
                 # Get the values from the PySimpleGUI window
