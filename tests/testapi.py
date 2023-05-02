@@ -1,6 +1,6 @@
 import requests
 
-url = 'http://85.240.2.211:8000/api/protected/'
+url = 'http://85.240.2.211:8000/api/test/'
 api_key = 'd0397945-5c8b-432c-8cbf-010d4b8fc7fb'
 
 headers = {
