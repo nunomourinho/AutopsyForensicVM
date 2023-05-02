@@ -363,7 +363,7 @@ def ForensicVMForm():
                   ]
                   )],
 
-        [sg.Button("Save", key="save_button")],
+        [sg.Button("Save Configuration", key="save_button", size=(20,3))],
         [sg.Text("", key="output_text")]
     ]
     config_tab = sg.Tab("Configuration", config_layout, key="config_tab")
