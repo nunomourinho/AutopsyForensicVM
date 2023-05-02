@@ -13,6 +13,19 @@ import time
 import os
 import sys
 import subprocess
+import requests
+
+def test_api_key(api_key, baseurl):
+    url = baseurl + '/api/test/'
+    headers = {'X-Api-Key': api_key}
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return 0, 'Access granted'
+        else:
+            return response.status_code, 'Access denied'
+    except Exception as e:
+        return 1, str(e)
 
 
 # Define the filename for the JSON file
@@ -502,6 +515,14 @@ def ForensicVMForm():
                 sg.popup("Connected successfully!")
             else:
                 sg.popup_error("Could not connect to the server")
+        elif event == "test_forensicServer_connect":
+            server_address = values["server_address"]
+            forensic_api = values["forensic_api"]
+            return_code, message= test_api_key(forensic_api, server_address)
+            if return_code != 0:
+                sg.popup_error("Could not connect to the server:\n" +  message)
+            else:
+                sg.popup("Connected successfully!\n" + message)
         elif event == "create_windows_share":
             try:
                 # Get the values from the PySimpleGUI window
