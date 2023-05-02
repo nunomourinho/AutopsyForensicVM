@@ -325,7 +325,7 @@ def ForensicVMForm():
                   ]
                   )],
 
-        [sg.Button("Test Connection", key="connect_button"), sg.Button("Save", key="save_button")],
+        [sg.Button("Save", key="save_button")],
         [sg.Text("", key="output_text")]
     ]
     config_tab = sg.Tab("Configuration", config_layout, key="config_tab")
@@ -393,8 +393,6 @@ def ForensicVMForm():
     # define a janela para exibir a saída
     layout2 = [[sg.Multiline(size=(80, 20), key='-OUTPUT-', font='Courier 10', background_color='black', text_color='white')]]
 
-    #window2 = sg.Window('Migration output', layout2)
-
 
 
     # Event loop
@@ -402,24 +400,24 @@ def ForensicVMForm():
         event, values = window.read()
         if event == sg.WINDOW_CLOSED:
             break
-        elif event == "connect_button":
-            server_address = values["server_address"]
-            forensic_api = values["forensic_api"]
-            folder_share_server = values["folder_share_server"]
-            share_login = values["share_login"]
-            share_password = values["share_password"]
-            forensic_image_path = values["forensic_image_path"]
-            equivalence = values["equivalence"]
-            if not validate_server_address(server_address):
-                window["server_address"].SetFocus()
-                sg.popup_error("Please enter a valid server address")
-                # Validate the server port
-            else:
-                save_config(values, filename)
-                # Your connection code goes here
-                print("Connecting to Forensic VM...")
-                print("Connected successfully!")
-                window["output_text"].update("Connecting to Forensic VM...\nConnected successfully!")
+        # elif event == "connect_button":
+        #     server_address = values["server_address"]
+        #     forensic_api = values["forensic_api"]
+        #     folder_share_server = values["folder_share_server"]
+        #     share_login = values["share_login"]
+        #     share_password = values["share_password"]
+        #     forensic_image_path = values["forensic_image_path"]
+        #     equivalence = values["equivalence"]
+        #     if not validate_server_address(server_address):
+        #         window["server_address"].SetFocus()
+        #         sg.popup_error("Please enter a valid server address")
+        #         # Validate the server port
+        #     else:
+        #         save_config(values, filename)
+        #         # Your connection code goes here
+        #         print("Connecting to Forensic VM...")
+        #         print("Connected successfully!")
+        #         window["output_text"].update("Connecting to Forensic VM...\nConnected successfully!")
         elif event == "save_button":
             # Save the configuration to the JSON file
             save_config(values, filename)
@@ -491,17 +489,17 @@ def ForensicVMForm():
         elif event == "open_forensic_vm_button":
             # get server address value
             print("Open ForensicVM Webserver...")
-            server_address = "http://" + values["server_address"]
+            server_address = values["server_address"]
             webbrowser.open(server_address)
         elif event == "open_forensic_shell_button":
             # get server address value
             print("Open ForensicVM Webserver...")
-            server_address = "http://" + values["server_address"] + "/shell"
+            server_address = values["server_address"] + "/shell"
             webbrowser.open(server_address)
         elif event == "open_forensic_netdata_button":
             # get server address value
             print("Open ForensicVM Webserver...")
-            server_address = "http://" + values["server_address"] + "/netdata"
+            server_address = values["server_address"] + "/netdata"
             webbrowser.open(server_address)
         elif event == "test_ssh_connect":
             # get server address value
