@@ -358,6 +358,7 @@ def ForensicVMForm():
         [sg.Text("Local ou remote path to share:"),sg.InputText(key="equivalence",
                                                                 default_text=config.get("equivalence", "")),
          sg.Button("Test windows share", key="test_windows_share"),
+         sg.Button("Autofill info", key="autofill_share"),
          sg.Button("Create share", key="create_windows_share")],
 
                   ]
@@ -429,7 +430,8 @@ def ForensicVMForm():
     window = sg.Window("Autopsy ForensicVM Client", layout, element_justification="center", icon=icon_path)
 
     # define a janela para exibir a saída
-    layout2 = [[sg.Multiline(size=(80, 20), key='-OUTPUT-', font='Courier 10', background_color='black', text_color='white')]]
+    layout2 = [[sg.Multiline(size=(80, 20), key='-OUTPUT-', font='Courier 10',
+                             background_color='black', text_color='white')]]
 
 
 
@@ -567,17 +569,20 @@ def ForensicVMForm():
                 sg.popup_error(message)
             else:
                 sg.popup(message)
+        elif event == "autofill_share":
+            # Get the values from the PySimpleGUI window
+            new_equivalence = os.path.dirname(os.path.realpath(image_path_arg))
+            window.Element('equivalence').update(value=new_equivalence)
+            new_share_folder = "\\\\127.0.0.1\\" + os.path.basename(new_equivalence)
+            window.Element('folder_share_server').update(value=new_share_folder)
         elif event == "create_windows_share":
             try:
                 # Get the values from the PySimpleGUI window
                 new_equivalence=os.path.dirname(os.path.realpath(image_path_arg))
-                window.Element('equivalence').update(value=new_equivalence)
-                new_share_folder = "\\\\127.0.0.1\\" + os.path.basename(new_equivalence)
-                window.Element('folder_share_server').update(value=new_share_folder)
 
                 username = values['share_login']
                 password = values['share_password']
-                sharename = new_share_folder
+                sharename = values['folder_share_server']
                 folderpath = new_equivalence
 
                 # Call the create_login_and_share function with the entered values
