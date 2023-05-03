@@ -18,5 +18,21 @@ reverse remote share a forensic image to the server in snapshot mode. The thread
 ---> Create a new webservice that stops the machine
 
 
-
 ---> Create a new webservice that snapshots the machine via qmp and returns the image as a file.
+
+
+---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
+
+
+---> In Jython code: Export tags to the python plugin using sql or the sleuthkit database.
+
+
+---> Create the fields in the interface needed to create the virtual forensic analisys drive (size and file local storage location)
+
+---> Change machine creation to include the virtual vmware folder. Investigate if it can be also a zip file (is it in the autorized autopsy file 
+formats?)
+
+
+---> Authentication: Integrate with google authentication
+
+---> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
