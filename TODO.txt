@@ -22,7 +22,7 @@ It also should return the running mode (snap or copy). It should return the Curr
 ---> In Jython code: Export tags to the python plugin using sql or the sleuthkit database.
 
 
----> Create the fields in the interface needed to create the virtual forensic analisys drive (size and file local storage location)
+---> Create the fields in the interface needed to create the virtual forensic analysis drive (size)
 
 ---> Change machine creation to include the virtual vmware folder. Investigate if it can be also a zip file (is it in the autorized autopsy file 
 formats?)
