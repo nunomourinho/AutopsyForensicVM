@@ -1,0 +1,22 @@
+----> Create an "Autofill Share" button. This button performs a function that already exists in the "Create Share" button but adds an intermediate step that allows the user to edit and correct the name of the share before sharing it.llows the user to edit and correct the name of the share before sharing it.
+
+----> Create a forensic image share configuration.
+The fields forensic image source, share login, share password, and remote or local folder to share should be stored in a new file. This file should be saved inside the forensic-image path folder, within the UUID subfolder (referring to the forensic image).
+
+
+---> Create a new weservice: The webservice should detect if the forensic image with the UUID exists, if it is running (the run.pid file exists).
+It also should return the running mode (snap or copy). It should return the Current VNC PORT, WEBSOCKET PORT, and qmp socket
+
+
+---> Create a new webservice that starts the machine in a remote screen session and returns the screen session
+
+
+---> Create a thread that creates a new ssh redirection using ssh.exe and maintains the connection in background. The purpuse is to 
+reverse remote share a forensic image to the server in snapshot mode. The thread shoud be terminated, if exists at the end of the program execution.
+
+
+---> Create a new webservice that stops the machine
+
+
+
+---> Create a new webservice that snapshots the machine via qmp and returns the image as a file.
