@@ -194,6 +194,43 @@ def run_openssh(server_address, server_port, windows_share,
         print(e)
 
 
+def ssh_background_session(server_address, server_port, windows_share):
+    try:
+        private_key_path = os.path.expanduser("mykey")
+
+        # Connect to remote host using SSH key authentication
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(server_address, username='forensicinvestigator', key_filename=private_key_path, port=server_port)
+        # Get an available remote port
+        transport = ssh.get_transport()
+        remote_port = transport.request_port_forward("", 0)
+        # Close the connection
+        ssh.close()
+
+
+
+        # Prepare the command to run the convertor
+        command = '/home/forensicinvestigator/wait-y.sh'
+        temp = windows_share.replace("\\\\", "")
+        print(temp)
+        samba_host, samba_share = temp.split("\\")
+
+        # Creating the port forwarding string and assigning it to result
+        reverse_ssh_foward = f"-R {remote_port}:{samba_host}:445"
+
+        ssh_command ="start cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i mykey " \
+                                                                                   "-oStrictHostKeyChecking=no " \
+                                                                                   "forensicinvestigator@" \
+                     + str(server_address)\
+                     + " -p " + str(server_port)\
+                     + " " + reverse_ssh_foward + " " + command
+        os.system(ssh_command)
+        return remote_port
+    except Exception as e:
+        print(e)
+
+
 def test_ssh(address, port):
 
     try:
@@ -495,6 +532,7 @@ def ForensicVMForm():
             window["open_forensic_vm_button"].update(visible=True)
             window["open_forensic_shell_button"].update(visible=True)
             window["open_forensic_netdata_button"].update(visible=True)
+
         elif event == "link_to_vm_button":
             print("Link...")
 
@@ -526,6 +564,8 @@ def ForensicVMForm():
             window["open_forensic_shell_button"].update(visible=True)
             window["open_forensic_netdata_button"].update(visible=True)
 
+            # TODO: Start the VM in the remote_port
+            remote_port = ssh_background_session(server_address, server_port, windows_share)
         elif event == "open_forensic_vm_button":
             # get server address value
             print("Open ForensicVM Webserver...")
