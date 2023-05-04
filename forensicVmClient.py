@@ -13,6 +13,21 @@ import sys
 import subprocess
 import requests
 
+def get_forensic_image_info(api_key, uuid, baseurl):
+    url = f'{baseurl}/api/forensic-image-vm-status/{uuid}/'
+    headers = {'X-API-KEY': api_key}
+
+    try:
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            return 0, response.json()
+        else:
+            return response.status_code, "Access denied"
+    except Exception as e:
+        return 1, str(e)
+
+
 def test_api_key(api_key, baseurl):
     url = baseurl + '/api/test/'
     headers = {'X-Api-Key': api_key}
@@ -134,6 +149,8 @@ try:
         case_name_arg = config.get("case_name_arg", "")
         case_number_arg = config.get("case_number_arg", "")
         case_examiner_arg = config.get("case_examiner_arg", "")
+        uuid_folder = str(string_to_uuid(image_path_arg + case_name_arg))
+        case_image_folder = case_directory_arg + "\\" + uuid_folder
 except Exception as e:
     sg.popup(e)
 
@@ -529,6 +546,7 @@ def ForensicVMForm():
             window["open_forensic_netdata_button"].update(visible=True)
 
         elif event == "link_to_vm_button":
+
             print("Link...")
 
             server_address = values["ssh_server_address"]
@@ -540,6 +558,17 @@ def ForensicVMForm():
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             copy = "snap"
             replacement_share = values["equivalence"]
+
+            web_server_address = values["server_address"]
+            forensic_api = values["forensic_api"]
+            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+
+            if return_code != 0:
+                sg.popup_error("Could not connect to the server:\n" + vm_status)
+            else:
+                print(vm_status)
+                sg.popup("Connected successfully!\n")
+                
 
             # Run the remote openssh command
             run_openssh(server_address,

@@ -1,6 +1,3 @@
-----> Create a forensic image share configuration.
-The fields forensic image source, share login, share password, and remote or local folder to share should be stored in a new file. This file should be saved inside the forensic-image path folder, within the UUID subfolder (referring to the forensic image).
-
 ---> Create a new webservice: The webservice should detect if the forensic image with the UUID exists, if it is running (the run.pid file exists).
 It also should return the running mode (snap or copy). It should return the Current VNC PORT, WEBSOCKET PORT, and qmp socket
 
