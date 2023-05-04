@@ -79,6 +79,17 @@ def create_login_and_share(username, password, sharename, folderpath):
     os.system('powershell -Command "{}"'.format(cmd))
 
 
+
+def string_to_uuid(input_string):
+    # Use a namespace for your application (theoretical site)
+    namespace = uuid.uuid5(uuid.NAMESPACE_DNS, 'forensic.vm.mesi.ninja')
+
+    # Generate a UUID based on the namespace and the input string
+    unique_uuid = uuid.uuid5(namespace, input_string)
+
+    return unique_uuid
+
+
 # Save the values as a json file
 def save_config(values, filename):
     # Save the configuration to the JSON file
@@ -110,6 +121,10 @@ try:
             "case_number_arg": case_number_arg,
             "case_examiner_arg": case_examiner_arg
         }
+        uuid_folder = str(string_to_uuid(image_path_arg + case_name_arg))
+        case_image_folder = case_directory_arg + "\\" + uuid_folder
+        os.makedirs(case_image_folder, exist_ok=True)
+
         save_config(values, "case-config.json")
     else:
         # Load the configuration from the JSON file
@@ -123,17 +138,6 @@ except Exception as e:
     sg.popup(e)
 
 # Rest of the code using the values
-
-
-
-def string_to_uuid(input_string):
-    # Use a namespace for your application (theoretical site)
-    namespace = uuid.uuid5(uuid.NAMESPACE_DNS, 'forensic.vm.mesi.ninja')
-
-    # Generate a UUID based on the namespace and the input string
-    unique_uuid = uuid.uuid5(namespace, input_string)
-
-    return unique_uuid
 
 
 def run_openssh(server_address, server_port, windows_share,
@@ -339,6 +343,8 @@ def ForensicVMForm():
 
     # Load the configuration from the JSON file if it exists
     config = load_config(filename)
+    image_config = load_config(case_image_folder + "\\image-share.json")
+
 
     # Define the layout of the virtualize tab
     virtualize_layout = [
@@ -388,12 +394,16 @@ def ForensicVMForm():
                   [
 
                       [sg.Text("Windows folder share server:"), sg.InputText(key="folder_share_server",
-                                                               default_text=config.get("folder_share_server", ""))],
-        [sg.Text("Share login:"), sg.InputText(key="share_login", default_text=config.get("share_login", ""))],
+                                                               default_text=image_config.get("folder_share_server",
+                                                                                             config.get("folder_share_server", "")))],
+        [sg.Text("Share login:"), sg.InputText(key="share_login", default_text=image_config.get("share_login",
+                                                                                                config.get("share_login", "")))],
         [sg.Text("Share password:"), sg.InputText(key="share_password", password_char="*",
-                                                  default_text=config.get("share_password", ""))],
+                                                  default_text=image_config.get("share_password",
+                                                                                config.get("share_password", "")))],
         [sg.Text("Local ou remote path to share:"),sg.InputText(key="equivalence",
-                                                                default_text=config.get("equivalence", "")),
+                                                                default_text=image_config.get("equivalence",
+                                                                                              config.get("equivalence", ""))),
          sg.Button("Test windows share", key="test_windows_share"),
          sg.Button("Autofill info", key="autofill_share"),
          sg.Button("Create share", key="create_windows_share")],
@@ -466,38 +476,23 @@ def ForensicVMForm():
     # Create the window
     window = sg.Window("Autopsy ForensicVM Client", layout, element_justification="center", icon=icon_path)
 
-    # define a janela para exibir a saída
-    layout2 = [[sg.Multiline(size=(80, 20), key='-OUTPUT-', font='Courier 10',
-                             background_color='black', text_color='white')]]
-
-
 
     # Event loop
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED:
             break
-        # elif event == "connect_button":
-        #     server_address = values["server_address"]
-        #     forensic_api = values["forensic_api"]
-        #     folder_share_server = values["folder_share_server"]
-        #     share_login = values["share_login"]
-        #     share_password = values["share_password"]
-        #     forensic_image_path = values["forensic_image_path"]
-        #     equivalence = values["equivalence"]
-        #     if not validate_server_address(server_address):
-        #         window["server_address"].SetFocus()
-        #         sg.popup_error("Please enter a valid server address")
-        #         # Validate the server port
-        #     else:
-        #         save_config(values, filename)
-        #         # Your connection code goes here
-        #         print("Connecting to Forensic VM...")
-        #         print("Connected successfully!")
-        #         window["output_text"].update("Connecting to Forensic VM...\nConnected successfully!")
         elif event == "save_button":
             # Save the configuration to the JSON file
             save_config(values, filename)
+
+            image_values = {
+                "folder_share_server": values["folder_share_server"],
+                "share_login": values["share_login"],
+                "share_password": values["share_password"],
+                "equivalence": values["equivalence"]
+            }
+            save_config(image_values, case_image_folder + "\\image-share.json")
             print("Configuration saved successfully!")
             sg.popup("Configuration saved successfully!")
         elif event == "convert_to_vm_button":
