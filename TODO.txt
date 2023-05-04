@@ -1,9 +1,8 @@
----> Create a new webservice: The webservice should detect if the forensic image with the UUID exists, if it is running (the run.pid file exists).
-It also should return the running mode (snap or copy). It should return the Current VNC PORT, WEBSOCKET PORT, and qmp socket
-
 ---> Create a new webservice that starts the machine in a remote screen session and returns the screen session
 
 ---> Create a new webservice that stops the machine
+
+---> Create a new webservice that lists the machines available.
 
 ---> Create a new webservice that snapshots the machine via qmp and returns the image as a file.
 
