@@ -23,9 +23,11 @@ def start_vm(api_key, uuid, baseurl):
         print(f"VM running: {result['vm_running']}")
         print(f"VNC port: {result['vnc_port']}")
         print(f"WebSocket port: {result['websocket_port']}")
+        return result, 0
     else:
         print(f"Error: {response.status_code}")
         print(response.text)
+        return response.text, response.status_code
 def get_forensic_image_info(api_key, uuid, baseurl):
     url = f'{baseurl}/api/forensic-image-vm-status/{uuid}/'
 
@@ -590,13 +592,20 @@ def ForensicVMForm():
                     window["open_forensic_shell_button"].update(visible=True)
                     window["open_forensic_netdata_button"].update(visible=True)
                 elif vm_status.get("vm_status", "") == "stopped":
-                    sg.popup("The vm exists and is stopped.\n Starting the VM in the remote server.\n")
                     # TODO: Start the VM in the remote_port
-                    remote_port = ssh_background_session(server_address, server_port, windows_share)
-                    if start_vm(forensic_api, uuid_folder, web_server_address) == "running":
+                    vm_status, result_status = start_vm(forensic_api, uuid_folder, web_server_address)
+
+                    if result_status == 0:
                         sg.popup("The machine is running.\n No actions required")
+                        window["convert_to_vm_button"].update(visible=False)
+                        window["link_to_vm_button"].update(visible=False)
+                        window["import_data_button"].update(visible=True)
+                        window["open_forensic_vm_button"].update(visible=True)
+                        window["open_forensic_shell_button"].update(visible=True)
+                        window["open_forensic_netdata_button"].update(visible=True)
                     else:
-                        sg.popup_error("Could not start the VM:\n")
+                        sg.popup_error(f"Could not start the VM:\n Attempting to start it {vm_status}")
+                        remote_port = ssh_background_session(server_address, server_port, windows_share)
                 else:
                     # Run the remote openssh command
                     run_openssh(server_address,
