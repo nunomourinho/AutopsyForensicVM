@@ -6,6 +6,10 @@
 
 ---> Create a new webservice that lists the machines available.
 
+---> Create a new webservice that lists the available patchs for the machine
+
+---> Create a new webservice that applys a patch to the machine
+
 ---> Create a new webservice that snapshots the machine via qmp and returns the image as a file.
 
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
