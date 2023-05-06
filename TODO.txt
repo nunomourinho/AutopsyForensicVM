@@ -1,14 +1,16 @@
----> BUG correction: create folder shares with spaces and convert machines with spaces
-
----> Changes buttons start, stop, opevforensicVM... acording to machine state (stopped, running)
-
 ---> Change the start script so that it calls the machine with VNC and websocket parameters
 
 ---> Create a new webservice that mounts a folder inside the other folder
 
+---> BUG correction: create folder shares with spaces and convert machines with spaces
+
+---> In Jython code: Export tags to the python plugin using sql or the sleuthkit database.
+
 ---> Create a new webservice that resets the machine via qmp
 
 ---> Create a new webservice that lists the machines available.
+
+---> Create a new webservice that deletes the vm folder.
 
 ---> Create a new webservice that querys available cdroms in the iso file
 
@@ -19,8 +21,6 @@
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
 
 ---> Make adicional comments and code documentation
-
----> In Jython code: Export tags to the python plugin using sql or the sleuthkit database.
 
 ---> Create the fields in the interface needed to create the virtual forensic analysis drive (size)
 
