@@ -12,6 +12,7 @@ import os
 import sys
 import subprocess
 import requests
+
 def start_vm(api_key, uuid, baseurl):
     url = f"{baseurl}/api/start-vm/{uuid}/"
     headers = {"X-API-KEY": api_key}
@@ -20,12 +21,26 @@ def start_vm(api_key, uuid, baseurl):
 
     if response.status_code == 200:
         result = response.json()
-        print(f"VM running: {result['vm_running']}")
-        print(f"VNC port: {result['vnc_port']}")
-        print(f"WebSocket port: {result['websocket_port']}")
+        return result
     else:
         print(f"Error: {response.status_code}")
         print(response.text)
+        return None
+
+def stop_vm(api_key, uuid, baseurl):
+    url = f"{baseurl}/api/stop-vm/{uuid}/"
+    headers = {"X-API-KEY": api_key}
+
+    response = requests.post(url, headers=headers)
+
+    if response.status_code == 200:
+        result = response.json()
+        return result
+    else:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return None
+
 def get_forensic_image_info(api_key, uuid, baseurl):
     url = f'{baseurl}/api/forensic-image-vm-status/{uuid}/'
 
@@ -388,6 +403,8 @@ def ForensicVMForm():
                    tooltip="Connect to Forensic VM Server and "
                                          "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2), visible=True)],
         [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 2), visible=False)],
+        [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2), visible=False)],
+        [sg.Button("Stop VM", key="stop_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Open ForensicVM WebShell", key="open_forensic_shell_button", size=(25, 1), visible=False)],
         [sg.Button("Analyse ForensicVM performance", key="open_forensic_netdata_button", size=(25, 1), visible=False)],
         [sg.Button("Import Data", key="import_data_button", size=(25, 1), visible=False)]
@@ -556,6 +573,8 @@ def ForensicVMForm():
             window["link_to_vm_button"].update(visible=False)
             window["import_data_button"].update(visible=True)
             window["open_forensic_vm_button"].update(visible=True)
+            window["stop_vm_button"].update(visible=True)
+            window["reset_vm_button"].update(visible=True)
             window["open_forensic_shell_button"].update(visible=True)
             window["open_forensic_netdata_button"].update(visible=True)
 
@@ -586,6 +605,8 @@ def ForensicVMForm():
                     window["convert_to_vm_button"].update(visible=False)
                     window["link_to_vm_button"].update(visible=False)
                     window["import_data_button"].update(visible=True)
+                    window["stop_vm_button"].update(visible=True)
+                    window["reset_vm_button"].update(visible=True)
                     window["open_forensic_vm_button"].update(visible=True)
                     window["open_forensic_shell_button"].update(visible=True)
                     window["open_forensic_netdata_button"].update(visible=True)
@@ -598,7 +619,7 @@ def ForensicVMForm():
                     else:
                         sg.popup_error("Could not start the VM:\n")
                 else:
-                    # Run the remote openssh command
+                    # Run the remote openssh command to convert the image to a VM
                     run_openssh(server_address,
                                 server_port,
                                 windows_share,
@@ -612,6 +633,8 @@ def ForensicVMForm():
                     window["convert_to_vm_button"].update(visible=False)
                     window["link_to_vm_button"].update(visible=False)
                     window["import_data_button"].update(visible=True)
+                    window["stop_vm_button"].update(visible=True)
+                    window["reset_vm_button"].update(visible=True)
                     window["open_forensic_vm_button"].update(visible=True)
                     window["open_forensic_shell_button"].update(visible=True)
                     window["open_forensic_netdata_button"].update(visible=True)
@@ -624,6 +647,19 @@ def ForensicVMForm():
             print("Open ForensicVM Webserver...")
             server_address = values["server_address"]
             webbrowser.open(server_address)
+        elif event == "stop_vm_button":
+            # get server address value
+            print("Stop VM...")
+            forensic_api = values["forensic_api"]
+            forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+            web_server_address = values["server_address"]
+
+            stop_result = stop_vm(forensic_api, uuid_folder, web_server_address)
+            if stop_result:
+                print(f"VM stopped: {stop_result['vm_stopped']}")
+
+
         elif event == "open_forensic_shell_button":
             # get server address value
             print("Open ForensicVM Webserver...")

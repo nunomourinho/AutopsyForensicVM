@@ -1,16 +1,22 @@
 ---> Create a new webservice that stops the machine
 
+---> Create a new webservice that mounts a folder inside the other folder
+
+---> Create a new webservice that resets the machine via qmp
+
 ---> Create a new webservice that lists the machines available.
 
 ---> Create a new webservice that snapshots the machine via qmp and returns the image as a file.
 
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
 
+---> Make adicional comments and code documentation
+
 ---> In Jython code: Export tags to the python plugin using sql or the sleuthkit database.
 
 ---> Create the fields in the interface needed to create the virtual forensic analysis drive (size)
 
----> Change machine creation to include the virtual vmware folder. Investigate if it can be also a zip file (is it in the autorized autopsy file 
+---> Change machine creation to include the virtual vmware evidence folder. Investigate if it can be also a zip file (is it in the autorized autopsy file 
 formats?)
 
 ---> Authentication: Integrate with google authentication
