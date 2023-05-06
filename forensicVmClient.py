@@ -597,7 +597,28 @@ def ForensicVMForm():
             return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
 
             if return_code != 0:
-                sg.popup_error("Could not connect to the server:\n" + vm_status)
+                if return_code!= 404:
+                    sg.popup_error("Could not connect to the server:\n" + vm_status)
+                else:
+                    # Run the remote openssh command to convert the image to a VM
+                    run_openssh(server_address,
+                                server_port,
+                                windows_share,
+                                share_login,
+                                share_password,
+                                replacement_share,
+                                forensic_image_path,
+                                uuid_folder,
+                                copy)
+
+                    window["convert_to_vm_button"].update(visible=False)
+                    window["link_to_vm_button"].update(visible=False)
+                    window["import_data_button"].update(visible=True)
+                    window["stop_vm_button"].update(visible=True)
+                    window["reset_vm_button"].update(visible=True)
+                    window["open_forensic_vm_button"].update(visible=True)
+                    window["open_forensic_shell_button"].update(visible=True)
+                    window["open_forensic_netdata_button"].update(visible=True)
             else:
                 print(vm_status)
                 if vm_status.get("vm_status", "") == "running":
@@ -619,25 +640,8 @@ def ForensicVMForm():
                     else:
                         sg.popup_error("Could not start the VM:\n")
                 else:
-                    # Run the remote openssh command to convert the image to a VM
-                    run_openssh(server_address,
-                                server_port,
-                                windows_share,
-                                share_login,
-                                share_password,
-                                replacement_share,
-                                forensic_image_path,
-                                uuid_folder,
-                                copy)
-
-                    window["convert_to_vm_button"].update(visible=False)
-                    window["link_to_vm_button"].update(visible=False)
-                    window["import_data_button"].update(visible=True)
-                    window["stop_vm_button"].update(visible=True)
-                    window["reset_vm_button"].update(visible=True)
-                    window["open_forensic_vm_button"].update(visible=True)
-                    window["open_forensic_shell_button"].update(visible=True)
-                    window["open_forensic_netdata_button"].update(visible=True)
+                    continue
+                    
 
 
 
