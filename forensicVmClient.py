@@ -13,6 +13,44 @@ import sys
 import subprocess
 import requests
 
+
+def confirm_deletion_twice():
+    for i in range(2):
+        confirmation_layout = [
+            [sg.Text(f"Are you sure you want to delete the VM? ({i + 1}/2)")],
+            [sg.Button("Yes"), sg.Button("No")]
+        ]
+
+        confirmation_window = sg.Window("Confirm Deletion", confirmation_layout)
+
+        event, values = confirmation_window.read()
+        confirmation_window.close()
+
+        if event != "Yes":
+            return False
+    return True
+def delete_vm(api_key, uuid, base_url):
+    if not confirm_deletion_twice():
+        print("VM deletion canceled.")
+        return False
+
+    url = f"{base_url}/api/delete-vm/{uuid}/"
+    headers = {"X-API-KEY": api_key}
+
+    response = requests.post(url, headers=headers)
+
+    if response.status_code == 200:
+        result = response.json()
+        if result['vm_deleted']:
+            print(f"VM with UUID {uuid} has been deleted.")
+            return True
+        else:
+            print(f"Error deleting VM: {result['error']}")
+            return False
+    else:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return False
 def check_vm_exists(api_key, uuid, baseurl):
     url = f"{baseurl}/api/check-vm-exists/{uuid}/"
     headers = {"X-API-KEY": api_key}
@@ -338,14 +376,7 @@ def test_ssh(address, port):
 
         return False
 
-        ssh_key.write_private_key_file(private_key_path)
 
-        # Save public key to disk
-        ###public_key_path = f"{private_key_path}.pub"
-        ###with open(public_key_path, "w") as public_key_file:
-        ###public_key_file.write(f"{ssh_key.get_name()} {ssh_key.get_base64()}")
-
-        return False
 
 
 def run_command_ssh(ssh, window2, cmd):
@@ -425,6 +456,7 @@ def ForensicVMForm():
         [sg.Button("Virtualize - b) Link to VM",
                    tooltip="Connect to Forensic VM Server and "
                                          "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2), visible=True)],
+        [sg.Button("Delete VM", key="delete_vm_button", size=(25, 2), visible=True)],
         [sg.Button("Start VM", key="start_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Stop VM", key="stop_vm_button", size=(25, 2), visible=False)],
@@ -602,6 +634,14 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == "delete_vm_button":
+            forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+            web_server_address = values["server_address"]
+            forensic_api = values["forensic_api"]
+            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+            if vm_status.get("vm_status", "") == "stopped":
+                delete_vm(forensic_api, uuid_folder, web_server_address)
         elif event == "start_vm_button":
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
