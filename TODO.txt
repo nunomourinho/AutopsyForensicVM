@@ -12,8 +12,6 @@
 
 ---> Create a new webservice that lists the machines available.
 
----> Create a new webservice that deletes the vm folder.
-
 ---> Create a new webservice that querys available cdroms in the iso file
 
 ---> Create a new webservice that inserts a cdrom inside da virtual machine.
