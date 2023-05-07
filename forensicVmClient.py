@@ -35,6 +35,7 @@ def start_vm(api_key, uuid, baseurl):
 
     if response.status_code == 200:
         result = response.json()
+        print(str(result))
         return result
     else:
         print(f"Error: {response.status_code}")
@@ -130,11 +131,15 @@ def create_login_and_share(username, password, sharename, folderpath):
     batch_file = os.path.join(script_dir, 'create_user_and_share.bat')
     share_name = sharename.split('\\')[-1]  # extract the share_name part
 
-    cmd = '{}\\nircmdc elevate "cmd /c {} {} {} {} {}"'.format(os.getcwd(),batch_file, username,
+    cmd = '"{}\\nircmdc" elevate cmd /c {} "{}" "{}" "{}" "{}"'.format(os.getcwd(),batch_file, username,
                                                                     password, share_name,
                                                                     folderpath)
-    print(cmd)
-    os.system('powershell -Command "{}"'.format(cmd))
+
+
+    #os.system(cmd)
+    pshell='powershell -Command "{}"'.format(cmd)
+    print(pshell)
+    os.system(pshell)
 
 
 

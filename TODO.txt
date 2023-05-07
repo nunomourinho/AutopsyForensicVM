@@ -2,6 +2,8 @@
 
 ---> Create a new webservice that mounts a folder inside the other folder
 
+---> Create a new webservice that umounts a folder
+
 ---> BUG correction: create folder shares with spaces and convert machines with spaces
 
 ---> In Jython code: Export tags to the python plugin using sql or the sleuthkit database.
