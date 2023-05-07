@@ -403,6 +403,7 @@ def validate_server_address(address):
 # Form: All fields in the form
 
 def ForensicVMForm():
+    server_offline = False
     # Set the theme
     sg.theme("DefaultNoMoreNagging")
 
@@ -414,6 +415,9 @@ def ForensicVMForm():
     # Define the layout of the virtualize tab
     virtualize_layout = [
         #[sg.Button("Configure", key="configure_button", size=(25, 1))],
+        [sg.Text("Cannot communicate with the ForensicVM Server. Please check access configuration on the"
+                 " config tab, or check if the server is running. Press the test server button to see if it is running.",
+                 key="alert_server_off", visible=False)],
         [sg.Button("Virtualize - a) Convert to VM",
                    tooltip="Connect to Forensic VM Server and "
                                          "virtualize the forensic Image", key="convert_to_vm_button", size=(25, 2),
@@ -554,28 +558,47 @@ def ForensicVMForm():
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
-            if check_vm_exists(forensic_api, uuid_folder, web_server_address):
-                window["convert_to_vm_button"].update(visible=False)
-                window["link_to_vm_button"].update(visible=False)
-                window["open_forensic_shell_button"].update(visible=True)
-                window["open_forensic_netdata_button"].update(visible=True)
-                return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
-                if vm_status.get("vm_status", "") == "running":
+            server_ok = 1
+            if not server_offline:
+                server_ok, _ = test_api_key(forensic_api, web_server_address)
+                if server_ok != 0:
+                    window["convert_to_vm_button"].update(visible=False)
+                    window["link_to_vm_button"].update(visible=False)
+                    window["alert_server_off"].update(visible=True)
                     window["start_vm_button"].update(visible=False)
-                    window["stop_vm_button"].update(visible=True)
-                    window["reset_vm_button"].update(visible=True)
-                    window["import_data_button"].update(visible=False)
-                    window["open_forensic_vm_button"].update(visible=True)
-                elif vm_status.get("vm_status", "") == "stopped":
-                    window["start_vm_button"].update(visible=True)
                     window["stop_vm_button"].update(visible=False)
                     window["reset_vm_button"].update(visible=False)
-                    window["import_data_button"].update(visible=True)
-            else:
+                    window["import_data_button"].update(visible=False)
+                    window["open_forensic_vm_button"].update(visible=False)
+                    window["open_forensic_shell_button"].update(visible=False)
+                    window["open_forensic_netdata_button"].update(visible=False)
+                    server_offline = True
+
+            if server_ok == 0:
+                window["alert_server_off"].update(visible=False)
+                if check_vm_exists(forensic_api, uuid_folder, web_server_address):
+                    window["convert_to_vm_button"].update(visible=False)
+                    window["link_to_vm_button"].update(visible=False)
+                    window["open_forensic_shell_button"].update(visible=True)
+                    window["open_forensic_netdata_button"].update(visible=True)
+                    return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+                    if vm_status.get("vm_status", "") == "running":
+                        window["start_vm_button"].update(visible=False)
+                        window["stop_vm_button"].update(visible=True)
+                        window["reset_vm_button"].update(visible=True)
+                        window["import_data_button"].update(visible=False)
+                        window["open_forensic_vm_button"].update(visible=True)
+                    elif vm_status.get("vm_status", "") == "stopped":
+                        window["start_vm_button"].update(visible=True)
+                        window["stop_vm_button"].update(visible=False)
+                        window["reset_vm_button"].update(visible=False)
+                        window["import_data_button"].update(visible=True)
+            elif not server_offline:
                 window["convert_to_vm_button"].update(visible=True)
                 window["link_to_vm_button"].update(visible=True)
                 window["open_forensic_shell_button"].update(visible=False)
                 window["open_forensic_netdata_button"].update(visible=False)
+
 
         if event == sg.WINDOW_CLOSED:
             break
@@ -749,6 +772,7 @@ def ForensicVMForm():
                 sg.popup_error("Could not connect to the server:\n" +  message)
             else:
                 sg.popup("Connected successfully!\n" + message)
+                server_offline = False
         elif event == "copy-ssh-key-to-server":
             ssh_dir = os.path.dirname(os.path.abspath(__file__))
             message, status_code = generate_and_send_public_key(values["server_address"], values["forensic_api"],
