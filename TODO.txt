@@ -1,7 +1,5 @@
 ---> BUG FIX: The run.pid can exist and the server is offline. It is necessary to check run.pip contents and check if there is a running qemu process with the same pid
 
----> Change the start script so that it calls the machine with VNC and websocket parameters
-
 ---> Create a new webservice that mounts a folder inside the other folder
 
 ---> Create a new webservice that umounts a folder

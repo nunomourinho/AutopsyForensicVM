@@ -728,7 +728,9 @@ def ForensicVMForm():
             # get server address value
             print("Open ForensicVM Webserver...")
             server_address = values["server_address"]
-            webbrowser.open(server_address)
+            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+            if return_code== 0:
+                webbrowser.open(f"{server_address}?port={vm_status['websocket_port']}")
         elif event == "stop_vm_button":
             # get server address value
             print("Stop VM...")
