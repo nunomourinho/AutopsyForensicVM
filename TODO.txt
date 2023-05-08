@@ -1,8 +1,11 @@
----> BUG FIX: The run.pid can exist and the server is offline. It is necessary to check run.pip contents and check if there is a running qemu process with the same pid
-
 ---> Create a new webservice that mounts a folder inside the other folder
+---> Change forensic2v script so that in the snap mode it creates a new script file with mount script to mount the dd, efw or
+aff forensic image
+---> Change the webservice to also mount the original forensic image
 
----> Create a new webservice that umounts a folder
+---> Create a new webservice that umounts
+
+---> BUG FIX: The run.pid can exist and the server is offline. It is necessary to check run.pip contents and check if there is a running qemu process with the same pid
 
 ---> BUG correction: create folder shares with spaces and convert machines with spaces
 
