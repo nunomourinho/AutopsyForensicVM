@@ -13,7 +13,35 @@ import sys
 import subprocess
 import requests
 
+def mount_folder(api_key, uuid, base_url, folder):
+    assert api_key, "API key is required"
+    assert uuid, "UUID is required"
+    assert base_url, "Base URL is required"
+    assert folder, "Folder path is required"
 
+    url = f"{base_url}/api/mount-folder/{uuid}/"
+    headers = {"X-API-KEY": api_key}
+    data = {"folder": folder}
+
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+
+        result = response.json()
+        if result['folder_mounted']:
+            print(f"Folder '{folder}' has been mounted.")
+            return True
+        else:
+            print(f"Error mounting folder: {result['error']}")
+            return False
+
+    except requests.exceptions.HTTPError as e:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+        return False
 def confirm_deletion_twice():
     for i in range(2):
         confirmation_layout = [
