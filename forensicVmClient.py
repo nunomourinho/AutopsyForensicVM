@@ -641,17 +641,19 @@ def ForensicVMForm():
                     window["convert_to_vm_button"].update(visible=False)
                     window["link_to_vm_button"].update(visible=False)
                     window["delete_vm_button"].update(visible=False)
-                    window["open_forensic_vm_button"].update(visible=True)
+                    window["open_forensic_vm_button"].update(visible=False)
                     window["open_forensic_shell_button"].update(visible=True)
                     window["open_forensic_netdata_button"].update(visible=True)
                     return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
                     if vm_status.get("vm_status", "") == "running":
+                        window["delete_vm_button"].update(visible=False)
                         window["start_vm_button"].update(visible=False)
                         window["stop_vm_button"].update(visible=True)
                         window["reset_vm_button"].update(visible=True)
                         window["import_data_button"].update(visible=False)
                         window["open_forensic_vm_button"].update(visible=True)
                     elif vm_status.get("vm_status", "") == "stopped":
+                        window["delete_vm_button"].update(visible=True)
                         window["start_vm_button"].update(visible=True)
                         window["stop_vm_button"].update(visible=False)
                         window["reset_vm_button"].update(visible=False)
@@ -801,6 +803,7 @@ def ForensicVMForm():
             print("Open ForensicVM Webserver...")
             server_address = values["server_address"]
             return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+            print(vm_status)
             if return_code== 0:
                 webbrowser.open(f"{server_address}?port={vm_status['websocket_port']}")
         elif event == "stop_vm_button":
