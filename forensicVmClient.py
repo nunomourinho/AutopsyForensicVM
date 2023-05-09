@@ -13,6 +13,33 @@ import sys
 import subprocess
 import requests
 
+def screenshot_vm(api_key, uuid, base_url):
+    assert api_key, "API key is required"
+    assert uuid, "UUID is required"
+    assert base_url, "Base URL is required"
+
+    url = f"{base_url}/api/screenshot-vm/{uuid}/"
+    headers = {"X-API-KEY": api_key}
+
+    try:
+        response = requests.post(url, headers=headers)
+        response.raise_for_status()
+
+        result = response.json()
+        if result['screenshot_taken']:
+            print("Screenshot taken successfully.")
+            return True
+        else:
+            print("Error taking screenshot.")
+            return False
+
+    except requests.exceptions.HTTPError as e:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+        return False
 def shutdown_vm(api_key, uuid, base_url):
     assert api_key, "API key is required"
     assert uuid, "UUID is required"
@@ -540,6 +567,7 @@ def ForensicVMForm():
         [sg.Button("Virtualize - b) Link to VM",
                    tooltip="Connect to Forensic VM Server and "
                                          "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2), visible=True)],
+        [sg.Button("Screenshot", key="screenshot_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Start VM", key="start_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Shutdown VM", key="shutdown_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2), visible=False)],
@@ -684,6 +712,7 @@ def ForensicVMForm():
                     window["alert_server_off"].update(visible=True)
                     window["start_vm_button"].update(visible=False)
                     window["stop_vm_button"].update(visible=False)
+                    window["screenshot_vm_button"].update(visible=False)
                     window["delete_vm_button"].update(visible=False)
                     window["reset_vm_button"].update(visible=False)
                     window["import_data_button"].update(visible=False)
@@ -705,6 +734,7 @@ def ForensicVMForm():
                     if vm_status.get("vm_status", "") == "running":
                         window["delete_vm_button"].update(visible=False)
                         window["start_vm_button"].update(visible=False)
+                        window["screenshot_vm_button"].update(visible=True)
                         window["shutdown_vm_button"].update(visible=True)
                         window["stop_vm_button"].update(visible=True)
                         window["reset_vm_button"].update(visible=True)
@@ -713,6 +743,7 @@ def ForensicVMForm():
                     elif vm_status.get("vm_status", "") == "stopped":
                         window["delete_vm_button"].update(visible=True)
                         window["start_vm_button"].update(visible=True)
+                        window["screenshot_vm_button"].update(visible=False)
                         window["shutdown_vm_button"].update(visible=False)
                         window["stop_vm_button"].update(visible=False)
                         window["reset_vm_button"].update(visible=False)
@@ -727,6 +758,14 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == "screenshot_vm_button":
+            forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+            web_server_address = values["server_address"]
+            forensic_api = values["forensic_api"]
+            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+            if vm_status.get("vm_status", "") == "running":
+                screenshot_vm(forensic_api, uuid_folder, web_server_address)
         elif event == "reset_vm_button":
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)

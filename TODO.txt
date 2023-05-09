@@ -1,4 +1,4 @@
----> Create a new webservice that screendumps via qmp
+---> Create a new webservice that downloads all screenshots in the folder as a zip file
 
 ---> Create a new webservice that creates a memory dump via qmp
 
@@ -12,8 +12,6 @@ aff forensic image
 ---> Sequence to stop. Stop the machine, umount aff, umount mnt, terminate samba session
 
 ---> Create a new webservice that umounts a folder
-
----> BUG FIX: The run.pid can exist and the server is offline. It is necessary to check run.pip contents and check if there is a running qemu process with the same pid
 
 ---> BUG correction: create folder shares with spaces and convert machines with spaces
 
