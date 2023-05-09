@@ -13,6 +13,34 @@ import sys
 import subprocess
 import requests
 
+def reset_vm(api_key, uuid, base_url):
+    assert api_key, "API key is required"
+    assert uuid, "UUID is required"
+    assert base_url, "Base URL is required"
+
+    url = f"{base_url}/api/reset-vm/{uuid}/"
+    headers = {"X-API-KEY": api_key}
+
+    try:
+        response = requests.post(url, headers=headers)
+        response.raise_for_status()
+
+        result = response.json()
+        if result['vm_reset']:
+            print("VM has been reset.")
+            return True
+        else:
+            print("Error resetting VM.")
+            return False
+
+    except requests.exceptions.HTTPError as e:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+        return False
+
 def mount_folder(api_key, uuid, base_url, folder):
     assert api_key, "API key is required"
     assert uuid, "UUID is required"
@@ -668,6 +696,14 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == "reset_vm_button":
+            forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+            web_server_address = values["server_address"]
+            forensic_api = values["forensic_api"]
+            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+            if vm_status.get("vm_status", "") == "running":
+                reset_vm(forensic_api, uuid_folder, web_server_address)
         elif event == "delete_vm_button":
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
