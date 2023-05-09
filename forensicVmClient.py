@@ -484,7 +484,7 @@ def ForensicVMForm():
         [sg.Button("Virtualize - b) Link to VM",
                    tooltip="Connect to Forensic VM Server and "
                                          "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2), visible=True)],
-        [sg.Button("Delete VM", key="delete_vm_button", size=(25, 2), visible=True)],
+        [sg.Button("Delete VM", key="delete_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Start VM", key="start_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Stop VM", key="stop_vm_button", size=(25, 2), visible=False)],
@@ -627,6 +627,7 @@ def ForensicVMForm():
                     window["alert_server_off"].update(visible=True)
                     window["start_vm_button"].update(visible=False)
                     window["stop_vm_button"].update(visible=False)
+                    window["delete_vm_button"].update(visible=False)
                     window["reset_vm_button"].update(visible=False)
                     window["import_data_button"].update(visible=False)
                     window["open_forensic_vm_button"].update(visible=False)
@@ -639,6 +640,8 @@ def ForensicVMForm():
                 if check_vm_exists(forensic_api, uuid_folder, web_server_address):
                     window["convert_to_vm_button"].update(visible=False)
                     window["link_to_vm_button"].update(visible=False)
+                    window["delete_vm_button"].update(visible=False)
+                    window["open_forensic_vm_button"].update(visible=True)
                     window["open_forensic_shell_button"].update(visible=True)
                     window["open_forensic_netdata_button"].update(visible=True)
                     return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
@@ -656,6 +659,7 @@ def ForensicVMForm():
             elif not server_offline:
                 window["convert_to_vm_button"].update(visible=True)
                 window["link_to_vm_button"].update(visible=True)
+                window["delete_vm_button"].update(visible=False)
                 window["open_forensic_shell_button"].update(visible=False)
                 window["open_forensic_netdata_button"].update(visible=False)
 

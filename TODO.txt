@@ -1,9 +1,14 @@
----> Create a new webservice that mounts a folder inside the other folder
+Run a machine in snap mode:
 ---> Change forensic2v script so that in the snap mode it creates a new script file with mount script to mount the dd, efw or
 aff forensic image
+---> Create a new webservice that mounts a folder inside the other folder
 ---> Change the webservice to also mount the original forensic image
+---> Sequence to run: Determine free port on server, Create ssh connection with port redirect to samba port, mount samba share on mnt folder, mount image on efw or aff folder via script,      run the machine
+---> Sequence to stop. Stop the machine, umount aff, umount mnt, terminate samba session
 
----> Create a new webservice that umounts
+
+
+---> Create a new webservice that umounts a folder
 
 ---> BUG FIX: The run.pid can exist and the server is offline. It is necessary to check run.pip contents and check if there is a running qemu process with the same pid
 
