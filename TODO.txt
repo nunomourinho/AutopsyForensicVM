@@ -1,7 +1,3 @@
----> Create a new webservice that resets the machine via qmp
-
----> Create a new webservice that shutdown the machine via qmp
-
 ---> Create a new webservice that screendumps via qmp
 
 ---> Create a new webservice that creates a memory dump via qmp
