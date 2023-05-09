@@ -1,3 +1,12 @@
+---> Create a new webservice that resets the machine via qmp
+
+---> Create a new webservice that shutdown the machine via qmp
+
+---> Create a new webservice that screendumps via qmp
+
+---> Create a new webservice that creates a memory dump via qmp
+
+
 Run a machine in snap mode:
 ---> Change forensic2v script so that in the snap mode it creates a new script file with mount script to mount the dd, efw or
 aff forensic image
@@ -5,8 +14,6 @@ aff forensic image
 ---> Change the webservice to also mount the original forensic image
 ---> Sequence to run: Determine free port on server, Create ssh connection with port redirect to samba port, mount samba share on mnt folder, mount image on efw or aff folder via script,      run the machine
 ---> Sequence to stop. Stop the machine, umount aff, umount mnt, terminate samba session
-
-
 
 ---> Create a new webservice that umounts a folder
 
@@ -16,11 +23,11 @@ aff forensic image
 
 ---> In Jython code: Export tags to the python plugin using sql or the sleuthkit database.
 
----> Create a new webservice that resets the machine via qmp
-
 ---> Create a new webservice that lists the machines available.
 
 ---> Create a new webservice that querys available cdroms in the iso file
+
+---> Create a new webservice that uploads a big iso file, by chunks, to be called by ajax or pythonsimplegui
 
 ---> Create a new webservice that inserts a cdrom inside da virtual machine.
 
