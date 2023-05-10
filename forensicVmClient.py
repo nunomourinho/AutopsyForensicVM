@@ -13,6 +13,57 @@ import sys
 import subprocess
 import requests
 
+def download_evidence(api_key, uuid, base_url, output_file):
+    assert api_key, "API key is required"
+    assert uuid, "UUID is required"
+    assert base_url, "Base URL is required"
+    assert output_file, "Output file is required"
+
+    chunk_size = 1048576  # 1 MB
+
+    url = f"{base_url}/api/download-evidence/{uuid}/"
+    headers = {"X-API-KEY": api_key}
+
+    try:
+        response = requests.get(url, headers=headers, stream=True)
+        response.raise_for_status()
+
+        total_size = int(response.headers.get('Content-Length', 0))
+        bytes_downloaded = 0
+
+        with open(output_file, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=chunk_size):
+                if chunk:
+                    f.write(chunk)
+                    bytes_downloaded += len(chunk)
+
+                    progress_bar = sg.one_line_progress_meter(
+                        "Downloading Evidence",
+                        bytes_downloaded,
+                        total_size,
+                        "key",
+                        f"Downloaded {bytes_downloaded / 1048576:.2f} / {total_size / 1048576:.2f} MB",
+                    )
+                    # If the user clicked the cancel button, break the loop
+                    if not progress_bar:
+                        break
+        if progress_bar:
+            sg.popup(f"Evidence downloaded to {output_file}")
+            return True
+        else:
+            sg.popup_error("Download canceled by user")
+            os.remove(output_file)
+            return False
+
+    except requests.exceptions.HTTPError as e:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+        return False
+
+
 def download_memory_dump(api_key, uuid, base_url, output_file):
     assert api_key, "API key is required"
     assert uuid, "UUID is required"
@@ -658,6 +709,7 @@ def ForensicVMForm():
         [sg.Button("Virtualize - b) Link to VM",
                    tooltip="Connect to Forensic VM Server and "
                                          "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2), visible=True)],
+        [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Screenshot", key="screenshot_vm_button", size=(25, 2), visible=False),sg.Button("Save screenshots", key="save_screenshots_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Make and download memory dump", key="download_memory_button", size=(25, 2), visible=False)],
         [sg.Button("Start VM", key="start_vm_button", size=(25, 2), visible=False)],
@@ -665,7 +717,6 @@ def ForensicVMForm():
         [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Stop VM", key="stop_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Delete VM", key="delete_vm_button", size=(25, 2), visible=False)],
-        [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Open ForensicVM WebShell", key="open_forensic_shell_button", size=(25, 1), visible=False)],
         [sg.Button("Analyse ForensicVM performance", key="open_forensic_netdata_button", size=(25, 1), visible=False)],
         [sg.Button("Import Evidence Disk", key="import_evidence_button", size=(25, 1), visible=False)]
@@ -872,6 +923,19 @@ def ForensicVMForm():
                                           file_types=(("Zip files", "*.zip"),))
             if save_path:
                 download_screenshots(forensic_api, uuid_folder, web_server_address, save_path)
+        elif event == "import_evidence_button":
+            forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+            web_server_address = values["server_address"]
+            forensic_api = values["forensic_api"]
+            save_path = sg.popup_get_file('Choose the path to save probable evidence disk',
+                                          save_as=True,
+                                          no_window=True,
+                                          default_extension=".vmdk",
+                                          default_path=f"{case_image_folder}/evidence.vmdk",
+                                          file_types=(("vmdk disk", "*.vmdk"),))
+            if save_path:
+                download_evidence(forensic_api, uuid_folder, web_server_address, save_path)
         elif event == "download_memory_button":
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
@@ -880,7 +944,7 @@ def ForensicVMForm():
             save_path = sg.popup_get_file('Choose the path to save the screenshots',
                                           save_as=True,
                                           no_window=True,
-                                          default_extension=".zip",
+                                          default_extension=".dump",
                                           default_path=f"{case_image_folder}/memory.dump",
                                           file_types=(("Dump files", "*.dump"),))
             if save_path:
