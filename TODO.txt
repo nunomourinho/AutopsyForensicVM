@@ -1,10 +1,10 @@
 ---> Create a new webservice that creates a memory dump via qmp
-
----> Create a new webservice that downloads the memory dump as a zip file
+---> Create a new webservice client that downloads the memory dump as a zip file
 
 ---> Create a new webservice that downloads the evidence.vmdk
 
-
+---> Authentication: Integrate with google authentication
+---> Change webservices to support autentication
 
 Run a machine in snap mode:
 ---> Change forensic2v script so that in the snap mode it creates a new script file with mount script to mount the dd, efw or
@@ -41,6 +41,6 @@ aff forensic image
 ---> Change machine creation to include the virtual vmware evidence folder. Investigate if it can be also a zip file (is it in the autorized autopsy file 
 formats?)
 
----> Authentication: Integrate with google authentication
+
 
 ---> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
