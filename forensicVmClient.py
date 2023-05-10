@@ -799,7 +799,12 @@ def ForensicVMForm():
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
-            save_path = sg.popup_get_file('Choose the path to save the screenshots', save_as=True, no_window=True)
+            save_path = sg.popup_get_file('Choose the path to save the screenshots',
+                                          save_as=True,
+                                          no_window=True,
+                                          default_extension=".zip",
+                                          default_path=f"{case_image_folder}/screenshots.zip",
+                                          file_types=(("Zip files", "*.zip"),))
             if save_path:
                 download_screenshots(forensic_api, uuid_folder, web_server_address, save_path)
         elif event == "screenshot_vm_button":
