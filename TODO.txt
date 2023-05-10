@@ -1,6 +1,3 @@
----> Create a new webservice that creates a memory dump via qmp
----> Create a new webservice client that downloads the memory dump as a zip file
-
 ---> Create a new webservice that downloads the evidence.vmdk
 
 ---> Authentication: Integrate with google authentication
