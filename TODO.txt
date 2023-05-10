@@ -1,3 +1,5 @@
+---> Change opwn_vm button to include the UUID as a parameter
+
 ---> Create a new webservice that downloads the evidence.vmdk
 
 ---> Authentication: Integrate with google authentication
