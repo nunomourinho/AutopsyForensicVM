@@ -1,6 +1,3 @@
----> The openfile should start on the case path and with the zip file extension
----> The download should present a progress bar in pythonsimplegui
-
 ---> Create a new webservice that creates a memory dump via qmp
 
 ---> Create a new webservice that downloads the memory dump as a zip file
@@ -32,6 +29,8 @@ aff forensic image
 ---> Create a new webservice that inserts a cdrom inside da virtual machine.
 
 ---> Create a new webservice that snapshots the machine via qmp and returns the image as a file.
+
+---> Create a new webservice that adds a network card with external visibility (device_add driver=e1000 id=net1)
 
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
 

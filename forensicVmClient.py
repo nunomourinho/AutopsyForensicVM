@@ -28,11 +28,23 @@ def download_screenshots(api_key, uuid, base_url, output_file):
         response = requests.get(url, headers=headers, stream=True)
         response.raise_for_status()
 
+        total_size = int(response.headers.get('Content-Length', 0))
+        bytes_downloaded = 0
+
         with open(output_file, 'wb') as f:
             for chunk in response.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
+                    bytes_downloaded += len(chunk)
 
+                    # Update the progress bar
+                    sg.one_line_progress_meter(
+                        "Downloading Screenshots",
+                        bytes_downloaded,
+                        total_size,
+                        "key",
+                        f"Downloaded {bytes_downloaded} / {total_size} bytes",
+                    )
         print(f"Screenshots downloaded to {output_file}")
         return True
 
