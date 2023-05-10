@@ -1,6 +1,11 @@
----> Create a new webservice that downloads all screenshots in the folder as a zip file
+---> The openfile should start on the case path and with the zip file extension
+---> The download should present a progress bar in pythonsimplegui
 
 ---> Create a new webservice that creates a memory dump via qmp
+
+---> Create a new webservice that downloads the memory dump as a zip file
+
+---> Create a new webservice that downloads the evidence.vmdk
 
 
 Run a machine in snap mode:
@@ -19,7 +24,7 @@ aff forensic image
 
 ---> Create a new webservice that lists the machines available.
 
----> Create a new webservice that querys available cdroms in the iso file
+---> Create a new webservice that querys available cdroms in the iso files
 
 ---> Create a new webservice that uploads a big iso file, by chunks, to be called by ajax or pythonsimplegui
 

@@ -13,6 +13,37 @@ import sys
 import subprocess
 import requests
 
+
+
+def download_screenshots(api_key, uuid, base_url, output_file):
+    assert api_key, "API key is required"
+    assert uuid, "UUID is required"
+    assert base_url, "Base URL is required"
+    assert output_file, "Output file is required"
+
+    url = f"{base_url}/api/download-screenshots/{uuid}/"
+    headers = {"X-API-KEY": api_key}
+
+    try:
+        response = requests.get(url, headers=headers, stream=True)
+        response.raise_for_status()
+
+        with open(output_file, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+
+        print(f"Screenshots downloaded to {output_file}")
+        return True
+
+    except requests.exceptions.HTTPError as e:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+        return False
+
 def screenshot_vm(api_key, uuid, base_url):
     assert api_key, "API key is required"
     assert uuid, "UUID is required"
@@ -567,7 +598,7 @@ def ForensicVMForm():
         [sg.Button("Virtualize - b) Link to VM",
                    tooltip="Connect to Forensic VM Server and "
                                          "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2), visible=True)],
-        [sg.Button("Screenshot", key="screenshot_vm_button", size=(25, 2), visible=False)],
+        [sg.Button("Screenshot", key="screenshot_vm_button", size=(25, 2), visible=False),sg.Button("Save screenshots", key="save_screenshots_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Start VM", key="start_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Shutdown VM", key="shutdown_vm_button", size=(25, 2), visible=False)],
         [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2), visible=False)],
@@ -713,6 +744,7 @@ def ForensicVMForm():
                     window["start_vm_button"].update(visible=False)
                     window["stop_vm_button"].update(visible=False)
                     window["screenshot_vm_button"].update(visible=False)
+                    window["save_screenshots_vm_button"].update(visible=False)
                     window["delete_vm_button"].update(visible=False)
                     window["reset_vm_button"].update(visible=False)
                     window["import_data_button"].update(visible=False)
@@ -730,6 +762,7 @@ def ForensicVMForm():
                     window["open_forensic_vm_button"].update(visible=False)
                     window["open_forensic_shell_button"].update(visible=True)
                     window["open_forensic_netdata_button"].update(visible=True)
+                    window["save_screenshots_vm_button"].update(visible=True)
                     return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
                     if vm_status.get("vm_status", "") == "running":
                         window["delete_vm_button"].update(visible=False)
@@ -740,6 +773,7 @@ def ForensicVMForm():
                         window["reset_vm_button"].update(visible=True)
                         window["import_data_button"].update(visible=False)
                         window["open_forensic_vm_button"].update(visible=True)
+                        window["save_screenshots_vm_button"].update(visible=True)
                     elif vm_status.get("vm_status", "") == "stopped":
                         window["delete_vm_button"].update(visible=True)
                         window["start_vm_button"].update(visible=True)
@@ -748,16 +782,26 @@ def ForensicVMForm():
                         window["stop_vm_button"].update(visible=False)
                         window["reset_vm_button"].update(visible=False)
                         window["import_data_button"].update(visible=True)
+                        window["save_screenshots_vm_button"].update(visible=True)
             elif not server_offline:
                 window["convert_to_vm_button"].update(visible=True)
                 window["link_to_vm_button"].update(visible=True)
                 window["delete_vm_button"].update(visible=False)
+                window["save_screenshots_vm_button"].update(visible=True)
                 window["open_forensic_shell_button"].update(visible=False)
                 window["open_forensic_netdata_button"].update(visible=False)
 
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == "save_screenshots_vm_button":
+            forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+            web_server_address = values["server_address"]
+            forensic_api = values["forensic_api"]
+            save_path = sg.popup_get_file('Choose the path to save the screenshots', save_as=True, no_window=True)
+            if save_path:
+                download_screenshots(forensic_api, uuid_folder, web_server_address, save_path)
         elif event == "screenshot_vm_button":
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
