@@ -8,6 +8,7 @@
 ---> Create a new webservice that downloads the evidence.vmdk
 
 
+
 Run a machine in snap mode:
 ---> Change forensic2v script so that in the snap mode it creates a new script file with mount script to mount the dd, efw or
 aff forensic image
