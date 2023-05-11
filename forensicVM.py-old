@@ -1,4 +1,5 @@
-import traceback
+
+
 import jarray
 import inspect
 import os
@@ -31,15 +32,15 @@ from org.sleuthkit.autopsy.casemodule import Case
 from org.sleuthkit.autopsy.casemodule.services import Services
 from org.sleuthkit.autopsy.datamodel import ContentUtils
 from org.sleuthkit.autopsy.coreutils import ExecUtil
-from java.io import FileWriter
-from org.json.simple import JSONArray, JSONObject
-from org.sleuthkit.datamodel import SleuthkitCase
 
 # Add filemanager capabilities
 from org.sleuthkit.autopsy.casemodule.services import FileManager
 
 
+# Factory that defines the name and details of the module and allows Autopsy
+# to create instances of the modules that will do the analysis.
 class MesiVMModuleFactory(IngestModuleFactoryAdapter):
+
     moduleName = "Forensic VM"
 
     def getModuleDisplayName(self):
@@ -58,7 +59,9 @@ class MesiVMModuleFactory(IngestModuleFactoryAdapter):
         return RunVMIngestModule()
 
 
+# Data Source-level ingest module.  One gets created per data source.
 class RunVMIngestModule(DataSourceIngestModule):
+
     _logger = Logger.getLogger(MesiVMModuleFactory.moduleName)
 
     def log(self, level, msg):
@@ -67,61 +70,70 @@ class RunVMIngestModule(DataSourceIngestModule):
     def __init__(self):
         self.context = None
 
+    # Where any setup and configuration is done
+    # 'context' is an instance of org.sleuthkit.autopsy.ingest.IngestJobContext.
+    # See: http://sleuthkit.org/autopsy/docs/api-docs/latest/classorg_1_1sleuthkit_1_1autopsy_1_1ingest_1_1_ingest_job_context.html
     def startUp(self, context):
         self.context = context
-
+        
         # Get path to EXE based on where this script is run from.
         # Assumes EXE is in same folder as script
         # Verify it is there before any ingest starts
-
+            
         bat_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mesi-debug.bat")
         self.pathToBAT = File(bat_path)
         if not self.pathToBAT.exists():
             raise IngestModuleException("MESI.BAT was not found in module folder " + bat_path)
-
+    
     def add_new_datasource(self, imagePath):
         print("ola")
         sk = Case.getCurrentCase()
 
+        # Add a new data source to the case
         timezone = ""
-    def add_tags_to_json(self, case_path):
-        tagsManager = Case.getCurrentCase().getServices().getTagsManager()
-        tags = tagsManager.getAllContentTags()
+        #process = makeAddImageProcess(timezone, True, False, "")
+        #paths = ArrayList()
+        #paths.add(imagePath)
+        #try:
+        #    process.run(UUID.randomUUID().toString(), paths.toArray([None] * paths.size()), 0)
+        #except TskDataException, ex:
+        #    logging.Logger.getLogger(Sample.__name__).log(logging.Level.SEVERE, None, ex)
 
-        tag_info_arr = JSONArray()
-
-        for tag in tags:
-            tag_dict = JSONObject()
-            tag_dict.put("id", tag.getId())
-            tag_dict.put("name", tag.getName().getDisplayName())
-            tag_dict.put("description", tag.getComment())
-            tag_dict.put("color", tag.getName().getColor())
-            tag_dict.put("type", tag.getName().getDisplayName())
-            tag_info_arr.add(tag_dict)
-
-        json_file = FileWriter(case_path)
-        json_file.write(tag_info_arr.toJSONString())
-        json_file.close()
-
-
-
+    
+    # Where the analysis is done.
+    # The 'dataSource' object being passed in is of type org.sleuthkit.datamodel.Content.
+    # See: http://www.sleuthkit.org/sleuthkit/docs/jni-docs/latest/interfaceorg_1_1sleuthkit_1_1datamodel_1_1_content.html
+    # 'progressBar' is of type org.sleuthkit.autopsy.ingest.DataSourceIngestModuleProgress
+    # See: http://sleuthkit.org/autopsy/docs/api-docs/latest/classorg_1_1sleuthkit_1_1autopsy_1_1ingest_1_1_data_source_ingest_module_progress.html
     def process(self, dataSource, progressBar):
-
-        if not PlatformUtil.isWindowsOS():
+        
+        # we don't know how much work there will be
+        progressBar.switchToIndeterminate()
+        # Example has only a Windows EXE, so bail if we aren't on Windows
+        if not PlatformUtil.isWindowsOS(): 
             self.log(Level.INFO, "Ignoring data source.  Not running on Windows")
             return IngestModule.ProcessResult.OK
 
+        # Verify we have a disk image and not a folder of files
         if not isinstance(dataSource, Image):
             self.log(Level.INFO, "Ignoring data source.  Not an image")
             return IngestModule.ProcessResult.OK
 
+        # Get disk image paths            
         imagePaths = dataSource.getPaths()
+        
+        # We'll save our output to a file in the reports folder, named based on EXE and data source ID
+        reportFile = File(Case.getCurrentCase().getCaseDirectory() + "\\Reports" + "\\img_stat-" + str(dataSource.getId()) + ".txt")
 
-        reportFile = File(
-            Case.getCurrentCase().getCaseDirectory() + "\\Reports" + "\\img_stat-" + str(dataSource.getId()) + ".txt")
-
+        # Test add datasource
+        #self.add_new_datasource("D:/convertidos/MUS-CT19-DESKTOP.V2.qcow2-sda")
+        
+        # Run the EXE, saving output to reportFile
+        # We use ExecUtil because it will deal with the user cancelling the job
         self.log(Level.INFO, "Running program on data source")
         cmd = ArrayList()
+        # Add each argument in its own line.  I.e. "-f foo" would be two calls to .add()
+
 
         cmd.add("cmd")
         cmd.add("/c")
@@ -132,13 +144,17 @@ class RunVMIngestModule(DataSourceIngestModule):
         cmd.add(Case.getCurrentCase().getName())
         cmd.add(Case.getCurrentCase().getNumber())
         cmd.add(Case.getCurrentCase().getExaminer())
+        #tags_manager = Case.getServices().getTagsManager()
 
-        try:
-           self.add_tags_to_json(Case.getCurrentCase().getCaseDirectory() + "/case_tags.json")
-        except Exception as e:
-            self.log(Level.WARNING, "Error adding tags to json")
-            self.log(Level.WARNING, str(e))
-            self.log(Level.WARNING, traceback.format_exc())
+        #all_tags = tags_manager.getAllContentTags()
+
+        #for tag in all_tags:
+            #content = tag.getContent()
+            #tag_name = tag.getName().getDisplayName()
+            #cmd.add(tag_name)
+            #comment = tag.getComment()
+
+        self.add_new_datasource('C:/tmp/drive1.E01')
 
         self.log(Level.INFO, imagePaths[0])
         self.log(Level.INFO, cmd.toString())
@@ -146,12 +162,16 @@ class RunVMIngestModule(DataSourceIngestModule):
         processBuilder.redirectOutput(reportFile)
         ExecUtil.execute(processBuilder, DataSourceIngestModuleProcessTerminator(self.context))
 
+
+
+        # Add the report to the case, so it shows up in the tree
+        # Do not add report to the case tree if the ingest is cancelled before finish.
         if not self.context.dataSourceIngestIsCancelled():
 
             Case.getCurrentCase().addReport(reportFile.toString(), "Mesi VM", "Qemu output")
         else:
             if reportFile.exists():
                 if not reportFile.delete():
-                    self.log(LEVEL.warning, "Error deleting the incomplete report file")
-
+                    self.log(LEVEL.warning,"Error deleting the incomplete report file")
+            
         return IngestModule.ProcessResult.OK
