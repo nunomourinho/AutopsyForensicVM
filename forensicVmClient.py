@@ -1,4 +1,3 @@
-
 import re
 import json
 import uuid
@@ -12,6 +11,42 @@ import os
 import sys
 import subprocess
 import requests
+
+
+
+def sanitize_string(s):
+    assert isinstance(s, str), 'Expecting a string!'
+    return re.sub('[^0-9a-zA-Z]+', '_', s)
+
+
+def read_case_config(json_filepath):
+    # Check if file exists
+    assert os.path.isfile(json_filepath), f'File {json_filepath} does not exist!'
+
+    # Read the JSON file
+    try:
+        with open(json_filepath, 'r') as file:
+            data = json.load(file)
+    except Exception as e:
+        raise IOError(f'Failed to open or read the file {json_filepath}. Error: {e}')
+
+    # Convert the JSON data to a list of directory names
+    dir_names = []
+    for tag in data:
+        try:
+            #type_ = sanitize_string(tag['type'])
+            id = sanitize_string(str(tag['id']))
+            name = sanitize_string(tag['name'])
+            #description = sanitize_string(tag['description'])
+        except KeyError as e:
+            raise KeyError(f'KeyError - {e} not found in the tag')
+
+        directory_name = f"{id}-{name}"
+        dir_names.append(directory_name)
+    return(dir_names)
+
+
+
 
 def download_evidence(api_key, uuid, base_url, output_file):
     assert api_key, "API key is required"
@@ -694,6 +729,12 @@ def ForensicVMForm():
     # Load the configuration from the JSON file if it exists
     config = load_config(filename)
     image_config = load_config(case_image_folder + "\\image-share.json")
+    case_tag_path = case_directory_arg + "\\case_tags.json"
+    if os.path.isfile(case_tag_path):
+        case_tags = read_case_config(case_tag_path)
+        for tag in case_tags:
+            print(str(tag))
+
 
 
     # Define the layout of the virtualize tab

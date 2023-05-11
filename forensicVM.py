@@ -84,6 +84,24 @@ class RunVMIngestModule(DataSourceIngestModule):
         sk = Case.getCurrentCase()
 
         timezone = ""
+#    def add_tags_to_json(self, case_path):
+#        tagsManager = Case.getCurrentCase().getServices().getTagsManager()
+#        tags = tagsManager.getAllContentTags()
+
+        #tag_info_arr = JSONArray()
+
+        #for tag in tags:
+        #    tag_dict = JSONObject()
+        #    tag_dict.put("id", tag.getId())
+        #    tag_dict.put("name", tag.getName().getDisplayName() if tag.getName().getDisplayName() else "")
+        #    tag_dict.put("description", tag.getComment() if tag.getComment() else "")
+        #    tag_dict.put("color", str(tag.getName().getColor()) if tag.getName().getColor() else "")
+        #    tag_dict.put("type", tag.getName().getDisplayName() if tag.getName().getDisplayName() else "")
+        #    tag_info_arr.add(tag_dict)
+
+        #json_file = FileWriter(case_path)
+        #json_file.write(tag_info_arr.toJSONString())
+        #json_file.close()
     def add_tags_to_json(self, case_path):
         tagsManager = Case.getCurrentCase().getServices().getTagsManager()
         tags = tagsManager.getAllContentTags()
@@ -93,17 +111,36 @@ class RunVMIngestModule(DataSourceIngestModule):
         for tag in tags:
             tag_dict = JSONObject()
             tag_dict.put("id", tag.getId())
-            tag_dict.put("name", tag.getName().getDisplayName())
-            tag_dict.put("description", tag.getComment())
-            tag_dict.put("color", tag.getName().getColor())
-            tag_dict.put("type", tag.getName().getDisplayName())
+            tag_dict.put("name", tag.getName().getDisplayName() if tag.getName().getDisplayName() else "")
+            tag_dict.put("description", tag.getComment() if tag.getComment() else "")
+            tag_dict.put("color", str(tag.getName().getColor()) if tag.getName().getColor() else "")
+            tag_dict.put("type", tag.getName().getDisplayName() if tag.getName().getDisplayName() else "")
+
+            # Get the content associated with the tag
+            content = tag.getContent()
+
+            # Get all tags associated with the content (i.e., the "subtags")
+            contentTags = tagsManager.getContentTagsByContent(content)
+
+            # Add the subtags to the main tag's JSON
+            subtags_arr = JSONArray()
+            for subtag in contentTags:
+                subtag_dict = JSONObject()
+                subtag_dict.put("id", subtag.getId())
+                subtag_dict.put("name", subtag.getName().getDisplayName() if subtag.getName().getDisplayName() else "")
+                subtag_dict.put("description", subtag.getComment() if subtag.getComment() else "")
+                subtag_dict.put("color", str(subtag.getName().getColor()) if subtag.getName().getColor() else "")
+                subtag_dict.put("type", subtag.getName().getDisplayName() if subtag.getName().getDisplayName() else "")
+                subtags_arr.add(subtag_dict)
+
+            # Add the array of subtags to the main tag_dict
+            tag_dict.put("subtags", subtags_arr)
+
             tag_info_arr.add(tag_dict)
 
         json_file = FileWriter(case_path)
         json_file.write(tag_info_arr.toJSONString())
         json_file.close()
-
-
 
     def process(self, dataSource, progressBar):
 
