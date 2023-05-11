@@ -12,7 +12,33 @@ import sys
 import subprocess
 import requests
 
+def create_folders_in_vmdk(api_key, base_url, uuid_path, folders):
+    assert api_key, "API key is required"
+    assert base_url, "Base URL is required"
+    assert uuid_path, "VMDK path is required"
+    assert folders, "Folders are required"
 
+    url = f"{base_url}/api/create-folders/"
+    headers = {"X-API-KEY": api_key}
+    data = {
+        "uuid_path": uuid_path,
+        "folders": folders,
+    }
+
+    try:
+        response = requests.post(url, headers=headers, data=data)
+        response.raise_for_status()
+
+        print(f"Response: {response.json()}")
+        return True
+
+    except requests.exceptions.HTTPError as e:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+        return False
 
 def sanitize_string(s):
     assert isinstance(s, str), 'Expecting a string!'
@@ -35,14 +61,15 @@ def read_case_config(json_filepath):
     for tag in data:
         try:
             #type_ = sanitize_string(tag['type'])
-            id = sanitize_string(str(tag['id']))
             name = sanitize_string(tag['name'])
             #description = sanitize_string(tag['description'])
         except KeyError as e:
             raise KeyError(f'KeyError - {e} not found in the tag')
 
-        directory_name = f"{id}-{name}"
+        directory_name = f"{name}"
         dir_names.append(directory_name)
+        #sort dir_name
+        dir_names.sort()
     return(dir_names)
 
 
@@ -722,6 +749,7 @@ def validate_server_address(address):
 # Form: All fields in the form
 
 def ForensicVMForm():
+    folders_created = False
     server_offline = False
     # Set the theme
     sg.theme("DefaultNoMoreNagging")
@@ -732,8 +760,11 @@ def ForensicVMForm():
     case_tag_path = case_directory_arg + "\\case_tags.json"
     if os.path.isfile(case_tag_path):
         case_tags = read_case_config(case_tag_path)
-        for tag in case_tags:
-            print(str(tag))
+        # convert case_tags to a string
+        case_tags_str = str(case_tags)
+    else:
+        case_tags_str=""
+        case_tags = {}
 
 
 
@@ -818,7 +849,7 @@ def ForensicVMForm():
     config_tab = sg.Tab("Configuration", config_layout, key="config_tab")
 
 
-    # Layout for the configuration tab
+    # Layout for the autopsy data
     autopsy_layout = [
         [sg.Frame("Case data",
                  [
@@ -849,10 +880,14 @@ def ForensicVMForm():
 
                  ])
     ], [sg.Frame("Generated UUID",   [[sg.Text("Unique Path and Case UUID"),
-                                       sg.Text(string_to_uuid(image_path_arg+case_name_arg))]])]
+                                       sg.Text(string_to_uuid(image_path_arg+case_name_arg))]]),
+
+        ], [sg.Frame("Case Tags", [
+        [sg.Multiline(case_tags_str, size=(120, 5), disabled=True)],
+    ]),
+            ]
     ]
     autopsy_tab = sg.Tab("Autopsy case", autopsy_layout, key="autopsy_tab")
-
 
 
     # Create the about tab
@@ -939,6 +974,14 @@ def ForensicVMForm():
                         window["reset_vm_button"].update(visible=False)
                         window["import_evidence_button"].update(visible=True)
                         window["save_screenshots_vm_button"].update(visible=True)
+                        if not folders_created:
+                            forensic_image_path = values["forensic_image_path"]
+                            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                            web_server_address = values["server_address"]
+                            forensic_api = values["forensic_api"]
+                            create_folders_in_vmdk(forensic_api, web_server_address, uuid_folder, case_tags)
+                            print("Folders created")
+                            folders_created = True
             elif not server_offline:
                 window["convert_to_vm_button"].update(visible=True)
                 window["link_to_vm_button"].update(visible=True)
