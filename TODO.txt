@@ -1,3 +1,11 @@
+---> Create a new TAB named iso store.
+---> Creae a list with existing iso
+---> Create a filetext selector to button to upload iso files
+
+---> Create a webservice that uploads a iso file
+---> Create a webservice that lists iso files
+---> Create a webservice that deletes a iso file
+
 ---> Authentication: Integrate with google authentication. Use this link as a reference:
 https://www.section.io/engineering-education/django-google-oauth/
 
@@ -40,11 +48,6 @@ aff forensic image
 
 ---> Make adicional comments and code documentation
 
----> Create the fields in the interface needed to create the virtual forensic analysis drive (size)
-
----> Change machine creation to include the virtual vmware evidence folder. Investigate if it can be also a zip file (is it in the autorized autopsy file 
-formats?)
-
-
+---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
 
 ---> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
