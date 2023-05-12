@@ -15,8 +15,6 @@ aff forensic image
 
 ---> BUG correction: create folder shares with spaces and convert machines with spaces
 
----> In Jython code: Export tags to the python plugin using sql or the sleuthkit database.
-
 ---> Create a new webservice that lists the machines available.
 
 ---> Create a new webservice that querys available cdroms in the iso files
