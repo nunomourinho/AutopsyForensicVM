@@ -12,6 +12,7 @@ import sys
 import subprocess
 import requests
 
+
 def create_folders_in_vmdk(api_key, base_url, uuid_path, folders):
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
@@ -40,6 +41,27 @@ def create_folders_in_vmdk(api_key, base_url, uuid_path, folders):
         print(f"An unexpected error occurred: {str(e)}")
         return False
 
+def create_folders_in_vmdk_background(api, web_server_address, uuid_folder, case_tags):
+    """
+    Run the create_folders_in_vmdk function in the background using a separate thread.
+
+    Args:
+        api (str): Forensic API
+        web_server_address (str): Web server address
+        uuid_folder (str): UUID folder
+        case_tags (str): Case tags
+
+    Returns:
+        None
+    """
+    # Define the target function
+    def target_function():
+        create_folders_in_vmdk(api, web_server_address, uuid_folder, case_tags)
+        print("Folders created")
+
+    # Create a thread and run the target function
+    thread = threading.Thread(target=target_function)
+    thread.start()
 def sanitize_string(s):
     assert isinstance(s, str), 'Expecting a string!'
     return re.sub('[^0-9a-zA-Z]+', '_', s)
@@ -902,10 +924,16 @@ def ForensicVMForm():
     ]
     about_tab = sg.Tab("About", about_layout, element_justification="center")
 
+    output_layout = [
+        [sg.Output(size=(140, 25), key="-OUTPUT-")],
+    ]
+
+    output_tab = sg.Tab("Output", output_layout, element_justification="left")
+
     # Create the layout for the window
     layout = [
         [sg.TabGroup([
-            [sg.TabGroup([[virtualize_tab, autopsy_tab, config_tab, about_tab]])],
+            [sg.TabGroup([[virtualize_tab, autopsy_tab, config_tab, output_tab, about_tab]])],
         ])]
     ]
 
@@ -979,8 +1007,7 @@ def ForensicVMForm():
                             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                             web_server_address = values["server_address"]
                             forensic_api = values["forensic_api"]
-                            create_folders_in_vmdk(forensic_api, web_server_address, uuid_folder, case_tags)
-                            print("Folders created")
+                            create_folders_in_vmdk_background(forensic_api, web_server_address, uuid_folder, case_tags)
                             folders_created = True
             elif not server_offline:
                 window["convert_to_vm_button"].update(visible=True)

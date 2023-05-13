@@ -80,46 +80,6 @@ class RunVMIngestModule(DataSourceIngestModule):
             raise IngestModuleException("MESI.BAT was not found in module folder " + bat_path)
 
 
-    # def add_tags_to_json(self, case_path):
-    #     tagsManager = Case.getCurrentCase().getServices().getTagsManager()
-    #     tags = tagsManager.getAllContentTags()
-    #
-    #     tag_info_arr = JSONArray()
-    #
-    #     for tag in tags:
-    #         tag_dict = JSONObject()
-    #         tag_dict.put("id", tag.getId())
-    #         tag_dict.put("name", tag.getName().getDisplayName() if tag.getName().getDisplayName() else "")
-    #         tag_dict.put("description", tag.getComment() if tag.getComment() else "")
-    #         tag_dict.put("color", str(tag.getName().getColor()) if tag.getName().getColor() else "")
-    #         tag_dict.put("type", tag.getName().getDisplayName() if tag.getName().getDisplayName() else "")
-    #
-    #         # Get the content associated with the tag
-    #         content = tag.getContent()
-    #
-    #         # Get all tags associated with the content (i.e., the "subtags")
-    #         contentTags = tagsManager.getContentTagsByContent(content)
-    #
-    #         # Add the subtags to the main tag's JSON
-    #         subtags_arr = JSONArray()
-    #         for subtag in contentTags:
-    #             subtag_dict = JSONObject()
-    #             subtag_dict.put("id", subtag.getId())
-    #             subtag_dict.put("name", subtag.getName().getDisplayName() if subtag.getName().getDisplayName() else "")
-    #             subtag_dict.put("description", subtag.getComment() if subtag.getComment() else "")
-    #             subtag_dict.put("color", str(subtag.getName().getColor()) if subtag.getName().getColor() else "")
-    #             subtag_dict.put("type", subtag.getName().getDisplayName() if subtag.getName().getDisplayName() else "")
-    #             subtags_arr.add(subtag_dict)
-    #
-    #         # Add the array of subtags to the main tag_dict
-    #         tag_dict.put("subtags", subtags_arr)
-    #
-    #         tag_info_arr.add(tag_dict)
-    #
-    #     json_file = FileWriter(case_path)
-    #     json_file.write(tag_info_arr.toJSONString())
-    #     json_file.close()
-
     def add_tags_to_json(self, case_path):
         tagsManager = Case.getCurrentCase().getServices().getTagsManager()
 
@@ -132,21 +92,7 @@ class RunVMIngestModule(DataSourceIngestModule):
             tag_dict = JSONObject()
             tag_dict.put("name", tag_name.getDisplayName() if tag_name.getDisplayName() else "")
 
-            # Get all tags associated with this tag name
-            #tags = tagsManager.getContentTagsByTagName(tag_name)
-
-            # Add the tags to the main tag's JSON
             tags_arr = JSONArray()
-            # for tag in tags:
-            #     tag_dict = JSONObject()
-            #     tag_dict.put("id", tag.getId())
-            #     tag_dict.put("description", tag.getComment() if tag.getComment() else "")
-            #     tag_dict.put("color", str(tag.getName().getColor()) if tag.getName().getColor() else "")
-            #     tag_dict.put("type", tag.getName().getDisplayName() if tag.getName().getDisplayName() else "")
-            #     tags_arr.add(tag_dict)
-
-            # Add the array of tags to the main tag_dict
-            #tag_dict.put("tags", tags_arr)
 
             tag_info_arr.add(tag_dict)
 
