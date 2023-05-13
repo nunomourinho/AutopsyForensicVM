@@ -788,52 +788,6 @@ def ForensicVMForm():
         case_tags_str=""
         case_tags = {}
 
-
-
-    # # Define the layout of the virtualize tab
-    # virtualize_layout = [
-    #     #[sg.Button("Configure", key="configure_button", size=(25, 1))],
-    #     [sg.Text("Cannot communicate with the ForensicVM Server. Please check access configuration on the"
-    #              " config tab, or check if the server is running. Press the test server button to see if it is running.",
-    #              key="alert_server_off", visible=False)],
-    #     [sg.Button("Virtualize - a) Convert to VM",
-    #                tooltip="Connect to Forensic VM Server and "
-    #                                      "virtualize the forensic Image", key="convert_to_vm_button", size=(25, 2),
-    #                visible=True,disabled=False)],
-    #     [sg.Button("Virtualize - b) Link to VM",
-    #                tooltip="Connect to Forensic VM Server and "
-    #                                      "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2),
-    #                visible=True,disabled=False)],
-    #     [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 2), visible=True,disabled=True)],
-    #     [sg.Button("Screenshot", key="screenshot_vm_button", size=(25, 2),
-    #                visible=True, disabled=False),
-    #      sg.Button("Save screenshots", key="save_screenshots_vm_button", size=(25, 2),
-    #                visible=True, disabled=False)],
-    #     [sg.Button("Make and download memory dump", key="download_memory_button", size=(25, 2), visible=True,
-    #                disabled=False)],
-    #     [sg.Button("Start VM", key="start_vm_button", size=(25, 2),
-    #                visible=True,
-    #                disabled=False)],
-    #     [sg.Button("Shutdown VM", key="shutdown_vm_button", size=(25, 2),
-    #                visible=True,
-    #                disabled=False)],
-    #     [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2),
-    #                visible=True,
-    #                disabled=False)],
-    #     [sg.Button("Stop VM", key="stop_vm_button", size=(25, 2), visible=True,
-    #                disabled=False)],
-    #     [sg.Button("Delete VM", key="delete_vm_button", size=(25, 2), visible=True,
-    #                disabled=False)],
-    #     [sg.Button("Open ForensicVM WebShell", key="open_forensic_shell_button", size=(25, 1), visible=True,
-    #                disabled=False)],
-    #     [sg.Button("Analyse ForensicVM performance", key="open_forensic_netdata_button", size=(25, 1),
-    #                visible=True,
-    #                disabled=False)],
-    #     [sg.Button("Import Evidence Disk", key="import_evidence_button", size=(25, 1), visible=True,
-    #                disabled=False)]
-    # ]
-    # virtualize_tab = sg.Tab("Virtualize", virtualize_layout, element_justification="center")
-
     # Create the frames
     convert_frame = sg.Frame("Convert forensic Image to VM", [
         [sg.Button("Virtualize - a) Convert to VM",
@@ -860,7 +814,11 @@ def ForensicVMForm():
         [sg.Button("Shutdown VM", key="shutdown_vm_button", size=(25, 2), visible=True, disabled=False)],
         [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2), visible=True, disabled=False)],
         [sg.Button("Stop VM", key="stop_vm_button", size=(25, 2), visible=True, disabled=False)],
-        [sg.Button("Delete VM", key="delete_vm_button", size=(25, 2), visible=True, disabled=False)]
+        [sg.Button("Delete VM", key="delete_vm_button",
+                   size=(25, 2),
+                   visible=True,
+                   disabled=False,
+                   button_color=('white', '#A00000'))]
     ])
 
     tools_frame = sg.Frame("Tools", [
@@ -995,17 +953,23 @@ def ForensicVMForm():
     about_tab = sg.Tab("About", about_layout, element_justification="center")
 
     output_layout = [
-        [sg.Output(size=(140, 34), key="-OUTPUT-")],
+        #[sg.Output(size=(140, 34), key="-OUTPUT-")],
+        [sg.Output(size=(100, 25), key="-OUTPUT-",
+                   background_color='black',
+                   text_color='white',
+                   font=('Courier New', 12))]
     ]
 
-    output_tab = sg.Tab("Output", output_layout, element_justification="left")
+    output_tab = sg.Tab("Output Console", output_layout, element_justification="left")
 
     # Create the layout for the window
     layout = [
         [sg.TabGroup([
+            #[sg.TabGroup([[virtualize_tab, autopsy_tab, config_tab, about_tab]])],
             [sg.TabGroup([[virtualize_tab, autopsy_tab, config_tab, output_tab, about_tab]])],
         ])]
     ]
+
 
     # Create the window
     window = sg.Window("Autopsy ForensicVM Client", layout, element_justification="center", icon=icon_path)
@@ -1026,7 +990,7 @@ def ForensicVMForm():
                 if server_ok != 0:
                     window["convert_to_vm_button"].update(disabled=not False)
                     window["link_to_vm_button"].update(disabled=not False)
-                    window["alert_server_off"].update(disabled=not True)
+                    window["alert_server_off"].update(visible=True)
                     window["start_vm_button"].update(disabled=not False)
                     window["stop_vm_button"].update(disabled=not False)
                     window["screenshot_vm_button"].update(disabled=not False)
@@ -1045,14 +1009,14 @@ def ForensicVMForm():
                 if check_vm_exists(forensic_api, uuid_folder, web_server_address):
                     window["convert_to_vm_button"].update(disabled=not False)
                     window["link_to_vm_button"].update(disabled=not False)
-                    window["delete_vm_button"].update(disabled=not False)
+                    window["delete_vm_button"].update(disabled=False)
                     window["open_forensic_vm_button"].update(disabled=not False)
                     window["open_forensic_shell_button"].update(disabled=not True)
                     window["open_forensic_netdata_button"].update(disabled=not True)
                     window["save_screenshots_vm_button"].update(disabled=not True)
                     return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
                     if vm_status.get("vm_status", "") == "running":
-                        window["delete_vm_button"].update(disabled=not False)
+                        window["delete_vm_button"].update(disabled=True)
                         window["start_vm_button"].update(disabled=not False)
                         window["screenshot_vm_button"].update(disabled=not True)
                         window["download_memory_button"].update(disabled=not True)
@@ -1063,7 +1027,7 @@ def ForensicVMForm():
                         window["open_forensic_vm_button"].update(disabled=not True)
                         window["save_screenshots_vm_button"].update(disabled=not True)
                     elif vm_status.get("vm_status", "") == "stopped":
-                        window["delete_vm_button"].update(disabled=True, visible=True)
+                        window["delete_vm_button"].update(disabled=False, visible=True)
                         window["start_vm_button"].update(disabled=not True)
                         window["screenshot_vm_button"].update(disabled=not False)
                         window["download_memory_button"].update(disabled=not False)
