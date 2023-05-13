@@ -1,4 +1,3 @@
----> Optimization: Run create forensic folders as a thread
 ---> Create a new TAB named iso store.
 ---> Creae a list with existing iso
 ---> Create a filetext selector to button to upload iso files

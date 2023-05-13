@@ -790,33 +790,103 @@ def ForensicVMForm():
 
 
 
+    # # Define the layout of the virtualize tab
+    # virtualize_layout = [
+    #     #[sg.Button("Configure", key="configure_button", size=(25, 1))],
+    #     [sg.Text("Cannot communicate with the ForensicVM Server. Please check access configuration on the"
+    #              " config tab, or check if the server is running. Press the test server button to see if it is running.",
+    #              key="alert_server_off", visible=False)],
+    #     [sg.Button("Virtualize - a) Convert to VM",
+    #                tooltip="Connect to Forensic VM Server and "
+    #                                      "virtualize the forensic Image", key="convert_to_vm_button", size=(25, 2),
+    #                visible=True,disabled=False)],
+    #     [sg.Button("Virtualize - b) Link to VM",
+    #                tooltip="Connect to Forensic VM Server and "
+    #                                      "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2),
+    #                visible=True,disabled=False)],
+    #     [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 2), visible=True,disabled=True)],
+    #     [sg.Button("Screenshot", key="screenshot_vm_button", size=(25, 2),
+    #                visible=True, disabled=False),
+    #      sg.Button("Save screenshots", key="save_screenshots_vm_button", size=(25, 2),
+    #                visible=True, disabled=False)],
+    #     [sg.Button("Make and download memory dump", key="download_memory_button", size=(25, 2), visible=True,
+    #                disabled=False)],
+    #     [sg.Button("Start VM", key="start_vm_button", size=(25, 2),
+    #                visible=True,
+    #                disabled=False)],
+    #     [sg.Button("Shutdown VM", key="shutdown_vm_button", size=(25, 2),
+    #                visible=True,
+    #                disabled=False)],
+    #     [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2),
+    #                visible=True,
+    #                disabled=False)],
+    #     [sg.Button("Stop VM", key="stop_vm_button", size=(25, 2), visible=True,
+    #                disabled=False)],
+    #     [sg.Button("Delete VM", key="delete_vm_button", size=(25, 2), visible=True,
+    #                disabled=False)],
+    #     [sg.Button("Open ForensicVM WebShell", key="open_forensic_shell_button", size=(25, 1), visible=True,
+    #                disabled=False)],
+    #     [sg.Button("Analyse ForensicVM performance", key="open_forensic_netdata_button", size=(25, 1),
+    #                visible=True,
+    #                disabled=False)],
+    #     [sg.Button("Import Evidence Disk", key="import_evidence_button", size=(25, 1), visible=True,
+    #                disabled=False)]
+    # ]
+    # virtualize_tab = sg.Tab("Virtualize", virtualize_layout, element_justification="center")
+
+    # Create the frames
+    convert_frame = sg.Frame("Convert forensic Image to VM", [
+        [sg.Button("Virtualize - a) Convert to VM",
+                   tooltip="Connect to Forensic VM Server and virtualize the forensic Image",
+                   key="convert_to_vm_button", size=(25, 2), visible=True, disabled=False)],
+        [sg.Button("Virtualize - b) Link to VM",
+                   tooltip="Connect to Forensic VM Server and virtualize the forensic Image",
+                   key="link_to_vm_button", size=(25, 2), visible=True, disabled=False)]
+    ])
+
+    screenshot_frame = sg.Frame("Screenshot", [
+        [sg.Button("Screenshot", key="screenshot_vm_button", size=(25, 2), visible=True, disabled=False)],
+        [sg.Button("Save screenshots", key="save_screenshots_vm_button", size=(25, 2), visible=True, disabled=False)]
+    ])
+
+    memory_frame = sg.Frame("Make and download memory dump", [
+        [sg.Button("Make and download memory dump", key="download_memory_button", size=(25, 2), visible=True,
+                   disabled=False)]
+    ])
+
+    vm_control_frame = sg.Frame("VM Control", [
+        [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 2), visible=True, disabled=True)],
+        [sg.Button("Start VM", key="start_vm_button", size=(25, 2), visible=True, disabled=False)],
+        [sg.Button("Shutdown VM", key="shutdown_vm_button", size=(25, 2), visible=True, disabled=False)],
+        [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2), visible=True, disabled=False)],
+        [sg.Button("Stop VM", key="stop_vm_button", size=(25, 2), visible=True, disabled=False)],
+        [sg.Button("Delete VM", key="delete_vm_button", size=(25, 2), visible=True, disabled=False)]
+    ])
+
+    tools_frame = sg.Frame("Tools", [
+        [sg.Button("Import Evidence Disk", key="import_evidence_button", size=(25, 1), visible=True, disabled=False)],
+        [sg.Button("Analyse ForensicVM performance", key="open_forensic_netdata_button", size=(25, 1), visible=True,
+                   disabled=False)],
+        [sg.Button("Open ForensicVM WebShell", key="open_forensic_shell_button", size=(25, 1), visible=True,
+                   disabled=False)]
+    ])
+
     # Define the layout of the virtualize tab
     virtualize_layout = [
-        #[sg.Button("Configure", key="configure_button", size=(25, 1))],
-        [sg.Text("Cannot communicate with the ForensicVM Server. Please check access configuration on the"
-                 " config tab, or check if the server is running. Press the test server button to see if it is running.",
-                 key="alert_server_off", visible=False)],
-        [sg.Button("Virtualize - a) Convert to VM",
-                   tooltip="Connect to Forensic VM Server and "
-                                         "virtualize the forensic Image", key="convert_to_vm_button", size=(25, 2),
-                   visible=True)],
-        [sg.Button("Virtualize - b) Link to VM",
-                   tooltip="Connect to Forensic VM Server and "
-                                         "virtualize the forensic Image", key="link_to_vm_button", size=(25, 2), visible=True)],
-        [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 2), visible=False)],
-        [sg.Button("Screenshot", key="screenshot_vm_button", size=(25, 2), visible=False),sg.Button("Save screenshots", key="save_screenshots_vm_button", size=(25, 2), visible=False)],
-        [sg.Button("Make and download memory dump", key="download_memory_button", size=(25, 2), visible=False)],
-        [sg.Button("Start VM", key="start_vm_button", size=(25, 2), visible=False)],
-        [sg.Button("Shutdown VM", key="shutdown_vm_button", size=(25, 2), visible=False)],
-        [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2), visible=False)],
-        [sg.Button("Stop VM", key="stop_vm_button", size=(25, 2), visible=False)],
-        [sg.Button("Delete VM", key="delete_vm_button", size=(25, 2), visible=False)],
-        [sg.Button("Open ForensicVM WebShell", key="open_forensic_shell_button", size=(25, 1), visible=False)],
-        [sg.Button("Analyse ForensicVM performance", key="open_forensic_netdata_button", size=(25, 1), visible=False)],
-        [sg.Button("Import Evidence Disk", key="import_evidence_button", size=(25, 1), visible=False)]
+        [sg.Column([[convert_frame], [vm_control_frame]],
+                   element_justification='left',
+                   vertical_alignment='top'),
+         sg.Column([[screenshot_frame], [memory_frame], [tools_frame]],
+                   element_justification='left',
+                   vertical_alignment='top')],
+        [sg.Text("Cannot communicate with the ForensicVM Server. Please check access configuration on the "
+                 "config tab, or check if the server is running. Press the test server button to see if it is running.",
+                 key="alert_server_off", visible=False)]
     ]
-    virtualize_tab = sg.Tab("Virtualize", virtualize_layout, element_justification="center")
 
+
+    # Create the virtualize tab
+    virtualize_tab = sg.Tab("Virtualize", virtualize_layout, element_justification="left")
     # layout for the configuration tab
     config_layout = [
         [sg.Frame("Forensic VM Server Configuration",
@@ -925,7 +995,7 @@ def ForensicVMForm():
     about_tab = sg.Tab("About", about_layout, element_justification="center")
 
     output_layout = [
-        [sg.Output(size=(140, 25), key="-OUTPUT-")],
+        [sg.Output(size=(140, 34), key="-OUTPUT-")],
     ]
 
     output_tab = sg.Tab("Output", output_layout, element_justification="left")
@@ -954,54 +1024,54 @@ def ForensicVMForm():
             if not server_offline:
                 server_ok, _ = test_api_key(forensic_api, web_server_address)
                 if server_ok != 0:
-                    window["convert_to_vm_button"].update(visible=False)
-                    window["link_to_vm_button"].update(visible=False)
-                    window["alert_server_off"].update(visible=True)
-                    window["start_vm_button"].update(visible=False)
-                    window["stop_vm_button"].update(visible=False)
-                    window["screenshot_vm_button"].update(visible=False)
-                    window["download_memory_button"].update(visible=False)
-                    window["save_screenshots_vm_button"].update(visible=False)
-                    window["delete_vm_button"].update(visible=False)
-                    window["reset_vm_button"].update(visible=False)
-                    window["import_evidence_button"].update(visible=False)
-                    window["open_forensic_vm_button"].update(visible=False)
-                    window["open_forensic_shell_button"].update(visible=False)
-                    window["open_forensic_netdata_button"].update(visible=False)
+                    window["convert_to_vm_button"].update(disabled=not False)
+                    window["link_to_vm_button"].update(disabled=not False)
+                    window["alert_server_off"].update(disabled=not True)
+                    window["start_vm_button"].update(disabled=not False)
+                    window["stop_vm_button"].update(disabled=not False)
+                    window["screenshot_vm_button"].update(disabled=not False)
+                    window["download_memory_button"].update(disabled=not False)
+                    window["save_screenshots_vm_button"].update(disabled=not False)
+                    window["delete_vm_button"].update(disabled=not False)
+                    window["reset_vm_button"].update(disabled=not False)
+                    window["import_evidence_button"].update(disabled=not False)
+                    window["open_forensic_vm_button"].update(disabled=not False)
+                    window["open_forensic_shell_button"].update(disabled=not False)
+                    window["open_forensic_netdata_button"].update(disabled=not False)
                     server_offline = True
 
             if server_ok == 0:
                 window["alert_server_off"].update(visible=False)
                 if check_vm_exists(forensic_api, uuid_folder, web_server_address):
-                    window["convert_to_vm_button"].update(visible=False)
-                    window["link_to_vm_button"].update(visible=False)
-                    window["delete_vm_button"].update(visible=False)
-                    window["open_forensic_vm_button"].update(visible=False)
-                    window["open_forensic_shell_button"].update(visible=True)
-                    window["open_forensic_netdata_button"].update(visible=True)
-                    window["save_screenshots_vm_button"].update(visible=True)
+                    window["convert_to_vm_button"].update(disabled=not False)
+                    window["link_to_vm_button"].update(disabled=not False)
+                    window["delete_vm_button"].update(disabled=not False)
+                    window["open_forensic_vm_button"].update(disabled=not False)
+                    window["open_forensic_shell_button"].update(disabled=not True)
+                    window["open_forensic_netdata_button"].update(disabled=not True)
+                    window["save_screenshots_vm_button"].update(disabled=not True)
                     return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
                     if vm_status.get("vm_status", "") == "running":
-                        window["delete_vm_button"].update(visible=False)
-                        window["start_vm_button"].update(visible=False)
-                        window["screenshot_vm_button"].update(visible=True)
-                        window["download_memory_button"].update(visible=True)
-                        window["shutdown_vm_button"].update(visible=True)
-                        window["stop_vm_button"].update(visible=True)
-                        window["reset_vm_button"].update(visible=True)
-                        window["import_evidence_button"].update(visible=False)
-                        window["open_forensic_vm_button"].update(visible=True)
-                        window["save_screenshots_vm_button"].update(visible=True)
+                        window["delete_vm_button"].update(disabled=not False)
+                        window["start_vm_button"].update(disabled=not False)
+                        window["screenshot_vm_button"].update(disabled=not True)
+                        window["download_memory_button"].update(disabled=not True)
+                        window["shutdown_vm_button"].update(disabled=not True)
+                        window["stop_vm_button"].update(disabled=not True)
+                        window["reset_vm_button"].update(disabled=not True)
+                        window["import_evidence_button"].update(disabled=not False)
+                        window["open_forensic_vm_button"].update(disabled=not True)
+                        window["save_screenshots_vm_button"].update(disabled=not True)
                     elif vm_status.get("vm_status", "") == "stopped":
-                        window["delete_vm_button"].update(visible=True)
-                        window["start_vm_button"].update(visible=True)
-                        window["screenshot_vm_button"].update(visible=False)
-                        window["download_memory_button"].update(visible=False)
-                        window["shutdown_vm_button"].update(visible=False)
-                        window["stop_vm_button"].update(visible=False)
-                        window["reset_vm_button"].update(visible=False)
-                        window["import_evidence_button"].update(visible=True)
-                        window["save_screenshots_vm_button"].update(visible=True)
+                        window["delete_vm_button"].update(disabled=True, visible=True)
+                        window["start_vm_button"].update(disabled=not True)
+                        window["screenshot_vm_button"].update(disabled=not False)
+                        window["download_memory_button"].update(disabled=not False)
+                        window["shutdown_vm_button"].update(disabled=not False)
+                        window["stop_vm_button"].update(disabled=not False)
+                        window["reset_vm_button"].update(disabled=not False)
+                        window["import_evidence_button"].update(disabled=not True)
+                        window["save_screenshots_vm_button"].update(disabled=not True)
                         if not folders_created:
                             forensic_image_path = values["forensic_image_path"]
                             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
@@ -1010,13 +1080,13 @@ def ForensicVMForm():
                             create_folders_in_vmdk_background(forensic_api, web_server_address, uuid_folder, case_tags)
                             folders_created = True
             elif not server_offline:
-                window["convert_to_vm_button"].update(visible=True)
-                window["link_to_vm_button"].update(visible=True)
-                window["delete_vm_button"].update(visible=False)
-                window["download_memory_button"].update(visible=False)
-                window["save_screenshots_vm_button"].update(visible=True)
-                window["open_forensic_shell_button"].update(visible=False)
-                window["open_forensic_netdata_button"].update(visible=False)
+                window["convert_to_vm_button"].update(disabled=not True)
+                window["link_to_vm_button"].update(disabled=not True)
+                window["delete_vm_button"].update(disabled=not False)
+                window["download_memory_button"].update(disabled=not False)
+                window["save_screenshots_vm_button"].update(disabled=not True)
+                window["open_forensic_shell_button"].update(disabled=not False)
+                window["open_forensic_netdata_button"].update(disabled=not False)
 
 
         if event == sg.WINDOW_CLOSED:
@@ -1137,14 +1207,14 @@ def ForensicVMForm():
                         copy)
 
             print("Convert")
-            window["convert_to_vm_button"].update(visible=False)
-            window["link_to_vm_button"].update(visible=False)
-            window["import_evidence_button"].update(visible=True)
-            window["open_forensic_vm_button"].update(visible=True)
-            window["stop_vm_button"].update(visible=True)
-            window["reset_vm_button"].update(visible=True)
-            window["open_forensic_shell_button"].update(visible=True)
-            window["open_forensic_netdata_button"].update(visible=True)
+            window["convert_to_vm_button"].update(disabled=not False)
+            window["link_to_vm_button"].update(disabled=not False)
+            window["import_evidence_button"].update(disabled=not True)
+            window["open_forensic_vm_button"].update(disabled=not True)
+            window["stop_vm_button"].update(disabled=not True)
+            window["reset_vm_button"].update(disabled=not True)
+            window["open_forensic_shell_button"].update(disabled=not True)
+            window["open_forensic_netdata_button"].update(disabled=not True)
 
         elif event == "link_to_vm_button":
 
@@ -1179,26 +1249,26 @@ def ForensicVMForm():
                                 uuid_folder,
                                 copy)
 
-                    window["convert_to_vm_button"].update(visible=False)
-                    window["link_to_vm_button"].update(visible=False)
-                    window["import_evidence_button"].update(visible=True)
-                    window["stop_vm_button"].update(visible=True)
-                    window["reset_vm_button"].update(visible=True)
-                    window["open_forensic_vm_button"].update(visible=True)
-                    window["open_forensic_shell_button"].update(visible=True)
-                    window["open_forensic_netdata_button"].update(visible=True)
+                    window["convert_to_vm_button"].update(disabled=not False)
+                    window["link_to_vm_button"].update(disabled=not False)
+                    window["import_evidence_button"].update(disabled=not True)
+                    window["stop_vm_button"].update(disabled=not True)
+                    window["reset_vm_button"].update(disabled=not True)
+                    window["open_forensic_vm_button"].update(disabled=not True)
+                    window["open_forensic_shell_button"].update(disabled=not True)
+                    window["open_forensic_netdata_button"].update(disabled=not True)
             else:
                 print(vm_status)
                 if vm_status.get("vm_status", "") == "running":
                     sg.popup("The machine is running.\n No actions required")
-                    window["convert_to_vm_button"].update(visible=False)
-                    window["link_to_vm_button"].update(visible=False)
-                    window["import_evidence_button"].update(visible=True)
-                    window["stop_vm_button"].update(visible=True)
-                    window["reset_vm_button"].update(visible=True)
-                    window["open_forensic_vm_button"].update(visible=True)
-                    window["open_forensic_shell_button"].update(visible=True)
-                    window["open_forensic_netdata_button"].update(visible=True)
+                    window["convert_to_vm_button"].update(disabled=not False)
+                    window["link_to_vm_button"].update(disabled=not False)
+                    window["import_evidence_button"].update(disabled=not True)
+                    window["stop_vm_button"].update(disabled=not True)
+                    window["reset_vm_button"].update(disabled=not True)
+                    window["open_forensic_vm_button"].update(disabled=not True)
+                    window["open_forensic_shell_button"].update(disabled=not True)
+                    window["open_forensic_netdata_button"].update(disabled=not True)
                 elif vm_status.get("vm_status", "") == "stopped":
                     sg.popup("The vm exists and is stopped.\n Starting the VM in the remote server.\n")
                     # TODO: Start the VM in the remote_port
