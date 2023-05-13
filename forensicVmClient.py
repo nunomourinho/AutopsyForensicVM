@@ -12,6 +12,53 @@ import sys
 import subprocess
 import requests
 
+
+def upload_iso(api_key, base_url, iso_file_path):
+    assert api_key, "API key is required"
+    assert base_url, "Base URL is required"
+    assert iso_file_path, "ISO file path is required"
+
+    url = f"{base_url}/api/upload-iso/"
+    headers = {
+        'X-Api-Key': api_key
+    }
+    files = {
+        'iso_file': open(iso_file_path, 'rb')
+    }
+
+    try:
+        response = requests.post(url, headers=headers, files=files, stream=True)
+        response.raise_for_status()
+        total_size = int(response.headers.get('Content-Length', 0))
+        bytes_uploaded = 0
+
+        progress_bar = None
+
+        for chunk in response.iter_content(chunk_size=1024):
+            if chunk:
+                bytes_uploaded += len(chunk)
+                progress_bar = sg.one_line_progress_meter(
+                    "Uploading ISO file",
+                    bytes_uploaded,
+                    total_size,
+                    "key",
+                    f"Uploaded {bytes_uploaded / 1048576:.2f} / {total_size / 1048576:.2f} MB"
+                )
+                if not progress_bar:
+                    break
+
+        if progress_bar:
+            sg.popup(f"ISO file uploaded successfully")
+            return True
+        else:
+            sg.popup_error("Upload canceled by user")
+            return False
+
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return False
+
+
 def list_iso_files(api_key, base_url):
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
@@ -783,6 +830,12 @@ def validate_server_address(address):
         return False
 
 
+# Event handler for the file browse button
+def handle_file_browse(event, values, window):
+    iso_file_path = values['-BROWSE-']
+    window['-CDROM FILE-'].update(value=iso_file_path)
+    window['-UPLOAD-'].update(disabled=False)
+
 # Form: All fields in the form
 
 def ForensicVMForm():
@@ -806,8 +859,7 @@ def ForensicVMForm():
 
     upload_frame = sg.Frame('Upload', [
         [sg.Input(key='-CDROM FILE-', enable_events=True, visible=False),
-         sg.FileBrowse('Browse', key='-BROWSE-', file_types=(('ISO Files', '*.iso'),)),
-         sg.Button('Upload', key='-UPLOAD-', disabled=True)]
+         sg.Button('Browse and Upload', key='-BROWSE-', disabled=False)]
     ])
     """
     Frame: Upload
@@ -1025,7 +1077,6 @@ def ForensicVMForm():
     about_tab = sg.Tab("About", about_layout, element_justification="center")
 
     output_layout = [
-        #[sg.Output(size=(140, 34), key="-OUTPUT-")],
         [sg.Output(size=(100, 25), key="-OUTPUT-",
                    background_color='black',
                    text_color='white',
@@ -1044,7 +1095,9 @@ def ForensicVMForm():
 
 
     # Create the window
+
     window = sg.Window("Autopsy ForensicVM Client", layout, element_justification="center", icon=icon_path)
+
 
 
     # Event loop
@@ -1127,6 +1180,33 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == '-BROWSE-':
+            try:
+                save_path = sg.popup_get_file('Choose iso file',
+                                              save_as=False,
+                                              no_window=True,
+                                              default_extension=".iso",
+                                              file_types=(("Iso Files", "*.iso"),))
+                if save_path:
+                    api_key = values["forensic_api"]
+                    base_url = values["server_address"]
+                    result = upload_iso(api_key, base_url, save_path)
+                    if result:
+                        sg.popup('Upload successful')
+                    else:
+                        sg.popup_error('Upload failed')
+            except Exception as e:
+                print(str(e))
+        elif event == '-LIST-':
+            web_server_address = values["server_address"]
+            forensic_api = values["forensic_api"]
+            try:
+                iso_files = list_iso_files(forensic_api, web_server_address)
+                if iso_files:
+                    print(iso_files)
+                    window['-CDROM LIST-'].update(iso_files['iso_files'])
+            except Exception as e:
+                print(str(e))
         elif event == "save_screenshots_vm_button":
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
