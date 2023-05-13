@@ -12,6 +12,21 @@ import sys
 import subprocess
 import requests
 
+def list_iso_files(api_key, base_url):
+    assert api_key, "API key is required"
+    assert base_url, "Base URL is required"
+
+    url = f"{base_url}/api/list-iso-files/"
+    headers = {"X-Api-Key": api_key}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        return data
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return None
 
 def create_folders_in_vmdk(api_key, base_url, uuid_path, folders):
     assert api_key, "API key is required"
@@ -788,6 +803,59 @@ def ForensicVMForm():
         case_tags_str=""
         case_tags = {}
 
+
+    upload_frame = sg.Frame('Upload', [
+        [sg.Input(key='-CDROM FILE-', enable_events=True, visible=False),
+         sg.FileBrowse('Browse', key='-BROWSE-', file_types=(('ISO Files', '*.iso'),)),
+         sg.Button('Upload', key='-UPLOAD-', disabled=True)]
+    ])
+    """
+    Frame: Upload
+    Components:
+    - Input field for CD-ROM file path (hidden by default)
+    - File browse button for selecting an ISO file
+    - Upload button (disabled until a file is selected)
+    """
+
+    cdrom_frame = sg.Frame('Manage', [
+        [sg.Button('Insert', key='-INSERT-'), sg.Button('Eject', key='-EJECT-')],
+    ])
+    """
+    Frame: Manage
+    Components:
+    - Button: Insert (for inserting CD-ROM)
+    - Button: Eject (for ejecting CD-ROM)
+    """
+
+    delete_frame = sg.Frame('Delete', [
+        [sg.Button('Delete', key='-DELETE-')],
+    ])
+    """
+    Frame: Delete
+    Components:
+    - Button: Delete (for deleting CD-ROM)
+    """
+
+    list_frame = sg.Frame('List', [
+        [sg.Button('Remote ISO files', key='-LIST-', disabled=False)]
+    ])
+    """
+    Frame: List
+    Components:
+    - Button: Remote ISO files (for fetching and displaying a list of remote ISO files)
+    """
+
+    iso_frame = sg.Frame('ISO Management', [
+            [sg.Listbox([], size=(61, 21), key='-CDROM LIST-', enable_events=True)],
+            [list_frame, cdrom_frame, upload_frame, delete_frame],
+        ])
+    """
+    Frame: ISO Management
+    Components:
+    - Listbox: Displaying CD-ROMs (initially empty)
+    - Other frames for managing CD-ROMs (list_frame, cdrom_frame, upload_frame, delete_frame)
+    """
+
     # Create the frames
     convert_frame = sg.Frame("Convert forensic Image to VM", [
         [sg.Button("Virtualize - a) Convert to VM",
@@ -799,30 +867,31 @@ def ForensicVMForm():
     ])
 
     screenshot_frame = sg.Frame("Screenshot", [
-        [sg.Button("Screenshot", key="screenshot_vm_button", size=(25, 2), visible=True, disabled=False)],
-        [sg.Button("Save screenshots", key="save_screenshots_vm_button", size=(25, 2), visible=True, disabled=False)]
+        [sg.Button("Screenshot", key="screenshot_vm_button", size=(25, 2), visible=True, disabled=True)],
+        [sg.Button("Save screenshots", key="save_screenshots_vm_button", size=(25, 2), visible=True, disabled=True)]
     ])
 
     memory_frame = sg.Frame("Make and download memory dump", [
         [sg.Button("Make and download memory dump", key="download_memory_button", size=(25, 2), visible=True,
-                   disabled=False)]
+                   disabled=True)]
     ])
 
     vm_control_frame = sg.Frame("VM Control", [
         [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 2), visible=True, disabled=True)],
-        [sg.Button("Start VM", key="start_vm_button", size=(25, 2), visible=True, disabled=False)],
-        [sg.Button("Shutdown VM", key="shutdown_vm_button", size=(25, 2), visible=True, disabled=False)],
-        [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2), visible=True, disabled=False)],
-        [sg.Button("Stop VM", key="stop_vm_button", size=(25, 2), visible=True, disabled=False)],
+        [sg.Button("Start VM", key="start_vm_button", size=(25, 2), visible=True, disabled=True)],
+        [sg.Button("Shutdown VM", key="shutdown_vm_button", size=(25, 2), visible=True, disabled=True)],
+        [sg.Button("Reset VM", key="reset_vm_button", size=(25, 2), visible=True, disabled=True)],
+        [sg.Button("Stop VM", key="stop_vm_button", size=(25, 2), visible=True, disabled=True)],
         [sg.Button("Delete VM", key="delete_vm_button",
                    size=(25, 2),
                    visible=True,
-                   disabled=False,
+                   disabled=True,
                    button_color=('white', '#A00000'))]
     ])
 
     tools_frame = sg.Frame("Tools", [
-        [sg.Button("Import Evidence Disk", key="import_evidence_button", size=(25, 1), visible=True, disabled=False)],
+        [sg.Button("Import Evidence Disk", key="import_evidence_button", size=(25, 1), visible=True,
+                   disabled=True)],
         [sg.Button("Analyse ForensicVM performance", key="open_forensic_netdata_button", size=(25, 1), visible=True,
                    disabled=False)],
         [sg.Button("Open ForensicVM WebShell", key="open_forensic_shell_button", size=(25, 1), visible=True,
@@ -834,7 +903,10 @@ def ForensicVMForm():
         [sg.Column([[convert_frame], [vm_control_frame]],
                    element_justification='left',
                    vertical_alignment='top'),
-         sg.Column([[screenshot_frame], [memory_frame], [tools_frame]],
+        sg.Column([[iso_frame]],
+                   element_justification='left',
+                   vertical_alignment='top'),
+        sg.Column([[screenshot_frame], [memory_frame], [tools_frame]],
                    element_justification='left',
                    vertical_alignment='top')],
         [sg.Text("Cannot communicate with the ForensicVM Server. Please check access configuration on the "

@@ -1,9 +1,23 @@
+---> Create a webservice that lists iso files
+---> Create a new webservice that querys available cdroms in the iso files
+
+---> Create a webservice that uploads a iso file
+---> Create a new webservice that uploads a big iso file, by chunks, to be called by ajax or pythonsimplegui
+
+---> Create a new webservice that inserts a cdrom inside da virtual machine. Example:
+{ "execute": "blockdev-change-medium",
+"arguments": { "id": "ide0-1-0",
+"filename": "e:/iso/damsmalllinux.iso",
+"format": "raw" } }
+
+---> Create a new webservice that enjects a cdrom. Example:
+{ "execute": "human-monitor-command",
+     "arguments": { "command-line": "eject ide2-cd0" } }
+
 ---> Create a new TAB named iso store.
 ---> Creae a list with existing iso
 ---> Create a filetext selector to button to upload iso files
 
----> Create a webservice that uploads a iso file
----> Create a webservice that lists iso files
 ---> Create a webservice that deletes a iso file
 
 ---> Authentication: Integrate with google authentication. Use this link as a reference:
@@ -25,26 +39,14 @@ aff forensic image
 
 ---> Create a new webservice that lists the machines available.
 
----> Create a new webservice that querys available cdroms in the iso files
-
----> Create a new webservice that uploads a big iso file, by chunks, to be called by ajax or pythonsimplegui
-
----> Create a new webservice that inserts a cdrom inside da virtual machine. Example:
-{ "execute": "blockdev-change-medium",
-"arguments": { "id": "ide0-1-0",
-"filename": "e:/iso/damsmalllinux.iso",
-"format": "raw" } }
-
----> Create a new webservice that enjects a cdrom. Example:
-{ "execute": "human-monitor-command",
-     "arguments": { "command-line": "eject ide2-cd0" } }
-
 
 ---> Create a new webservice that snapshots the machine via qmp and returns the image as a file.
 
 ---> Create a new webservice that adds a network card with external visibility (device_add driver=e1000 id=net1)
 
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
+
+---> Create a webservice that injects a network card inside a running machine
 
 ---> Make adicional comments and code documentation
 
