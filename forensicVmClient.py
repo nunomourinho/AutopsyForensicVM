@@ -12,6 +12,30 @@ import sys
 import subprocess
 import requests
 
+def delete_iso(api_key, base_url, iso_filename):
+    assert api_key, "API key is required"
+    assert base_url, "Base URL is required"
+    assert iso_filename, "ISO file name is required"
+
+    url = f"{base_url}/api/delete-iso/{iso_filename}/"
+    headers = {
+        'X-Api-Key': api_key
+    }
+
+    try:
+        response = requests.post(url, headers=headers)
+        response.raise_for_status()
+
+        if response.status_code == requests.codes.ok:
+            print(f"ISO file {iso_filename} deleted successfully")
+            return True
+        else:
+            print("Failed to delete ISO file")
+            return False
+
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return False
 
 def upload_iso(api_key, base_url, iso_file_path):
     assert api_key, "API key is required"
@@ -48,7 +72,6 @@ def upload_iso(api_key, base_url, iso_file_path):
                     break
 
         if progress_bar:
-            sg.popup(f"ISO file uploaded successfully")
             return True
         else:
             sg.popup_error("Upload canceled by user")
@@ -843,6 +866,10 @@ def ForensicVMForm():
     server_offline = False
     # Set the theme
     sg.theme("DefaultNoMoreNagging")
+    # Define the filename for the JSON file
+
+    filename = "config.json"
+    icon_path = "forensicVMCLient.ico"
 
     # Load the configuration from the JSON file if it exists
     config = load_config(filename)
@@ -1180,6 +1207,29 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == '-DELETE-':
+            # Get the selected ISO file from the Listbox
+            try:
+                selected_files = values['-CDROM LIST-']
+                print(selected_files)
+                if selected_files:
+                    iso_filename = selected_files[0]
+                    # Call the delete_iso function
+                    api_key = values["forensic_api"]
+                    base_url = values["server_address"]
+                    deleted = delete_iso(api_key, base_url, iso_filename)
+                    if deleted:
+                        web_server_address = values["server_address"]
+                        forensic_api = values["forensic_api"]
+                        try:
+                            iso_files = list_iso_files(forensic_api, web_server_address)
+                            if iso_files:
+                                print(iso_files)
+                                window['-CDROM LIST-'].update(iso_files['iso_files'])
+                        except Exception as e:
+                            print(str(e))
+            except Exception as e:
+                print(str(e))
         elif event == '-BROWSE-':
             try:
                 save_path = sg.popup_get_file('Choose iso file',
@@ -1193,6 +1243,15 @@ def ForensicVMForm():
                     result = upload_iso(api_key, base_url, save_path)
                     if result:
                         sg.popup('Upload successful')
+                        web_server_address = values["server_address"]
+                        forensic_api = values["forensic_api"]
+                        try:
+                            iso_files = list_iso_files(forensic_api, web_server_address)
+                            if iso_files:
+                                print(iso_files)
+                                window['-CDROM LIST-'].update(iso_files['iso_files'])
+                        except Exception as e:
+                            print(str(e))
                     else:
                         sg.popup_error('Upload failed')
             except Exception as e:
