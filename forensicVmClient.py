@@ -12,6 +12,25 @@ import sys
 import subprocess
 import requests
 
+def insert_cdrom(api_key, base_url, uuid, filename):
+    assert api_key, "API key is required"
+    assert base_url, "Base URL is required"
+    assert uuid, "UUID is required"
+    assert filename, "Filename is required"
+
+    url = f"{base_url}/api/insert-cdrom/{uuid}/{filename}/"
+    headers = {
+        'X-Api-Key': api_key
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return None
+
 def eject_cdrom(api_key, base_url, uuid):
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
@@ -1236,6 +1255,22 @@ def ForensicVMForm():
                     print(response)
                 else:
                     print("Failed to eject CD-ROM")
+            except Exception as e:
+                 print(str(e))
+        elif event == '-INSERT-':
+            try:
+                api_key = values["forensic_api"]
+                base_url = values["server_address"]
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                selected_files = values['-CDROM LIST-']
+                if selected_files:
+                    iso_filename = selected_files[0]
+                    response = insert_cdrom(api_key, base_url, uuid_folder, iso_filename)
+                    if response:
+                        print(response)
+                    else:
+                        print("Failed to insert CD-ROM")
             except Exception as e:
                  print(str(e))
         elif event == '-DELETE-':
