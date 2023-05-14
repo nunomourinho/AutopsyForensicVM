@@ -1,14 +1,12 @@
----> Create a new webservice that inserts a cdrom inside da virtual machine. Example:
-{ "execute": "blockdev-change-medium",
-"arguments": { "id": "ide0-1-0",
-"filename": "e:/iso/damsmalllinux.iso",
-"format": "raw" } }
+---> Create a webservice that injects a network card inside a running machine
 
----> Create a new webservice that enjects a cdrom. Example:
-{ "execute": "human-monitor-command",
-     "arguments": { "command-line": "eject ide2-cd0" } }
+---> Multifactor autentication: https://www.cloudwithdjango.com/multi-factor-authentication-mfa-for-your-django-admin-page/
 
+---> Create a new webservice that adds a network card with external visibility (device_add driver=e1000 id=net1)
 
+---> Create a new webservice that lists offline plugins
+
+---> Create a new webservice that runs a plugin
 
 ---> Authentication: Integrate with google authentication. Use this link as a reference:
 https://www.section.io/engineering-education/django-google-oauth/
@@ -16,27 +14,27 @@ https://www.section.io/engineering-education/django-google-oauth/
 ---> Change webservices to support autentication
 
 Run a machine in snap mode:
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ---> Change forensic2v script so that in the snap mode it creates a new script file with mount script to mount the dd, efw or
 aff forensic image
+
+
 ---> Create a new webservice that mounts a folder inside the other folder
 ---> Change the webservice to also mount the original forensic image
+
+
 ---> Sequence to run: Determine free port on server, Create ssh connection with port redirect to samba port, mount samba share on mnt folder, mount image on efw or aff folder via script,      run the machine
 ---> Sequence to stop. Stop the machine, umount aff, umount mnt, terminate samba session
-
 ---> Create a new webservice that umounts a folder
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 ---> BUG correction: create folder shares with spaces and convert machines with spaces
 
 ---> Create a new webservice that lists the machines available.
 
-
 ---> Create a new webservice that snapshots the machine via qmp and returns the image as a file.
 
----> Create a new webservice that adds a network card with external visibility (device_add driver=e1000 id=net1)
-
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
-
----> Create a webservice that injects a network card inside a running machine
 
 ---> Make adicional comments and code documentation
 
