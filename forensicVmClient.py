@@ -12,6 +12,24 @@ import sys
 import subprocess
 import requests
 
+def eject_cdrom(api_key, base_url, uuid):
+    assert api_key, "API key is required"
+    assert base_url, "Base URL is required"
+    assert uuid, "UUID is required"
+
+    url = f"{base_url}/api/eject-cdrom/{uuid}/"
+    headers = {
+        'X-Api-Key': api_key
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return None
+
 def delete_iso(api_key, base_url, iso_filename):
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
@@ -1207,6 +1225,19 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == '-EJECT-':
+            try:
+                api_key = values["forensic_api"]
+                base_url = values["server_address"]
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                response = eject_cdrom(api_key, base_url, uuid_folder)
+                if response:
+                    print(response)
+                else:
+                    print("Failed to eject CD-ROM")
+            except Exception as e:
+                 print(str(e))
         elif event == '-DELETE-':
             # Get the selected ISO file from the Listbox
             try:
