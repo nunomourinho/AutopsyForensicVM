@@ -12,6 +12,25 @@ import sys
 import subprocess
 import requests
 
+def insert_network_card(api_key, uuid_path, base_url):
+    assert api_key, "API key is required"
+    assert base_url, "Base URL is required"
+    assert uuid, "UUID is required"
+
+    url = f'{base_url}/api/insert-network-card/{uuid_path}'
+    print(url)
+
+    headers = {'X-API-KEY': api_key}
+
+    #data = {'uuid': uuid}
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        print('Network card inserted successfully.')
+    else:
+        print(f'Failed to insert network card. Error: {response.text}')
+
 def insert_cdrom(api_key, base_url, uuid, filename):
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
@@ -1006,6 +1025,8 @@ def ForensicVMForm():
     ])
 
     tools_frame = sg.Frame("Tools", [
+        [sg.Button("Insert network card", key="insert_network_button", size=(25, 1), visible=True,
+                   disabled=True)],
         [sg.Button("Import Evidence Disk", key="import_evidence_button", size=(25, 1), visible=True,
                    disabled=True)],
         [sg.Button("Analyse ForensicVM performance", key="open_forensic_netdata_button", size=(25, 1), visible=True,
@@ -1208,6 +1229,7 @@ def ForensicVMForm():
                         window["delete_vm_button"].update(disabled=True)
                         window["start_vm_button"].update(disabled=not False)
                         window["screenshot_vm_button"].update(disabled=not True)
+                        window["insert_network_button"].update(disabled=False)
                         window["download_memory_button"].update(disabled=not True)
                         window["shutdown_vm_button"].update(disabled=not True)
                         window["stop_vm_button"].update(disabled=not True)
@@ -1220,6 +1242,7 @@ def ForensicVMForm():
                         window["start_vm_button"].update(disabled=not True)
                         window["screenshot_vm_button"].update(disabled=not False)
                         window["download_memory_button"].update(disabled=not False)
+                        window["insert_network_button"].update(disabled=True)
                         window["shutdown_vm_button"].update(disabled=not False)
                         window["stop_vm_button"].update(disabled=not False)
                         window["reset_vm_button"].update(disabled=not False)
@@ -1255,6 +1278,19 @@ def ForensicVMForm():
                     print(response)
                 else:
                     print("Failed to eject CD-ROM")
+            except Exception as e:
+                 print(str(e))
+        elif event == 'insert_network_button':
+            try:
+                api_key = values["forensic_api"]
+                base_url = values["server_address"]
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                response = insert_network_card(api_key, uuid_folder, base_url)
+                if response:
+                    print(response)
+                else:
+                    print("Failed to insert network card")
             except Exception as e:
                  print(str(e))
         elif event == '-INSERT-':

@@ -1,9 +1,7 @@
----> Multifactor autentication: https://www.cloudwithdjango.com/multi-factor-authentication-mfa-for-your-django-admin-page/
-
 ---> Create a webservice that injects a network card inside a running machine
 ---> Create a new webservice that adds a network card with external visibility (device_add driver=e1000 id=net1)
 
----> Create a new webservice that lists offline plugins
+---> Create a new webservice that lists offline plugins compatible with the machine
 
 ---> Create a new webservice that runs a plugin
 
@@ -38,5 +36,7 @@ aff forensic image
 ---> Make adicional comments and code documentation
 
 ---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
+
+---> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
 
 ---> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
