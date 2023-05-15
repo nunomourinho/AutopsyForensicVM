@@ -1,7 +1,6 @@
----> Create a webservice that injects a network card inside a running machine
-
 ---> Multifactor autentication: https://www.cloudwithdjango.com/multi-factor-authentication-mfa-for-your-django-admin-page/
 
+---> Create a webservice that injects a network card inside a running machine
 ---> Create a new webservice that adds a network card with external visibility (device_add driver=e1000 id=net1)
 
 ---> Create a new webservice that lists offline plugins
@@ -11,7 +10,7 @@
 ---> Authentication: Integrate with google authentication. Use this link as a reference:
 https://www.section.io/engineering-education/django-google-oauth/
 
----> Change webservices to support autentication
+---> Change webservices to support autentication of a logged user (called from webpage)
 
 Run a machine in snap mode:
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
