@@ -137,6 +137,25 @@ def upload_iso(api_key, base_url, iso_file_path):
         print('Error:', e)
         return False
 
+def run_plugin(api_key, base_url, plugin_directory, image_uuid):
+    assert api_key, "API key is required"
+    assert base_url, "Base URL is required"
+    assert plugin_directory, "Plugin directory is required"
+    assert image_uuid, "Image UUID is required"
+
+    url = f"{base_url}/api/run-plugin/"
+    headers = {"X-Api-Key": api_key}
+    params = {"plugin_directory": plugin_directory, "image_uuid": image_uuid}
+
+    try:
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        return data
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return None
+
 def list_plugins(api_key, base_url):
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
@@ -1372,6 +1391,29 @@ def ForensicVMForm():
                         print(response)
                     else:
                         print("Failed to insert CD-ROM")
+            except Exception as e:
+                 print(str(e))
+        elif event == '-RUN PLUGIN-':
+            try:
+                api_key = values["forensic_api"]
+                base_url = values["server_address"]
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                selected_files = values['-PLUGIN LIST-']
+                if selected_files:
+                    pattern = r'\((.*?)\)'
+                    matches = re.findall(pattern, selected_files[0])
+
+                    # Check if any matches found
+                    if matches:
+                        plugin_dir = matches[0]
+                        response = run_plugin(api_key, base_url, plugin_dir, uuid_folder)
+                        if response:
+                            print(response)
+                        else:
+                            print("Failed to run plugin")
+                        print(plugin_dir)
+
             except Exception as e:
                  print(str(e))
         elif event == '-DELETE-':
