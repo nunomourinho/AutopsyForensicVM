@@ -1,6 +1,3 @@
----> Create a webservice that injects a network card inside a running machine
-BUG: The network card is not inserted. Change webservice to append or remove the network card line to the init file.
-
 ---> Create a new webservice that lists offline plugins compatible with the machine
 
 ---> Create a new webservice that runs a plugin
@@ -12,6 +9,7 @@ BUG: The network card is not inserted. Change webservice to append or remove the
 https://www.section.io/engineering-education/django-google-oauth/
 
 ---> Change webservices to support autentication of a logged user (called from webpage)
+---C Create ajax client to shutdown machine and change noVNC button actions
 
 Run a machine in snap mode:
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -27,6 +25,8 @@ aff forensic image
 ---> Sequence to stop. Stop the machine, umount aff, umount mnt, terminate samba session
 ---> Create a new webservice that umounts a folder
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+---> BUG Correction: Test network insert in several OS
 
 ---> BUG correction: create folder shares with spaces and convert machines with spaces
 
