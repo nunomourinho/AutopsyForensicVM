@@ -1,17 +1,27 @@
+OFFLINE PLUGINS
 ---> Create a new webservice that lists offline plugins compatible with the machine
-
 ---> Create a new webservice that runs a plugin
 
+MEMORY
 ---> Create webservice that reads memory size from init file
 ---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
 
+AUTHENTICATION
+---> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
 ---> Authentication: Integrate with google authentication. Use this link as a reference:
 https://www.section.io/engineering-education/django-google-oauth/
 
----> Change webservices to support autentication of a logged user (called from webpage)
----C Create ajax client to shutdown machine and change noVNC button actions
 
-Run a machine in snap mode:
+SNAPSHOTS
+---> Create a new webservice that snapshots the machine and creates a new start script
+---> Create a new webservice that delets a shapshot. Only the snapshots not referenced should be deleted. The first snapshot should not be deleted
+---> Create a new webservice that list available snapshots 
+
+NOVNC BUTTONS:
+---> Change webservices to support autentication of a logged user (called from webpage)
+---> Create ajax client to shutdown machine and change noVNC button actions
+
+SNAP MODE: Run a machine in snap mode:
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ---> Change forensic2v script so that in the snap mode it creates a new script file with mount script to mount the dd, efw or
 aff forensic image
@@ -32,13 +42,11 @@ aff forensic image
 
 ---> Create a new webservice that lists the machines available.
 
----> Create a new webservice that snapshots the machine via qmp and returns the image as a file.
 
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
 
 ---> Make adicional comments and code documentation
 
 
----> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
 
 ---> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
