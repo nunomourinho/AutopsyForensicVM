@@ -1,7 +1,10 @@
 OFFLINE PLUGINS
----> Create a new webservice that lists offline plugins compatible with the machine
----> Create a new webservice that runs a plugin
+---> Fix the run a plugin should only be run when the machine is off and stoped
 
+SNAPSHOTS
+---> Create a new webservice that snapshots the machine and creates a new start script
+---> Create a new webservice that delets a shapshot. Only the snapshots not referenced should be deleted. The first snapshot should not be deleted
+---> Create a new webservice that list available snapshots 
 
 MEMORY
 ---> Create webservice that reads memory size from init file
@@ -12,15 +15,15 @@ RECORD VIDEO
 ---> Create a webservice that stops video recording
 ---> Create a webservice that saves the video file
 
+WIRESHARK
+---> Create a webservice that adds a new network card that records network trafic
+---> Create a new webservice that disables this network card, and downloads the wireshark file
+
 AUTHENTICATION
 ---> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
 ---> Authentication: Integrate with google authentication. Use this link as a reference:
 https://www.section.io/engineering-education/django-google-oauth/
 
-SNAPSHOTS
----> Create a new webservice that snapshots the machine and creates a new start script
----> Create a new webservice that delets a shapshot. Only the snapshots not referenced should be deleted. The first snapshot should not be deleted
----> Create a new webservice that list available snapshots 
 
 NOVNC BUTTONS:
 ---> Change webservices to support autentication of a logged user (called from webpage)
