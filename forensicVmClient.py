@@ -1035,6 +1035,8 @@ def ForensicVMForm():
                    disabled=False)]
     ])
 
+
+
     # Define the layout of the virtualize tab
     virtualize_layout = [
         [sg.Column([[convert_frame], [vm_control_frame]],
