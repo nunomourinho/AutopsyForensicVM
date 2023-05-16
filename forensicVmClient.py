@@ -1035,14 +1035,62 @@ def ForensicVMForm():
                    disabled=False)]
     ])
 
+    list_plugins_frame = sg.Frame('List', [
+        [sg.Button('List Remote Plugins', key='-LIST PLUGINS-', disabled=False)]
+    ])
 
+    run_plugin_frame = sg.Frame('Run', [
+        [sg.Button('Run Selected Plugin', key='-RUN PLUGIN-', disabled=False)]
+    ])
+
+    plugins_frame = sg.Frame('Plugin Management', [
+        [sg.Listbox([], size=(61, 21), key='-PLUGIN LIST-', enable_events=True)],
+        [list_plugins_frame, run_plugin_frame],
+    ])
+
+    list_snapshots_frame = sg.Frame('List', [
+        [sg.Button('Snapshots', key='-LIST SNAPSHOTS-', disabled=False)]
+    ])
+
+    create_snapshot_frame = sg.Frame('Create', [
+        [sg.Button('Snapshot', key='-CREATE SNAPSHOT-', disabled=False)]
+    ])
+
+    rollback_snapshot_frame = sg.Frame('Rollback', [
+        [sg.Button('Snapshot', key='-ROLLBACK SNAPSHOT-', disabled=False)]
+    ])
+
+    delete_snapshot_frame = sg.Frame('Delete', [
+        [sg.Button('Snapshot', key='-DELETE SNAPSHOT-', disabled=False)]
+    ])
+
+    snapshot_frame = sg.Frame('Snapshot Management', [
+        [sg.Listbox([], size=(61, 21), key='-SNAPSHOT LIST-', enable_events=True)],
+        [list_snapshots_frame, create_snapshot_frame, rollback_snapshot_frame, delete_snapshot_frame],
+    ])
+
+
+
+    tab_group = sg.TabGroup([
+        [
+            sg.Tab('Media', [
+                [iso_frame]
+            ]),
+            sg.Tab('Plugins', [
+                [plugins_frame]
+            ]),
+            sg.Tab('Snapshots', [
+                [snapshot_frame]
+            ]),
+        ]
+    ])
 
     # Define the layout of the virtualize tab
     virtualize_layout = [
         [sg.Column([[convert_frame], [vm_control_frame]],
                    element_justification='left',
                    vertical_alignment='top'),
-        sg.Column([[iso_frame]],
+        sg.Column([[tab_group]],
                    element_justification='left',
                    vertical_alignment='top'),
         sg.Column([[screenshot_frame], [memory_frame], [tools_frame]],

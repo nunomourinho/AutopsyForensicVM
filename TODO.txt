@@ -1,4 +1,8 @@
----> Create a new tab layout. The tab should contain iso and run plugin buttons
+OFFLINE PLUGINS
+---> Create a new webservice that lists offline plugins compatible with the machine
+---> Create a new webservice that runs a plugin
+
+
 MEMORY
 ---> Create webservice that reads memory size from init file
 ---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
@@ -8,15 +12,10 @@ RECORD VIDEO
 ---> Create a webservice that stops video recording
 ---> Create a webservice that saves the video file
 
-OFFLINE PLUGINS
----> Create a new webservice that lists offline plugins compatible with the machine
----> Create a new webservice that runs a plugin
-
 AUTHENTICATION
 ---> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
 ---> Authentication: Integrate with google authentication. Use this link as a reference:
 https://www.section.io/engineering-education/django-google-oauth/
-
 
 SNAPSHOTS
 ---> Create a new webservice that snapshots the machine and creates a new start script
