@@ -137,6 +137,21 @@ def upload_iso(api_key, base_url, iso_file_path):
         print('Error:', e)
         return False
 
+def list_plugins(api_key, base_url):
+    assert api_key, "API key is required"
+    assert base_url, "Base URL is required"
+
+    url = f"{base_url}/api/list-plugins/"
+    headers = {"X-Api-Key": api_key}
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('plugins', [])
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return []
 
 def list_iso_files(api_key, base_url):
     assert api_key, "API key is required"
@@ -1416,6 +1431,26 @@ def ForensicVMForm():
                 if iso_files:
                     print(iso_files)
                     window['-CDROM LIST-'].update(iso_files['iso_files'])
+            except Exception as e:
+                print(str(e))
+        elif event == '-LIST PLUGINS-':
+
+            web_server_address = values["server_address"]
+            forensic_api = values["forensic_api"]
+            try:
+                plugins = list_plugins(forensic_api, web_server_address)
+                if plugins:
+                    plugin_list = []
+                    for plugin in plugins:
+                        plugin_dir = plugin.get('plugin_dir')
+                        print(plugin_dir)
+                        plugin_name = plugin.get('plugin_name')
+                        print(plugin_name)
+                        plugin_description = plugin.get('plugin_description')
+                        print(plugin_description)
+                        plugin_list.append(f"{plugin_name} - {plugin_description} ({plugin_dir}) ")
+
+                    window['-PLUGIN LIST-'].update(plugin_list)
             except Exception as e:
                 print(str(e))
         elif event == "save_screenshots_vm_button":
