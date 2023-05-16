@@ -1,9 +1,12 @@
 ---> Create a webservice that injects a network card inside a running machine
----> Create a new webservice that adds a network card with external visibility (device_add driver=e1000 id=net1)
+BUG: The network card is not inserted. Change webservice to append or remove the network card line to the init file.
 
 ---> Create a new webservice that lists offline plugins compatible with the machine
 
 ---> Create a new webservice that runs a plugin
+
+---> Create webservice that reads memory size from init file
+---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
 
 ---> Authentication: Integrate with google authentication. Use this link as a reference:
 https://www.section.io/engineering-education/django-google-oauth/
@@ -35,7 +38,6 @@ aff forensic image
 
 ---> Make adicional comments and code documentation
 
----> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
 
 ---> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
 
