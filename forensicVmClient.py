@@ -952,6 +952,7 @@ def handle_file_browse(event, values, window):
 # Form: All fields in the form
 
 def ForensicVMForm():
+    vm_stopped = True
     folders_created = False
     server_offline = False
     # Set the theme
@@ -1082,25 +1083,20 @@ def ForensicVMForm():
         [list_plugins_frame, run_plugin_frame],
     ])
 
-    list_snapshots_frame = sg.Frame('List', [
-        [sg.Button('Snapshots', key='-LIST SNAPSHOTS-', disabled=False)]
+    snapshots_frame = sg.Frame('Snapshot management', [
+        [sg.Button('List Remote Snapshots', key='-LIST SNAPSHOTS-', disabled=False),
+        sg.Button('Create new', key='-CREATE SNAPSHOT-', disabled=False),
+        sg.Button('Rollback', key='-ROLLBACK SNAPSHOT-', disabled=False)],
     ])
 
-    create_snapshot_frame = sg.Frame('Create', [
-        [sg.Button('Snapshot', key='-CREATE SNAPSHOT-', disabled=False)]
-    ])
 
-    rollback_snapshot_frame = sg.Frame('Rollback', [
-        [sg.Button('Snapshot', key='-ROLLBACK SNAPSHOT-', disabled=False)]
-    ])
-
-    delete_snapshot_frame = sg.Frame('Delete', [
-        [sg.Button('Snapshot', key='-DELETE SNAPSHOT-', disabled=False)]
+    delete_snapshot_frame = sg.Frame('Danger Zone!', [
+        [sg.Button('Delete ???', key='-DELETE SNAPSHOT-', disabled=False)]
     ])
 
     snapshot_frame = sg.Frame('Snapshot Management', [
         [sg.Listbox([], size=(61, 21), key='-SNAPSHOT LIST-', enable_events=True)],
-        [list_snapshots_frame, create_snapshot_frame, rollback_snapshot_frame, delete_snapshot_frame],
+        [snapshots_frame, delete_snapshot_frame],
     ])
 
 
@@ -1296,6 +1292,7 @@ def ForensicVMForm():
                     window["open_forensic_vm_button"].update(disabled=not False)
                     window["open_forensic_shell_button"].update(disabled=not False)
                     window["open_forensic_netdata_button"].update(disabled=not False)
+                    window["-RUN PLUGIN-"].update(disabled=True)
                     server_offline = True
 
             if server_ok == 0:
@@ -1321,6 +1318,8 @@ def ForensicVMForm():
                         window["import_evidence_button"].update(disabled=not False)
                         window["open_forensic_vm_button"].update(disabled=not True)
                         window["save_screenshots_vm_button"].update(disabled=not True)
+                        window["-RUN PLUGIN-"].update(disabled=True)
+                        vm_stopped = False
                     elif vm_status.get("vm_status", "") == "stopped":
                         window["delete_vm_button"].update(disabled=False, visible=True)
                         window["start_vm_button"].update(disabled=not True)
@@ -1332,6 +1331,8 @@ def ForensicVMForm():
                         window["reset_vm_button"].update(disabled=not False)
                         window["import_evidence_button"].update(disabled=not True)
                         window["save_screenshots_vm_button"].update(disabled=not True)
+                        window["-RUN PLUGIN-"].update(disabled=False)
+                        vm_stopped = True
                         if not folders_created:
                             forensic_image_path = values["forensic_image_path"]
                             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)

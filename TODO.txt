@@ -1,8 +1,6 @@
 EVIDENCE
+---> Create a new button that deletes and recreates the evidence drive with the correct folders
 ---> Create a new webservice that deletes and recreates the evidence drive with the correct folders
-
-OFFLINE PLUGINS
----> Fix the run a plugin should only be run when the machine is off and stoped
 
 SNAPSHOTS
 ---> Create a new webservice that snapshots the machine and creates a new start script
