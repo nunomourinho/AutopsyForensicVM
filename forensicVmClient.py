@@ -188,6 +188,28 @@ def list_iso_files(api_key, base_url):
         print('Error:', e)
         return None
 
+def recreate_folders(api_key, base_url, uuid_path, folders):
+    assert api_key, "API key is required"
+    assert base_url, "Base URL is required"
+    assert uuid_path, "UUID path is required"
+    assert folders, "Folders list is required"
+
+    url = f"{base_url}/api/recreate-folders/"
+    headers = {"X-Api-Key": api_key}
+    data = {
+        "uuid_path": uuid_path,
+        "folders": folders
+    }
+
+    try:
+        response = requests.post(url, headers=headers, data=data)
+        response.raise_for_status()
+        data = response.json()
+        return data
+    except requests.exceptions.RequestException as e:
+        print('Error:', e)
+        return None
+
 def create_folders_in_vmdk(api_key, base_url, uuid_path, folders):
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
@@ -1067,6 +1089,8 @@ def ForensicVMForm():
         [sg.Button("Analyse ForensicVM performance", key="open_forensic_netdata_button", size=(25, 1), visible=True,
                    disabled=False)],
         [sg.Button("Open ForensicVM WebShell", key="open_forensic_shell_button", size=(25, 1), visible=True,
+                   disabled=False)],
+        [sg.Button("Recreate Evidence Disk", key="recreate_evidence_disk_button", size=(25, 1), visible=True,
                    disabled=False)]
     ])
 
@@ -1318,6 +1342,7 @@ def ForensicVMForm():
                         window["import_evidence_button"].update(disabled=not False)
                         window["open_forensic_vm_button"].update(disabled=not True)
                         window["save_screenshots_vm_button"].update(disabled=not True)
+                        window["recreate_evidence_disk_button"].update(disabled=True)
                         window["-RUN PLUGIN-"].update(disabled=True)
                         vm_stopped = False
                     elif vm_status.get("vm_status", "") == "stopped":
@@ -1330,6 +1355,7 @@ def ForensicVMForm():
                         window["stop_vm_button"].update(disabled=not False)
                         window["reset_vm_button"].update(disabled=not False)
                         window["import_evidence_button"].update(disabled=not True)
+                        window["recreate_evidence_disk_button"].update(disabled=False)
                         window["save_screenshots_vm_button"].update(disabled=not True)
                         window["-RUN PLUGIN-"].update(disabled=False)
                         vm_stopped = True
@@ -1352,6 +1378,21 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == 'recreate_evidence_disk_button':
+            response = sg.PopupYesNo('Do you want delete the evidence disk?', title='Confirmation')
+            if response == 'Yes':
+                response_2 = sg.PopupYesNo('ARE YOU REALLY SURE?', title='Confirmation')
+                if response_2 == 'Yes':
+                    forensic_image_path = values["forensic_image_path"]
+                    uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                    web_server_address = values["server_address"]
+                    forensic_api = values["forensic_api"]
+                    recreate_folders(forensic_api, web_server_address, uuid_folder, case_tags)
+                    folders_created = True
+                    print('Evidence Drive recreated')
+                    sg.popup("Evidence Drive recreated")
+            else:
+                print('User clicked No')
         elif event == '-EJECT-':
             try:
                 api_key = values["forensic_api"]
