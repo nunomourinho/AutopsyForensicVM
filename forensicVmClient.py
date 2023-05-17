@@ -681,8 +681,8 @@ def create_login_and_share(username, password, sharename, folderpath):
     batch_file = os.path.join(script_dir, 'create_user_and_share.bat')
     share_name = sharename.split('\\')[-1]  # extract the share_name part
 
-    cmd = '"{}\\nircmdc" elevate cmd /c {} ""{}"" ""{}"" ""{}"" ""{}""'.format(os.getcwd(),batch_file, username,
-                                                                    password, share_name,
+    cmd = '"{}\\nircmdc" elevate cmd /c {} "{}" "{}" "{}" ""{}""'.format(os.getcwd(),batch_file, username,
+                                                                    password, share_name.replace(" ", ""),
                                                                     folderpath)
 
 
@@ -1761,7 +1761,8 @@ def ForensicVMForm():
 
                 username = values['share_login']
                 password = values['share_password']
-                sharename = values['folder_share_server']
+                sharename = str(values['folder_share_server']).replace(" ", "")
+                values['folder_share_server'] = sharename
                 folderpath = new_equivalence
 
                 # Call the create_login_and_share function with the entered values

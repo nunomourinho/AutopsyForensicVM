@@ -51,7 +51,6 @@ aff forensic image
 
 ---> BUG Correction: Test network insert in several OS
 
----> BUG correction: create folder shares with spaces and convert machines with spaces
 
 ---> Create a new webservice that lists the machines available.
 
@@ -63,3 +62,5 @@ aff forensic image
 
 
 ---> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
+
+---> Create function to list and delete shares
