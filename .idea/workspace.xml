@@ -6,21 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="d310cea7-15a2-46f5-bd36-ce493092a5e3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TODO.txt" beforeDir="false" afterPath="$PROJECT_DIR$/TODO.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/Analysis-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/EXE-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/PKG-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/PYZ-00.pyz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/PYZ-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/Tree-00.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/Tree-01.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/Tree-02.toc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/base_library.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/forensicVmClient.exe.manifest" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/forensicVmClient.pkg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/warn-forensicVmClient.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/forensicVmClient/xref-forensicVmClient.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/create_user_and_share.bat" beforeDir="false" afterPath="$PROJECT_DIR$/create_user_and_share.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/forensicVmClient.py" beforeDir="false" afterPath="$PROJECT_DIR$/forensicVmClient.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -1,10 +1,10 @@
 @echo off
 setlocal
 
-set "username=%~1"
-set "password=%~2"
-set "sharename=%~3"
-set "folderpath=%~4"
+set username=%~1
+set password=%~2
+set sharename=%~3
+set folderpath=%~4
 
 echo Checking if user already exists...
 net user "%username%" >nul 2>&1
