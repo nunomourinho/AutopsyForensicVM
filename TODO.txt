@@ -1,14 +1,19 @@
+EVIDENCE
+---> Create a new webservice that deletes and recreates the evidence drive with the correct folders
+
 OFFLINE PLUGINS
 ---> Fix the run a plugin should only be run when the machine is off and stoped
 
 SNAPSHOTS
 ---> Create a new webservice that snapshots the machine and creates a new start script
----> Create a new webservice that delets a shapshot. Only the snapshots not referenced should be deleted. The first snapshot should not be deleted
+---> Create a new webservice that deletes a shapshot. Only the snapshots not referenced should be deleted. The first snapshot should not be deleted
 ---> Create a new webservice that list available snapshots 
+---> Create a new webservice rollbacks the snapshot and creates a new start script
 
 MEMORY
----> Create webservice that reads memory size from init file
+---> Create webservice that reads memory size from script file
 ---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
+---> Create a button that changes the memory of the vm on the script
 
 RECORD VIDEO
 ---> Create a webservice that records video
