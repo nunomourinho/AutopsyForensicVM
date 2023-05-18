@@ -1,22 +1,27 @@
 SNAPSHOTS
----> Create a new webservice that snapshots the machine and creates a new start script
----> Create a new webservice that deletes a shapshot. Only the snapshots not referenced should be deleted. The first snapshot should not be deleted
 ---> Create a new webservice that list available snapshots 
+---> Create a new webservice that snapshots the machine and creates a new start script
 ---> Create a new webservice rollbacks the snapshot and creates a new start script
+---> Create a new webservice that deletes a shapshot. Only the snapshots not referenced should be deleted. The first snapshot should not be deleted
 
 MEMORY
 ---> Create webservice that reads memory size from script file
 ---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
 ---> Create a button that changes the memory of the vm on the script
 
+WIRESHARK NETWORK CARD
+---> Create a webservice that adds a new network card that records network trafic
+---> Create a new webservice that disables this network card, and downloads the wireshark file
+
+SIMPLE NETWORK CARD
+---> Create a webservice that adds a new network card
+---> Create a new webservice that removes a network card
+
+
 RECORD VIDEO
 ---> Create a webservice that records video
 ---> Create a webservice that stops video recording
 ---> Create a webservice that saves the video file
-
-WIRESHARK
----> Create a webservice that adds a new network card that records network trafic
----> Create a new webservice that disables this network card, and downloads the wireshark file
 
 AUTHENTICATION
 ---> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
