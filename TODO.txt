@@ -1,8 +1,33 @@
 SNAPSHOTS
 ---> Create a new webservice that list available snapshots 
+{ "execute": "human-monitor-command",
+     "arguments": { "command-line": "info snapshots" } }
+
 ---> Create a new webservice that snapshots the machine and creates a new start script
+https://qemu.readthedocs.io/en/latest/interop/live-block-operations.html
+{ "execute": "human-monitor-command",
+     "arguments": { "command-line": "savevm first" } }
+{"execute": "blockdev-snapshot-sync", "arguments": {"node": "#block157", "overlay": "internal", "snapshot-node": "snapshot", "snapshot-file": "snapshot001.qcow2"}}
+
+{
+  "execute": "device_del",
+  "arguments": {
+    "id": "1"
+  }
+}
+
+
+
+
 ---> Create a new webservice rollbacks the snapshot and creates a new start script
+{ "execute": "human-monitor-command",
+     "arguments": { "command-line": "loadvm first" } }
+
 ---> Create a new webservice that deletes a shapshot. Only the snapshots not referenced should be deleted. The first snapshot should not be deleted
+
+{ "execute": "human-monitor-command",
+     "arguments": { "command-line": "delvm first" } }
+
 
 MEMORY
 ---> Create webservice that reads memory size from script file
