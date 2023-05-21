@@ -11,6 +11,7 @@ import os
 import sys
 import subprocess
 import requests
+from requests_toolbelt import MultipartEncoder
 
 def insert_network_card(api_key, uuid_path, base_url):
     assert api_key, "API key is required"
@@ -136,6 +137,50 @@ def upload_iso(api_key, base_url, iso_file_path):
     except requests.exceptions.RequestException as e:
         print('Error:', e)
         return False
+
+
+# def upload_iso(api_key, base_url, iso_file_path, window):
+#     assert api_key, "API key is required"
+#     assert base_url, "Base URL is required"
+#     assert iso_file_path, "ISO file path is required"
+#
+#     url = f"{base_url}/api/upload-iso/"
+#     headers = {
+#         'X-Api-Key': api_key,
+#     }
+#
+#     file_size = os.path.getsize(iso_file_path)
+#     progress_bar = sg.one_line_progress_meter('Uploading ISO file', 0, file_size, '-PROGRESS-')
+#
+#     def perform_upload():
+#         try:
+#             multipart_data = MultipartEncoder(fields={'iso_file': (os.path.basename(iso_file_path), open(iso_file_path, 'rb'))})
+#             headers['Content-Type'] = multipart_data.content_type
+#             response = requests.post(url, headers=headers, data=multipart_data, stream=True)
+#             response.raise_for_status()
+#             total_uploaded = 0
+#
+#             for chunk in response.iter_content(chunk_size=1024):
+#                 if chunk:
+#                     total_uploaded += len(chunk)
+#                     progress_bar.UpdateBar(total_uploaded)
+#
+#             sg.one_line_progress_meter('Uploading ISO file', file_size, file_size, '-PROGRESS-', 'Upload complete')
+#             sg.popup('Upload complete!')
+#
+#         except requests.exceptions.RequestException as e:
+#             sg.popup_error('Error:', e)
+#
+#     # Start the upload in a separate thread
+#     upload_thread = threading.Thread(target=perform_upload)
+#     upload_thread.start()
+#
+#     # Wait for the upload_thread to finish
+#     while upload_thread.is_alive():
+#         event, _ = window.read(timeout=100)
+#         if event == sg.WINDOW_CLOSED:
+#             break
+
 
 def run_plugin(api_key, base_url, plugin_directory, image_uuid):
     assert api_key, "API key is required"

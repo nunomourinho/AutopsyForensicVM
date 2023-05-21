@@ -1,3 +1,5 @@
+--->  Create a button that calls runs a remote session inside the dir /forensicVM/mnt/vm/uuid using ssh
+
 SNAPSHOTS
 ---> Create a new webservice that list available snapshots 
 { "execute": "human-monitor-command",
