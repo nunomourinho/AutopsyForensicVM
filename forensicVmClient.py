@@ -880,6 +880,23 @@ def run_openssh(server_address, server_port, windows_share,
         print(e)
 
 
+def debug_remotessh(server_address, server_port, uuid_folder):
+    try:
+        command = f"cd /forensicVM/mnt/vm/{uuid_folder}; exec bash"
+
+        ssh_command ="start /wait cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i " \
+                     + os.path.dirname(os.path.abspath(__file__))+ \
+                     "\\mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+                     + str(server_address)\
+                     + " -p " + str(server_port)\
+                     + " " + command
+
+        os.system(ssh_command)
+
+    except Exception as e:
+        print(e)
+
+
 def ssh_background_session(server_address, server_port, windows_share):
     try:
         private_key_path = os.path.expanduser("mykey")
@@ -1136,6 +1153,8 @@ def ForensicVMForm():
         [sg.Button("Open ForensicVM WebShell", key="open_forensic_shell_button", size=(25, 1), visible=True,
                    disabled=False)],
         [sg.Button("Recreate Evidence Disk", key="recreate_evidence_disk_button", size=(25, 1), visible=True,
+                   disabled=False)],
+        [sg.Button("DEGUG: Remote ssh to folder", key="debug_ssh_button", size=(25, 1), visible=True,
                    disabled=False)]
     ])
 
@@ -1423,6 +1442,12 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == 'debug_ssh_button':
+            forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+            server_address = values["ssh_server_address"]
+            server_port = values["ssh_server_port"]
+            debug_remotessh(server_address, server_port,uuid_folder )
         elif event == 'recreate_evidence_disk_button':
             response = sg.PopupYesNo('Do you want delete the evidence disk?', title='Confirmation')
             if response == 'Yes':
