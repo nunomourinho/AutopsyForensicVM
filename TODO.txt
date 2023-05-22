@@ -79,3 +79,8 @@ aff forensic image
 ---> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
 
 ---> Create function to list and delete shares
+
+AUTOMATED MALWARE DETECTION:
+---> Detect malware (memory or others-Yara RULES or Others)
+(Idea: Use alien vault pulses to detect malware. Use tor exit nodes to detect hidden channels)
+
