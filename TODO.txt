@@ -1,5 +1,3 @@
---->  Create a button that calls runs a remote session inside the dir /forensicVM/mnt/vm/uuid using ssh
-
 SNAPSHOTS
 ---> Create a new webservice that list available snapshots 
 { "execute": "human-monitor-command",
@@ -17,9 +15,6 @@ https://qemu.readthedocs.io/en/latest/interop/live-block-operations.html
     "id": "1"
   }
 }
-
-
-
 
 ---> Create a new webservice rollbacks the snapshot and creates a new start script
 { "execute": "human-monitor-command",
@@ -44,7 +39,6 @@ SIMPLE NETWORK CARD
 ---> Create a webservice that adds a new network card
 ---> Create a new webservice that removes a network card
 
-
 RECORD VIDEO
 ---> Create a webservice that records video
 ---> Create a webservice that stops video recording
@@ -65,10 +59,8 @@ SNAP MODE: Run a machine in snap mode:
 ---> Change forensic2v script so that in the snap mode it creates a new script file with mount script to mount the dd, efw or
 aff forensic image
 
-
 ---> Create a new webservice that mounts a folder inside the other folder
 ---> Change the webservice to also mount the original forensic image
-
 
 ---> Sequence to run: Determine free port on server, Create ssh connection with port redirect to samba port, mount samba share on mnt folder, mount image on efw or aff folder via script,      run the machine
 ---> Sequence to stop. Stop the machine, umount aff, umount mnt, terminate samba session
@@ -77,14 +69,11 @@ aff forensic image
 
 ---> BUG Correction: Test network insert in several OS
 
-
 ---> Create a new webservice that lists the machines available.
-
 
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
 
 ---> Make adicional comments and code documentation
-
 
 
 ---> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
