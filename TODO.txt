@@ -1,3 +1,10 @@
+--> Change the create vmdk function so that it creates a qcow2 insted. 
+---> Change The 
+---> Convert vmdk to qcow2
+---> COnvert qcow2 to vmdk
+---> Change the convert function to create the disk
+
+
 SNAPSHOTS
 ---> Create a new webservice that list available snapshots 
 { "execute": "human-monitor-command",
@@ -83,4 +90,16 @@ aff forensic image
 AUTOMATED MALWARE DETECTION:
 ---> Detect malware (memory or others-Yara RULES or Others)
 (Idea: Use alien vault pulses to detect malware. Use tor exit nodes to detect hidden channels)
+Sources: 
+https://github.com/abusech/YARAify ---> Python examples to find malware from md5, sha1, sha256 hashs
+https://abuse.ch/ ---> API to search malware samples. It also allows to download malware samples (bad idea)
+https://github.com/OpenCTI-Platform/opencti ---> Investigate
+https://www.filigran.io/en/solutions/products/opencti/ --> Investigate
+https://www.misp-project.org/ ---> Threat sharing plataform
+https://www.misp-project.org/feeds/ ---> Feeds that base of this project
+https://github.com/AlienVault-OTX/OTX-Python-SDK/blob/master/examples/is_malicious/is_malicious.py --> How using the api one can check if the file is malicious
+https://www.dan.me.uk/ ---> Ip addresses that sould be blocked
+
+
+
 
