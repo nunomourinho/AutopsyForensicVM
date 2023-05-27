@@ -14,6 +14,24 @@ import requests
 from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
 
+
+def delete_snapshot(api_key, site_url, uuid, snapshot_name):
+    url = f"{site_url}/api/delete-snapshot/{uuid}/"
+    headers = {'X-API-KEY': api_key}
+    data = {'snapshot_name': snapshot_name}
+
+    try:
+        response = requests.post(url, headers=headers, data=data)
+        if response.status_code == 200:
+            data = response.json()
+            message = data.get('message')
+            return message
+        else:
+            print(f"Error: {response.status_code} - {response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+
+    return None
 def rollback_snapshot(api_key, site_url, uuid, snapshot_name):
     url = f"{site_url}/api/rollback-snapshot/{uuid}/"
     headers = {'X-API-KEY': api_key}
@@ -1514,6 +1532,26 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == '-DELETE SNAPSHOT-':
+            try:
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                web_server_address = values["server_address"]
+                forensic_api = values["forensic_api"]
+                selected_files = values['-SNAPSHOT-LIST-']
+                if selected_files:
+                    snap_filename = selected_files[0]
+                    # Find out the snapshot name from inside the file name
+                    match = re.search(r'\((.*?)\)', snap_filename)
+                    if match:
+                        snapshot_name =match.group(1)
+                        if sg.PopupYesNo("Are you sure you want to delete the snapshot " +
+                                         snapshot_name + "?", title=""):
+                            delete_snapshot(forensic_api, web_server_address, uuid_folder, snapshot_name)
+                            sg.popup(f"Deleted snapshot {snapshot_name}")
+
+            except Exception as e:
+                print(str(e))
         elif event == '-ROLLBACK SNAPSHOT-':
             try:
                 forensic_image_path = values["forensic_image_path"]

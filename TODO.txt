@@ -1,10 +1,3 @@
-SNAPSHOTS
----> Create a new webservice that deletes a shapshot. Only the snapshots not referenced should be deleted. The first snapshot should not be deleted
-
-{ "execute": "human-monitor-command",
-     "arguments": { "command-line": "delvm first" } }
-
-
 MEMORY
 ---> Create webservice that reads memory size from script file
 ---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
