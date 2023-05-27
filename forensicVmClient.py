@@ -787,12 +787,25 @@ def load_config(filename):
 
 # Check if there are enough command line arguments
 try:
+    image_path_arg = ""
+    case_directory_arg = ""
+    case_name_arg = ""
+    case_number_arg = ""
+    case_examiner_arg = ""
     if len(sys.argv) >= 4:
         image_path_arg = sys.argv[1]
         case_directory_arg = sys.argv[2]
         case_name_arg = sys.argv[3]
-        case_number_arg = sys.argv[4] if len(sys.argv) > 4 else "-"
-        case_examiner_arg = sys.argv[5] if len(sys.argv) > 4 else "-"
+        try:
+            case_number_arg = sys.argv[4]
+        except Exception as e:
+            case_number_arg = "-"
+
+        try:
+            case_examiner_arg = sys.argv[5]
+        except Exception as e:
+            case_examiner_arg = "-"
+
         # Save the values as a JSON file
         values = {
             "image_path_arg": image_path_arg,
@@ -1045,10 +1058,19 @@ def ForensicVMForm():
 
     filename = "config.json"
     icon_path = "forensicVMCLient.ico"
-
+    #case_image_folder = ""
     # Load the configuration from the JSON file if it exists
-    config = load_config(filename)
-    image_config = load_config(case_image_folder + "\\image-share.json")
+    if os.path.isfile(filename):
+        config = load_config(filename)
+    else:
+        config = {}
+    if 'case_image_folder' in locals():
+        if os.path.isfile(case_image_folder + "\\image-share.json"):
+            image_config = load_config(case_image_folder + "\\image-share.json")
+        else:
+            image_config = {}
+    else:
+        image_config = {}
     case_tag_path = case_directory_arg + "\\case_tags.json"
     if os.path.isfile(case_tag_path):
         case_tags = read_case_config(case_tag_path)
@@ -1685,18 +1707,22 @@ def ForensicVMForm():
             forensic_api = values["forensic_api"]
             start_vm(forensic_api, uuid_folder, web_server_address)
         elif event == "save_button":
-            # Save the configuration to the JSON file
-            save_config(values, filename)
+            try:
+                # Save the configuration to the JSON file
+                save_config(values, filename)
 
-            image_values = {
-                "folder_share_server": values["folder_share_server"],
-                "share_login": values["share_login"],
-                "share_password": values["share_password"],
-                "equivalence": values["equivalence"]
-            }
-            save_config(image_values, case_image_folder + "\\image-share.json")
-            print("Configuration saved successfully!")
-            sg.popup("Configuration saved successfully!")
+                image_values = {
+                    "folder_share_server": values["folder_share_server"],
+                    "share_login": values["share_login"],
+                    "share_password": values["share_password"],
+                    "equivalence": values["equivalence"]
+                }
+                save_config(image_values, case_image_folder + "\\image-share.json")
+                print("Configuration saved successfully!")
+                sg.popup("Configuration saved successfully!")
+            except Exception as e:
+                print(str(e))
+                sg.popup_error(str(e))
         elif event == "convert_to_vm_button":
 
             print("Copy and convert...")
