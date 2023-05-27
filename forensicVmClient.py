@@ -1115,6 +1115,29 @@ def handle_file_browse(event, values, window):
     window['-CDROM FILE-'].update(value=iso_file_path)
     window['-UPLOAD-'].update(disabled=False)
 
+
+def list_snapshots(forensic_api, uuid_folder, web_server_address):
+    snapshot_info_list = []
+
+    try:
+        snapshots = get_snapshot_list(forensic_api, uuid_folder, web_server_address)
+
+        for snapshot in snapshots:
+            snapshot_tag = snapshot.get('tag')
+            vm_size = snapshot.get('vm_size')
+            snapshot_info = f"({snapshot_tag}) - {vm_size} MB"
+            snapshot_info_list.append(snapshot_info)
+            print(snapshot_info)
+
+        return snapshot_info_list
+
+    except Exception as e:
+        print(e)
+        sg.popup_ok("Error listing snapshots", title="Error")
+        return []
+
+
+
 # Form: All fields in the form
 
 def ForensicVMForm():
@@ -1548,6 +1571,8 @@ def ForensicVMForm():
                         if sg.PopupYesNo("Are you sure you want to delete the snapshot " +
                                          snapshot_name + "?", title=""):
                             delete_snapshot(forensic_api, web_server_address, uuid_folder, snapshot_name)
+                            snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
+                            window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
                             sg.popup(f"Deleted snapshot {snapshot_name}")
 
             except Exception as e:
@@ -1566,6 +1591,8 @@ def ForensicVMForm():
                     if match:
                         snapshot_name =match.group(1)
                         rollback_snapshot(forensic_api, web_server_address, uuid_folder, snapshot_name)
+                        snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
+                        window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
                         sg.popup(f"Reverted to snapshot {snapshot_name}")
 
             except Exception as e:
@@ -1577,31 +1604,38 @@ def ForensicVMForm():
                 web_server_address = values["server_address"]
                 forensic_api = values["forensic_api"]
                 create_snapshot(forensic_api, uuid_folder, web_server_address)
+                snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
+                window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
             except Exception as e:
                 print(str(e))
         elif event == '-LIST SNAPSHOTS-':
+            forensic_api = values["forensic_api"]
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
-            forensic_api = values["forensic_api"]
-            try:
-                snapshots = get_snapshot_list(forensic_api, uuid_folder, web_server_address)
+            snapshot_info_list=list_snapshots(forensic_api, uuid_folder, web_server_address)
+            window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
 
-                snapshot_info_list = []
-                for snapshot in snapshots:
-                    snapshot_id = snapshot.get('id')
-                    snapshot_tag = snapshot.get('tag')
-                    vm_size = snapshot.get('vm_size')
-                    date = snapshot.get('date')
-                    vm_clock = snapshot.get('vm_clock')
-                    snapshot_info = f"({snapshot_tag}) - {vm_size} MB"
-                    snapshot_info_list.append(snapshot_info)
-                    print(snapshot_info)
-                window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
 
-            except Exception as e:
-                print(e)
-                sg.popup_ok("Error listing snapshots", title="Error")
+
+            # try:
+            #     snapshots = get_snapshot_list(forensic_api, uuid_folder, web_server_address)
+            #
+            #     snapshot_info_list = []
+            #     for snapshot in snapshots:
+            #         snapshot_id = snapshot.get('id')
+            #         snapshot_tag = snapshot.get('tag')
+            #         vm_size = snapshot.get('vm_size')
+            #         date = snapshot.get('date')
+            #         vm_clock = snapshot.get('vm_clock')
+            #         snapshot_info = f"({snapshot_tag}) - {vm_size} MB"
+            #         snapshot_info_list.append(snapshot_info)
+            #         print(snapshot_info)
+            #     window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
+            #
+            # except Exception as e:
+            #     print(e)
+            #     sg.popup_ok("Error listing snapshots", title="Error")
 
         elif event == 'debug_ssh_button':
             forensic_image_path = values["forensic_image_path"]
