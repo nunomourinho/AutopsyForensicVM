@@ -12,6 +12,24 @@ import sys
 import subprocess
 import requests
 from requests_toolbelt import MultipartEncoder
+from urllib.parse import urljoin
+
+def get_snapshot_list(api_key, uuid_path, base_url):
+    url = urljoin(base_url, f"api/snapshots-list/{uuid_path}/")
+    headers = {'X-API-KEY': api_key}
+
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            snapshots = data.get('snapshots')
+            return snapshots
+        else:
+            print(f"Error: {response.status_code} - {response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+
+    return []
 
 def insert_network_card(api_key, uuid_path, base_url):
     assert api_key, "API key is required"
@@ -1205,7 +1223,7 @@ def ForensicVMForm():
     ])
 
     snapshot_frame = sg.Frame('Snapshot Management', [
-        [sg.Listbox([], size=(61, 21), key='-SNAPSHOT LIST-', enable_events=True)],
+        [sg.Listbox([], size=(61, 21), key='-SNAPSHOT-LIST-', enable_events=True)],
         [snapshots_frame, delete_snapshot_frame],
     ])
 
@@ -1464,6 +1482,30 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == '-LIST SNAPSHOTS-':
+            forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+            web_server_address = values["server_address"]
+            forensic_api = values["forensic_api"]
+            try:
+                snapshots = get_snapshot_list(forensic_api, uuid_folder, web_server_address)
+
+                snapshot_info_list = []
+                for snapshot in snapshots:
+                    snapshot_id = snapshot.get('id')
+                    snapshot_tag = snapshot.get('tag')
+                    vm_size = snapshot.get('vm_size')
+                    date = snapshot.get('date')
+                    vm_clock = snapshot.get('vm_clock')
+                    snapshot_info = f"ID: {snapshot_id}, Tag: {snapshot_tag}, VM Size: {vm_size}, Date: {date}, VM Clock: {vm_clock}"
+                    snapshot_info_list.append(snapshot_info)
+                    print(snapshot_info)
+                window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
+
+            except Exception as e:
+                print(e)
+                sg.popup_ok("Error listing snapshots", title="Error")
+
         elif event == 'debug_ssh_button':
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
