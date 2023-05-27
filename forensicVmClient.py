@@ -14,6 +14,39 @@ import requests
 from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
 
+def rollback_snapshot(api_key, site_url, uuid, snapshot_name):
+    url = f"{site_url}/api/rollback-snapshot/{uuid}/"
+    headers = {'X-API-KEY': api_key}
+    data = {'snapshot_name': snapshot_name}
+
+    try:
+        response = requests.post(url, headers=headers, data=data)
+        if response.status_code == 200:
+            data = response.json()
+            message = data.get('message')
+            return message
+        else:
+            print(f"Error: {response.status_code} - {response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+
+    return None
+def create_snapshot(api_key, uuid_path, base_url):
+    url = urljoin(base_url, f"api/create-snapshot/{uuid_path}/")
+    headers = {'X-API-KEY': api_key}
+
+    try:
+        response = requests.post(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            snapshot_name = data.get('snapshot_name')
+            return snapshot_name
+        else:
+            print(f"Error: {response.status_code} - {response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+
+    return None
 def get_snapshot_list(api_key, uuid_path, base_url):
     url = urljoin(base_url, f"api/snapshots-list/{uuid_path}/")
     headers = {'X-API-KEY': api_key}
@@ -1076,7 +1109,6 @@ def ForensicVMForm():
 
     filename = "config.json"
     icon_path = "forensicVMCLient.ico"
-    #case_image_folder = ""
     # Load the configuration from the JSON file if it exists
     if os.path.isfile(filename):
         config = load_config(filename)
@@ -1482,6 +1514,33 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == '-ROLLBACK SNAPSHOT-':
+            try:
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                web_server_address = values["server_address"]
+                forensic_api = values["forensic_api"]
+                selected_files = values['-SNAPSHOT-LIST-']
+                if selected_files:
+                    snap_filename = selected_files[0]
+                    # Find out the snapshot name from inside the file name
+                    match = re.search(r'\((.*?)\)', snap_filename)
+                    if match:
+                        snapshot_name =match.group(1)
+                        rollback_snapshot(forensic_api, web_server_address, uuid_folder, snapshot_name)
+                        sg.popup(f"Reverted to snapshot {snapshot_name}")
+
+            except Exception as e:
+                print(str(e))
+        elif event == '-CREATE SNAPSHOT-':
+            try:
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                web_server_address = values["server_address"]
+                forensic_api = values["forensic_api"]
+                create_snapshot(forensic_api, uuid_folder, web_server_address)
+            except Exception as e:
+                print(str(e))
         elif event == '-LIST SNAPSHOTS-':
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
@@ -1497,7 +1556,7 @@ def ForensicVMForm():
                     vm_size = snapshot.get('vm_size')
                     date = snapshot.get('date')
                     vm_clock = snapshot.get('vm_clock')
-                    snapshot_info = f"ID: {snapshot_id}, Tag: {snapshot_tag}, VM Size: {vm_size}, Date: {date}, VM Clock: {vm_clock}"
+                    snapshot_info = f"({snapshot_tag}) - {vm_size} MB"
                     snapshot_info_list.append(snapshot_info)
                     print(snapshot_info)
                 window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
