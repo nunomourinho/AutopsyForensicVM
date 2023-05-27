@@ -255,7 +255,7 @@ def recreate_folders(api_key, base_url, uuid_path, folders):
         print('Error:', e)
         return None
 
-def create_folders_in_vmdk(api_key, base_url, uuid_path, folders):
+def create_folders_in_qcow2(api_key, base_url, uuid_path, folders):
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
     assert uuid_path, "VMDK path is required"
@@ -283,7 +283,7 @@ def create_folders_in_vmdk(api_key, base_url, uuid_path, folders):
         print(f"An unexpected error occurred: {str(e)}")
         return False
 
-def create_folders_in_vmdk_background(api, web_server_address, uuid_folder, case_tags):
+def create_folders_in_qcow2_background(api, web_server_address, uuid_folder, case_tags):
     """
     Run the create_folders_in_vmdk function in the background using a separate thread.
 
@@ -298,7 +298,7 @@ def create_folders_in_vmdk_background(api, web_server_address, uuid_folder, case
     """
     # Define the target function
     def target_function():
-        create_folders_in_vmdk(api, web_server_address, uuid_folder, case_tags)
+        create_folders_in_qcow2(api, web_server_address, uuid_folder, case_tags)
         print("Folders created")
 
     # Create a thread and run the target function
@@ -1450,7 +1450,7 @@ def ForensicVMForm():
                             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                             web_server_address = values["server_address"]
                             forensic_api = values["forensic_api"]
-                            create_folders_in_vmdk_background(forensic_api, web_server_address, uuid_folder, case_tags)
+                            create_folders_in_qcow2_background(forensic_api, web_server_address, uuid_folder, case_tags)
                             folders_created = True
             elif not server_offline:
                 window["convert_to_vm_button"].update(disabled=not True)
