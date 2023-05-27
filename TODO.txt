@@ -1,10 +1,3 @@
---> Change the create vmdk function so that it creates a qcow2 insted. 
----> Change The 
----> Convert vmdk to qcow2
----> COnvert qcow2 to vmdk
----> Change the convert function to create the disk
-
-
 SNAPSHOTS
 ---> Create a new webservice that list available snapshots 
 { "execute": "human-monitor-command",
@@ -99,7 +92,3 @@ https://www.misp-project.org/ ---> Threat sharing plataform
 https://www.misp-project.org/feeds/ ---> Feeds that base of this project
 https://github.com/AlienVault-OTX/OTX-Python-SDK/blob/master/examples/is_malicious/is_malicious.py --> How using the api one can check if the file is malicious
 https://www.dan.me.uk/ ---> Ip addresses that sould be blocked
-
-
-
-
