@@ -6,7 +6,8 @@ SNAPSHOTS
 ---> Create a new webservice that snapshots the machine and creates a new start script
 https://qemu.readthedocs.io/en/latest/interop/live-block-operations.html
 { "execute": "human-monitor-command",
-     "arguments": { "command-line": "savevm first" } }
+     "arguments": { "command-line": "savevm snap-2023-05-27_1602" } }
+
 {"execute": "blockdev-snapshot-sync", "arguments": {"node": "#block157", "overlay": "internal", "snapshot-node": "snapshot", "snapshot-file": "snapshot001.qcow2"}}
 
 {
