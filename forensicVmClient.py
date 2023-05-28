@@ -14,6 +14,20 @@ import requests
 from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
 
+def get_memory_size(api_key, site_url, uuid):
+    headers = {'X-API-KEY': api_key}
+    url = f"{site_url}/api/get-memory-size/{uuid}/"
+
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            memory_size = data['memory_size']
+            return memory_size
+        else:
+            print(f"Error: {response.status_code}")
+    except requests.RequestException as e:
+        print(f"Request Error: {str(e)}")
 
 def delete_snapshot(api_key, site_url, uuid, snapshot_name):
     url = f"{site_url}/api/delete-snapshot/{uuid}/"
@@ -1137,6 +1151,15 @@ def list_snapshots(forensic_api, uuid_folder, web_server_address):
         return []
 
 
+def formInit(values):
+    forensic_image_path = values["forensic_image_path"]
+    uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+    web_server_address = values["server_address"]
+    forensic_api = values["forensic_api"]
+    memory = get_memory_size(forensic_api, web_server_address, uuid_folder)
+    if memory:
+        print("Forensic VM Server is running on " + str(memory) + " MB")
+
 
 # Form: All fields in the form
 
@@ -1470,6 +1493,7 @@ def ForensicVMForm():
     while True:
         event, values = window.read(timeout=1000)
         if event == sg.TIMEOUT_EVENT:
+
             # Test if the vm exists
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
@@ -1569,7 +1593,7 @@ def ForensicVMForm():
                     if match:
                         snapshot_name =match.group(1)
                         if sg.PopupYesNo("Are you sure you want to delete the snapshot " +
-                                         snapshot_name + "?", title=""):
+                                         snapshot_name + "?", title="") == "Yes":
                             delete_snapshot(forensic_api, web_server_address, uuid_folder, snapshot_name)
                             snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
                             window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
