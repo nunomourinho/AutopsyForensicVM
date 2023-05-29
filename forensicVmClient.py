@@ -14,6 +14,21 @@ import requests
 from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
 
+
+def change_memory_size(api_key, site_url, uuid, memory_size):
+    headers = {
+        'X-API-Key': api_key,
+    }
+    payload = {
+        'memory_size': memory_size,
+    }
+    response = requests.post(endpoint, headers=headers, data=payload)
+
+    if response.status_code == 200:
+        print("Memory size updated successfully")
+    else:
+        print(f"Error: {response.text}")
+
 def get_memory_size(api_key, site_url, uuid):
     headers = {'X-API-KEY': api_key}
     url = f"{site_url}/api/get-memory-size/{uuid}/"
@@ -1323,7 +1338,12 @@ def ForensicVMForm():
         [snapshots_frame, delete_snapshot_frame],
     ])
 
+    finetune_frame = sg.Frame('Memory Size (GB)', [
+        [sg.Slider(range=(0, 128), default_value=0.128, orientation='h',
+                   size=(40, 20),  resolution=0.1, key='-MB-SLIDER-'),
+         sg.Button('CHANGE', size=(10, 2), key='-GB-SELECTED-')],
 
+    ])
 
     tab_group = sg.TabGroup([
         [
@@ -1335,6 +1355,9 @@ def ForensicVMForm():
             ]),
             sg.Tab('Snapshots', [
                 [snapshot_frame]
+            ]),
+            sg.Tab('Finetuning', [
+                [finetune_frame]
             ]),
         ]
     ])
@@ -1630,6 +1653,7 @@ def ForensicVMForm():
                 create_snapshot(forensic_api, uuid_folder, web_server_address)
                 snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
                 window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
+                sg.popup(f"Snapshot created")
             except Exception as e:
                 print(str(e))
         elif event == '-LIST SNAPSHOTS-':
