@@ -14,6 +14,21 @@ import requests
 from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
 
+def get_available_memory(api_key, site_url):
+    headers = {
+        'X-API-Key': api_key,
+    }
+    endpoint = f"{site_url}/api/get-available-memory/"
+    response = requests.get(endpoint, headers=headers)
+
+    if response.status_code == 200:
+        available_memory = int(response.json().get('available_memory'))/1024
+        print(f"Available Memory: {available_memory} MB")
+        return(available_memory)
+    else:
+        print(f"Error: {response.text}")
+        return(0)
+
 
 def change_memory_size(api_key, site_url, uuid, memory_size):
     headers = {
@@ -238,47 +253,6 @@ def upload_iso(api_key, base_url, iso_file_path):
         return False
 
 
-# def upload_iso(api_key, base_url, iso_file_path, window):
-#     assert api_key, "API key is required"
-#     assert base_url, "Base URL is required"
-#     assert iso_file_path, "ISO file path is required"
-#
-#     url = f"{base_url}/api/upload-iso/"
-#     headers = {
-#         'X-Api-Key': api_key,
-#     }
-#
-#     file_size = os.path.getsize(iso_file_path)
-#     progress_bar = sg.one_line_progress_meter('Uploading ISO file', 0, file_size, '-PROGRESS-')
-#
-#     def perform_upload():
-#         try:
-#             multipart_data = MultipartEncoder(fields={'iso_file': (os.path.basename(iso_file_path), open(iso_file_path, 'rb'))})
-#             headers['Content-Type'] = multipart_data.content_type
-#             response = requests.post(url, headers=headers, data=multipart_data, stream=True)
-#             response.raise_for_status()
-#             total_uploaded = 0
-#
-#             for chunk in response.iter_content(chunk_size=1024):
-#                 if chunk:
-#                     total_uploaded += len(chunk)
-#                     progress_bar.UpdateBar(total_uploaded)
-#
-#             sg.one_line_progress_meter('Uploading ISO file', file_size, file_size, '-PROGRESS-', 'Upload complete')
-#             sg.popup('Upload complete!')
-#
-#         except requests.exceptions.RequestException as e:
-#             sg.popup_error('Error:', e)
-#
-#     # Start the upload in a separate thread
-#     upload_thread = threading.Thread(target=perform_upload)
-#     upload_thread.start()
-#
-#     # Wait for the upload_thread to finish
-#     while upload_thread.is_alive():
-#         event, _ = window.read(timeout=100)
-#         if event == sg.WINDOW_CLOSED:
-#             break
 
 
 def run_plugin(api_key, base_url, plugin_directory, image_uuid):
@@ -1175,14 +1149,24 @@ def formInit(values, window):
     server_ok, _ = test_api_key(forensic_api, web_server_address)
 
     if server_ok==0:
-        memory = get_memory_size(forensic_api, web_server_address, uuid_folder) / 1024
-        if memory:
-            print("Forensic VM Server is running on " + str(memory) + " MB")
-            window['-MB-SLIDER-'].update(memory)
+        try:
+            memory = get_memory_size(forensic_api, web_server_address, uuid_folder) / 1024
+            if memory:
+                print("Forensic VM Server is running on " + str(memory) + " MB")
 
-        # Update snapshot list
-        snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
-        window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
+
+                available_memory = get_available_memory(forensic_api, web_server_address)
+                window['-MB-SLIDER-'].update(range=(0, available_memory))
+                window['-MB-SLIDER-'].update(memory)
+        except Exception as e:
+            print(str(e))
+
+        try:
+            # Update snapshot list
+            snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
+            window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
+        except Exception as e:
+            print(str(e))
 
         # Update iso file list
         try:
@@ -1648,7 +1632,7 @@ def ForensicVMForm():
                 web_server_address = values["server_address"]
                 forensic_api = values["forensic_api"]
                 change_memory_size(forensic_api, web_server_address, uuid_folder, values["-MB-SLIDER-"] * 1024)
-                sg.popup(f"Memory size changed to {values['-MB-SLIDER-']} MB")
+                sg.popup(f"Memory size changed to {values['-MB-SLIDER-']} GB")
             except Exception as e:
                 print(str(e))
         elif event == '-DELETE SNAPSHOT-':
