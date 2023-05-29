@@ -19,8 +19,9 @@ def change_memory_size(api_key, site_url, uuid, memory_size):
     headers = {
         'X-API-Key': api_key,
     }
+    endpoint = f"{site_url}/api/change-memory-size/{uuid}/"
     payload = {
-        'memory_size': memory_size,
+        'memory_size': int(memory_size),
     }
     response = requests.post(endpoint, headers=headers, data=payload)
 
@@ -1166,14 +1167,48 @@ def list_snapshots(forensic_api, uuid_folder, web_server_address):
         return []
 
 
-def formInit(values):
+def formInit(values, window):
     forensic_image_path = values["forensic_image_path"]
     uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
     web_server_address = values["server_address"]
     forensic_api = values["forensic_api"]
-    memory = get_memory_size(forensic_api, web_server_address, uuid_folder)
-    if memory:
-        print("Forensic VM Server is running on " + str(memory) + " MB")
+    server_ok, _ = test_api_key(forensic_api, web_server_address)
+
+    if server_ok==0:
+        memory = get_memory_size(forensic_api, web_server_address, uuid_folder) / 1024
+        if memory:
+            print("Forensic VM Server is running on " + str(memory) + " MB")
+            window['-MB-SLIDER-'].update(memory)
+
+        # Update snapshot list
+        snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
+        window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
+
+        # Update iso file list
+        try:
+            iso_files = list_iso_files(forensic_api, web_server_address)
+            if iso_files:
+                window['-CDROM LIST-'].update(iso_files['iso_files'])
+        except Exception as e:
+            print(str(e))
+
+        # List remote plugins
+        try:
+            plugins = list_plugins(forensic_api, web_server_address)
+            if plugins:
+                plugin_list = []
+                for plugin in plugins:
+                    plugin_dir = plugin.get('plugin_dir')
+                    print(plugin_dir)
+                    plugin_name = plugin.get('plugin_name')
+                    print(plugin_name)
+                    plugin_description = plugin.get('plugin_description')
+                    print(plugin_description)
+                    plugin_list.append(f"{plugin_name} - {plugin_description} ({plugin_dir}) ")
+
+                window['-PLUGIN LIST-'].update(plugin_list)
+        except Exception as e:
+            print(str(e))
 
 
 # Form: All fields in the form
@@ -1182,6 +1217,7 @@ def ForensicVMForm():
     vm_stopped = True
     folders_created = False
     server_offline = False
+    first_run = True
     # Set the theme
     sg.theme("DefaultNoMoreNagging")
     # Define the filename for the JSON file
@@ -1341,7 +1377,7 @@ def ForensicVMForm():
     finetune_frame = sg.Frame('Memory Size (GB)', [
         [sg.Slider(range=(0, 128), default_value=0.128, orientation='h',
                    size=(40, 20),  resolution=0.1, key='-MB-SLIDER-'),
-         sg.Button('CHANGE', size=(10, 2), key='-GB-SELECTED-')],
+         sg.Button('CHANGE', size=(10, 2), key='-CHANGE-MB-')],
 
     ])
 
@@ -1544,6 +1580,9 @@ def ForensicVMForm():
                     server_offline = True
 
             if server_ok == 0:
+                if first_run:
+                    formInit(values, window)
+                    first_run = False
                 window["alert_server_off"].update(visible=False)
                 if check_vm_exists(forensic_api, uuid_folder, web_server_address):
                     window["convert_to_vm_button"].update(disabled=not False)
@@ -1602,6 +1641,16 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == '-CHANGE-MB-':
+            try:
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                web_server_address = values["server_address"]
+                forensic_api = values["forensic_api"]
+                change_memory_size(forensic_api, web_server_address, uuid_folder, values["-MB-SLIDER-"] * 1024)
+                sg.popup(f"Memory size changed to {values['-MB-SLIDER-']} MB")
+            except Exception as e:
+                print(str(e))
         elif event == '-DELETE SNAPSHOT-':
             try:
                 forensic_image_path = values["forensic_image_path"]
@@ -1666,24 +1715,7 @@ def ForensicVMForm():
 
 
 
-            # try:
-            #     snapshots = get_snapshot_list(forensic_api, uuid_folder, web_server_address)
-            #
-            #     snapshot_info_list = []
-            #     for snapshot in snapshots:
-            #         snapshot_id = snapshot.get('id')
-            #         snapshot_tag = snapshot.get('tag')
-            #         vm_size = snapshot.get('vm_size')
-            #         date = snapshot.get('date')
-            #         vm_clock = snapshot.get('vm_clock')
-            #         snapshot_info = f"({snapshot_tag}) - {vm_size} MB"
-            #         snapshot_info_list.append(snapshot_info)
-            #         print(snapshot_info)
-            #     window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
-            #
-            # except Exception as e:
-            #     print(e)
-            #     sg.popup_ok("Error listing snapshots", title="Error")
+
 
         elif event == 'debug_ssh_button':
             forensic_image_path = values["forensic_image_path"]
