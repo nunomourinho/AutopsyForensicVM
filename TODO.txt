@@ -1,25 +1,11 @@
-FINETTUNING FIX: 
----> After converting a image one should call updateinterface.
----> Centralize all actions in update interface!
-
-
 DELETE FIX: 
 ---> After deleting a VM, one whould reset the interface buttons state
 ---> After deleting image user should have the feedback of the result
 
-SNAPSHOTS FIX:
----> The snapshot in uefi does not work because pflash is in a temp directory and uefi is in raw file. ~
-------> Converted UEFI to qcow2 file
-------> Have to change the forensic2v.sh script to load the qcow2 file. Follow this changes in the start script:
---->cp -n '/forensicVM/usr/share/qemu/OVMF_VARS.qcow2' "/forensicVM/mnt/vm/69e05769-1593-58b8-b2fd-7f9416c295cb/OVMF_VARS.qcow2"
-qemu-system-x86_64 \
-    -no-user-config \
-    -nodefaults \
-    -name S0002-P0001.qcow2 \
-    -machine q35,accel=kvm:tcg \
---->    -drive if=pflash,format=qcow2,file=/forensicVM/usr/share/qemu/OVMF_CODE.qcow2,readonly \
---->    -drive if=pflash,format=qcow2,file="/forensicVM/mnt/vm/69e05769-1593-58b8-b2fd-7f9416c295cb/OVMF_VARS.qcow2" \
 
+FINETTUNING FIX: 
+---> After converting a image one should call updateinterface.
+---> Centralize all actions in update interface!
 
 CPU
 ---> Create webservice that reads number of CPUS from script file
