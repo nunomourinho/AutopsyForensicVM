@@ -1,3 +1,12 @@
+FINETTUNING FIX: 
+---> After converting a image one should call updateinterface.
+---> Centralize all actions in update interface!
+
+
+DELETE FIX: 
+---> After deleting a VM, one whould reset the interface buttons state
+---> After deleting image user should have the feedback of the result
+
 SNAPSHOTS FIX:
 ---> The snapshot in uefi does not work because pflash is in a temp directory and uefi is in raw file. ~
 ------> Converted UEFI to qcow2 file
