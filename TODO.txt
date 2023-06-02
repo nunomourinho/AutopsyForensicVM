@@ -1,3 +1,15 @@
+WIRESHARK NETWORK CARD
+---> Create a script that generates a tap interface
+---> Create a webservice that adds a new network card that records network trafic
+---> Create a new webservice that disables this network card, and downloads the wireshark file
+
+
+NOVNC BUTTONS:
+---> Change webservices to support autentication of a logged user (called from webpage)
+---> Create ajax client to shutdown machine and change noVNC button actions
+
+
+
 DELETE FIX: 
 ---> After deleting a VM, one whould reset the interface buttons state
 ---> After deleting image user should have the feedback of the result
@@ -14,10 +26,6 @@ CPU
 EVIDENCE DISK: 
 ---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
 
-WIRESHARK NETWORK CARD
----> Create a script that generates a tap interface
----> Create a webservice that adds a new network card that records network trafic
----> Create a new webservice that disables this network card, and downloads the wireshark file
 
 SIMPLE NETWORK CARD
 ---> Create a webservice that adds a new network card
@@ -33,10 +41,6 @@ AUTHENTICATION
 ---> Authentication: Integrate with google authentication. Use this link as a reference:
 https://www.section.io/engineering-education/django-google-oauth/
 
-
-NOVNC BUTTONS:
----> Change webservices to support autentication of a logged user (called from webpage)
----> Create ajax client to shutdown machine and change noVNC button actions
 
 SNAP MODE: Run a machine in snap mode:
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
