@@ -8,7 +8,9 @@ NOVNC BUTTONS:
 ---> Change webservices to support autentication of a logged user (called from webpage)
 ---> Create ajax client to shutdown machine and change noVNC button actions
 
-
+INIT FIX:
+---> Make the system detected if is called by parameter. It it is, load is inicial configuration from autopsy. 
+Now it is wrongly reading he local json config first.
 
 DELETE FIX: 
 ---> After deleting a VM, one whould reset the interface buttons state
