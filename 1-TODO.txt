@@ -10,11 +10,7 @@ NOVNC BUTTONS:
 
 INIT FIX:
 ---> Make the system detected if is called by parameter. It it is, load is inicial configuration from autopsy. 
-Now it is wrongly reading he local json config first.
-
-DELETE FIX: 
----> After deleting a VM, one whould reset the interface buttons state
----> After deleting image user should have the feedback of the result
+Now it is wrongly reading he local json config first. Watchout for samba share before convertion. Check the autofill path
 
 
 FINETTUNING FIX: 

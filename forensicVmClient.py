@@ -1613,6 +1613,15 @@ def ForensicVMForm():
                             forensic_api = values["forensic_api"]
                             create_folders_in_qcow2_background(forensic_api, web_server_address, uuid_folder, case_tags)
                             folders_created = True
+                else:
+                    window["convert_to_vm_button"].update(disabled=False)
+                    window["link_to_vm_button"].update(disabled=False)
+                    window["delete_vm_button"].update(disabled=True)
+                    window["open_forensic_vm_button"].update(disabled=True)
+                    window["open_forensic_shell_button"].update(disabled=False)
+                    window["open_forensic_netdata_button"].update(disabled=False)
+                    window["save_screenshots_vm_button"].update(disabled=True)
+                    window["start_vm_button"].update(disabled=True)
             elif not server_offline:
                 window["convert_to_vm_button"].update(disabled=not True)
                 window["link_to_vm_button"].update(disabled=not True)
