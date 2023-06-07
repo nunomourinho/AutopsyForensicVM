@@ -704,19 +704,23 @@ def delete_vm(api_key, uuid, base_url):
         print(response.text)
         return False
 def check_vm_exists(api_key, uuid, baseurl):
-    url = f"{baseurl}/api/check-vm-exists/{uuid}/"
-    headers = {"X-API-KEY": api_key}
+    try:
+        url = f"{baseurl}/api/check-vm-exists/{uuid}/"
+        headers = {"X-API-KEY": api_key}
 
-    response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers)
 
-    if response.status_code == 200:
-        result = response.json()
-        vm_exists = result['vm_exists']
-        return vm_exists
-    else:
-        print("DEBUG:")
-        print(f"Error: {response.status_code}")
-        print(response.text)
+        if response.status_code == 200:
+            result = response.json()
+            vm_exists = result['vm_exists']
+            return vm_exists
+        else:
+            print("DEBUG:")
+            print(f"Error: {response.status_code}")
+            print(response.text)
+            return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
         return False
 def start_vm(api_key, uuid, baseurl):
     url = f"{baseurl}/api/start-vm/{uuid}/"
