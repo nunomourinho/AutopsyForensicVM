@@ -1509,10 +1509,10 @@ def ForensicVMForm():
     about_tab = sg.Tab("About", about_layout, element_justification="center")
 
     output_layout = [
-        [sg.Output(size=(100, 25), key="-OUTPUT-",
-                   background_color='black',
-                   text_color='white',
-                   font=('Courier New', 12))]
+#        [sg.Output(size=(100, 25), key="-OUTPUT-",
+#                   background_color='black',
+#                   text_color='white',
+#                   font=('Courier New', 12))]
     ]
 
     output_tab = sg.Tab("Output Console", output_layout, element_justification="left")
