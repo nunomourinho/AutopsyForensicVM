@@ -714,6 +714,7 @@ def check_vm_exists(api_key, uuid, baseurl):
         vm_exists = result['vm_exists']
         return vm_exists
     else:
+        print("DEBUG:")
         print(f"Error: {response.status_code}")
         print(response.text)
         return False
