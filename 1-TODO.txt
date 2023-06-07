@@ -1,7 +1,11 @@
 WIRESHARK NETWORK CARD
 ---> Create a script that generates a tap interface
 ---> Create a webservice that adds a new network card that records network trafic
+-netdev user,id=u1 -device e1000,netdev=u1 -object filter-dump,id=f1,netdev=u1,file=dump.dat
+https://wiki.qemu.org/Documentation/Networking: 
+
 ---> Create a new webservice that disables this network card, and downloads the wireshark file
+
 
 
 NOVNC BUTTONS:
