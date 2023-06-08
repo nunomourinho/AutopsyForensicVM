@@ -764,6 +764,7 @@ def get_forensic_image_info(api_key, uuid, baseurl):
         else:
             return response.status_code, "Access denied"
     except Exception as e:
+        print(f"DEBUG: An unexpected error occurred: {str(e)}")
         return 1, str(e)
 
 
