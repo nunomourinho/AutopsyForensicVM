@@ -971,6 +971,22 @@ def run_openssh(server_address, server_port, windows_share,
     except Exception as e:
         print(e)
 
+def start_server_remotessh(server_address, server_port):
+    try:
+        command = f"cd /forensicVM/bin; exec sudo /forensicVM/bin/run-django-screen"
+
+        ssh_command ="start /wait cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i " \
+                     + os.path.dirname(os.path.abspath(__file__))+ \
+                     "\\mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+                     + str(server_address)\
+                     + " -p " + str(server_port)\
+                     + " " + command
+
+        os.system(ssh_command)
+
+    except Exception as e:
+        print(e)
+
 
 def debug_remotessh(server_address, server_port, uuid_folder):
     try:
@@ -1416,8 +1432,11 @@ def ForensicVMForm():
                                                  default_text=config.get("server_address", ""))],
                   [sg.Text("Forensic API:"), sg.InputText(key="forensic_api",
                                                 default_text=config.get("forensic_api", "")),
-                   sg.Button("Test Server Connection", key="test_forensicServer_connect")
-                   ]
+                   sg.Button("Test Server Connection", key="test_forensicServer_connect"),
+                   sg.Button("Start ForensicVM server", key="start_server_ssh_button", size=(25, 1), visible=True,
+                     disabled=False)
+                   ],
+
                  ]
                  )
          ],
@@ -1718,7 +1737,12 @@ def ForensicVMForm():
             window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
 
 
-
+        elif event == 'start_server_ssh_button':
+            forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+            server_address = values["ssh_server_address"]
+            server_port = values["ssh_server_port"]
+            start_server_remotessh(server_address, server_port)
 
 
         elif event == 'debug_ssh_button':
