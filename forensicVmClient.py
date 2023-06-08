@@ -1574,7 +1574,9 @@ def ForensicVMForm():
                     formInit(values, window)
                     first_run = False
                 window["alert_server_off"].update(visible=False)
-                if check_vm_exists(forensic_api, uuid_folder, web_server_address):
+                vm_folder_exists = check_vm_exists(forensic_api, uuid_folder, web_server_address)
+                print(f" vm_folder_exists: {vm_folder_exists}")
+                if vm_folder_exists:
                     print("DEBUG: VM EXISTS")
                     window["convert_to_vm_button"].update(disabled=not False)
                     window["link_to_vm_button"].update(disabled=not False)
