@@ -1575,9 +1575,9 @@ def ForensicVMForm():
                     first_run = False
                 window["alert_server_off"].update(visible=False)
                 vm_folder_exists = check_vm_exists(forensic_api, uuid_folder, web_server_address)
-                print(f" vm_folder_exists: {vm_folder_exists}")
+                #print(f" vm_folder_exists: {vm_folder_exists}")
                 if vm_folder_exists:
-                    print("DEBUG: VM EXISTS")
+                    #print("DEBUG: VM EXISTS")
                     window["convert_to_vm_button"].update(disabled=not False)
                     window["link_to_vm_button"].update(disabled=not False)
                     window["delete_vm_button"].update(disabled=False)
@@ -1586,8 +1586,8 @@ def ForensicVMForm():
                     window["open_forensic_netdata_button"].update(disabled=not True)
                     window["save_screenshots_vm_button"].update(disabled=not True)
                     return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
-                    print(return_code)
-                    print(vm_status)
+                    #print(return_code)
+                    #print(vm_status)
                     if vm_status.get("vm_status", "") == "running":
                         window["delete_vm_button"].update(disabled=True)
                         window["start_vm_button"].update(disabled=not False)
