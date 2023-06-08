@@ -1586,6 +1586,8 @@ def ForensicVMForm():
                     window["open_forensic_netdata_button"].update(disabled=not True)
                     window["save_screenshots_vm_button"].update(disabled=not True)
                     return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+                    print(return_code)
+                    print(vm_status)
                     if vm_status.get("vm_status", "") == "running":
                         window["delete_vm_button"].update(disabled=True)
                         window["start_vm_button"].update(disabled=not False)
