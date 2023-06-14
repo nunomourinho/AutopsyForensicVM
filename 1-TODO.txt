@@ -5,6 +5,7 @@ WIRESHARK NETWORK CARD
 -netdev user,id=u1 -device e1000,netdev=u1 -object filter-dump,id=f1,netdev=u1,file=/forensicVM/mnt/vm/8741c214-8956-573a-a6e7-c28d86684f05/network.pcap
 -net nic -net tap,ifname=tap0,script=no,downscript=no
 -netdev tap,id=net0,ifname=tap0,script=no,downscript=no -device e1000,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=/forensicVM/mnt/vm/8741c214-8956-573a-a6e7-c28d86684f05/network.pcap
+Investigate tap in proxmox
 
 https://wiki.qemu.org/Documentation/Networking: 
 ---> Create a new webservice that disables this network card, and downloads the wireshark file
@@ -74,7 +75,12 @@ aff forensic image
 ---> Create function to list and delete shares
 
 AUTOMATED MALWARE DETECTION:
+
 ---> Detect malware (memory or others-Yara RULES or Others)
+1) tshark to convert ip capture to ip list. 2) process ip list with ip identification
+Use scapy: https://incognitjoe.github.io/reading-pcap-with-scapy.html
+https://chat.openai.com/share/a758fd60-fce1-4b08-aece-7bbb02469796
+
 (Idea: Use alien vault pulses to detect malware. Use tor exit nodes to detect hidden channels)
 Sources: 
 https://github.com/abusech/YARAify ---> Python examples to find malware from md5, sha1, sha256 hashs
