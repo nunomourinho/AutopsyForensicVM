@@ -15,6 +15,24 @@ from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
 
 def get_available_memory(api_key, site_url):
+ """
+    Retrieves the available memory in megabytes from a specified API VM.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        site_url (str): The URL of the site to fetch the available memory from.
+
+    Returns:
+        float: The available memory in megabytes.
+
+    Raises:
+        None
+
+    Example:
+        >>> get_available_memory('your_api_key', 'https://example.com')
+        Available Memory: 256.0 MB
+        256.0
+    """
     headers = {
         'X-API-Key': api_key,
     }
@@ -31,6 +49,25 @@ def get_available_memory(api_key, site_url):
 
 
 def change_memory_size(api_key, site_url, uuid, memory_size):
+    """
+    Changes the memory size of a specified VM identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        site_url (str): The URL of the site where the VM is located.
+        uuid (str): The UUID of the VM to modify.
+        memory_size (int): The new memory size in megabytes.
+
+    Returns:
+        None
+
+    Raises:
+        None
+
+    Example:
+        >>> change_memory_size('your_api_key', 'https://example.com', 'resource_uuid', 512)
+        Memory size updated successfully
+    """
     headers = {
         'X-API-Key': api_key,
     }
@@ -46,6 +83,24 @@ def change_memory_size(api_key, site_url, uuid, memory_size):
         print(f"Error: {response.text}")
 
 def get_memory_size(api_key, site_url, uuid):
+    """
+    Retrieves the memory size of a specified resource identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        site_url (str): The URL of the site where the resource is located.
+        uuid (str): The UUID of the resource to fetch the memory size from.
+
+    Returns:
+        int: The memory size of the resource in megabytes.
+
+    Raises:
+        None
+
+    Example:
+        >>> get_memory_size('your_api_key', 'https://example.com', 'resource_uuid')
+        1024
+    """
     headers = {'X-API-KEY': api_key}
     url = f"{site_url}/api/get-memory-size/{uuid}/"
 
@@ -61,6 +116,25 @@ def get_memory_size(api_key, site_url, uuid):
         print(f"Request Error: {str(e)}")
 
 def delete_snapshot(api_key, site_url, uuid, snapshot_name):
+    """
+    Deletes a snapshot with the specified name for a resource identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        site_url (str): The URL of the site where the resource is located.
+        uuid (str): The UUID of the resource from which to delete the snapshot.
+        snapshot_name (str): The name of the snapshot to delete.
+
+    Returns:
+        str: A message indicating the success or failure of the snapshot deletion.
+
+    Raises:
+        None
+
+    Example:
+        >>> delete_snapshot('your_api_key', 'https://example.com', 'resource_uuid', 'snapshot_1')
+        'Snapshot snapshot_1 deleted successfully'
+    """
     url = f"{site_url}/api/delete-snapshot/{uuid}/"
     headers = {'X-API-KEY': api_key}
     data = {'snapshot_name': snapshot_name}
@@ -77,7 +151,27 @@ def delete_snapshot(api_key, site_url, uuid, snapshot_name):
         print(f"Error: {e}")
 
     return None
+    
 def rollback_snapshot(api_key, site_url, uuid, snapshot_name):
+    """
+    Rolls back a resource identified by UUID to a specific snapshot using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        site_url (str): The URL of the site where the resource is located.
+        uuid (str): The UUID of the resource to rollback.
+        snapshot_name (str): The name of the snapshot to rollback to.
+
+    Returns:
+        str: A message indicating the success or failure of the snapshot rollback.
+
+    Raises:
+        None
+
+    Example:
+        >>> rollback_snapshot('your_api_key', 'https://example.com', 'resource_uuid', 'snapshot_1')
+        'Snapshot snapshot_1 rolled back successfully'
+    """
     url = f"{site_url}/api/rollback-snapshot/{uuid}/"
     headers = {'X-API-KEY': api_key}
     data = {'snapshot_name': snapshot_name}
@@ -94,7 +188,26 @@ def rollback_snapshot(api_key, site_url, uuid, snapshot_name):
         print(f"Error: {e}")
 
     return None
+    
 def create_snapshot(api_key, uuid_path, base_url):
+    """
+    Creates a snapshot for a resource identified by UUID path using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid_path (str): The UUID path of the resource for which to create a snapshot.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        str: The name of the created snapshot.
+
+    Raises:
+        None
+
+    Example:
+        >>> create_snapshot('your_api_key', 'resource_uuid_path', 'https://example.com')
+        'snapshot_1'
+    """
     url = urljoin(base_url, f"api/create-snapshot/{uuid_path}/")
     headers = {'X-API-KEY': api_key}
 
@@ -110,7 +223,26 @@ def create_snapshot(api_key, uuid_path, base_url):
         print(f"Error: {e}")
 
     return None
+    
 def get_snapshot_list(api_key, uuid_path, base_url):
+    """
+    Retrieves the list of snapshots for a resource identified by UUID path using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid_path (str): The UUID path of the resource for which to retrieve the snapshot list.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        list: A list of snapshot names for the specified resource.
+
+    Raises:
+        None
+
+    Example:
+        >>> get_snapshot_list('your_api_key', 'resource_uuid_path', 'https://example.com')
+        ['snapshot_1', 'snapshot_2', 'snapshot_3']
+    """
     url = urljoin(base_url, f"api/snapshots-list/{uuid_path}/")
     headers = {'X-API-KEY': api_key}
 
@@ -128,6 +260,24 @@ def get_snapshot_list(api_key, uuid_path, base_url):
     return []
 
 def insert_network_card(api_key, uuid_path, base_url):
+    """
+    Inserts a network card for a resource identified by UUID path using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid_path (str): The UUID path of the resource for which to insert the network card.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        None
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `base_url`, `uuid`) is missing.
+
+    Example:
+        >>> insert_network_card('your_api_key', 'resource_uuid_path', 'https://example.com')
+        Network card inserted successfully.
+    """
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
     assert uuid, "UUID is required"
@@ -147,6 +297,26 @@ def insert_network_card(api_key, uuid_path, base_url):
         print(f'Failed to insert network card. Error: {response.text}')
 
 def insert_cdrom(api_key, base_url, uuid, filename):
+    """
+    Inserts a CD-ROM with a specified filename for a resource identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        base_url (str): The base URL of the API.
+        uuid (str): The UUID of the resource for which to insert the CD-ROM.
+        filename (str): The filename of the CD-ROM.
+
+    Returns:
+        dict: The JSON response from the API containing the result of the CD-ROM insertion.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `base_url`, `uuid`, `filename`) is missing.
+        requests.exceptions.RequestException: If an error occurs during the request.
+
+    Example:
+        >>> insert_cdrom('your_api_key', 'https://example.com', 'resource_uuid', 'cdrom.iso')
+        {'status': 'success', 'message': 'CD-ROM inserted successfully'}
+    """
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
     assert uuid, "UUID is required"
@@ -166,6 +336,25 @@ def insert_cdrom(api_key, base_url, uuid, filename):
         return None
 
 def eject_cdrom(api_key, base_url, uuid):
+    """
+    Ejects the CD-ROM for a resource identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        base_url (str): The base URL of the API.
+        uuid (str): The UUID of the resource for which to eject the CD-ROM.
+
+    Returns:
+        dict: The JSON response from the API containing the result of the CD-ROM ejection.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `base_url`, `uuid`) is missing.
+        requests.exceptions.RequestException: If an error occurs during the request.
+
+    Example:
+        >>> eject_cdrom('your_api_key', 'https://example.com', 'resource_uuid')
+        {'status': 'success', 'message': 'CD-ROM ejected successfully'}
+    """
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
     assert uuid, "UUID is required"
@@ -184,6 +373,26 @@ def eject_cdrom(api_key, base_url, uuid):
         return None
 
 def delete_iso(api_key, base_url, iso_filename):
+    """
+    Deletes an ISO file with the specified filename using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        base_url (str): The base URL of the API.
+        iso_filename (str): The filename of the ISO file to delete.
+
+    Returns:
+        bool: True if the ISO file was deleted successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `base_url`, `iso_filename`) is missing.
+        requests.exceptions.RequestException: If an error occurs during the request.
+
+    Example:
+        >>> delete_iso('your_api_key', 'https://example.com', 'my_iso_file.iso')
+        ISO file my_iso_file.iso deleted successfully
+        True
+    """
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
     assert iso_filename, "ISO file name is required"
@@ -209,6 +418,25 @@ def delete_iso(api_key, base_url, iso_filename):
         return False
 
 def upload_iso(api_key, base_url, iso_file_path):
+    """
+    Uploads an ISO file to the specified base URL using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        base_url (str): The base URL of the API.
+        iso_file_path (str): The file path of the ISO file to upload.
+
+    Returns:
+        bool: True if the ISO file was uploaded successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `base_url`, `iso_file_path`) is missing.
+        requests.exceptions.RequestException: If an error occurs during the request.
+
+    Example:
+        >>> upload_iso('your_api_key', 'https://example.com', '/path/to/iso_file.iso')
+        True
+    """
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
     assert iso_file_path, "ISO file path is required"
@@ -256,6 +484,26 @@ def upload_iso(api_key, base_url, iso_file_path):
 
 
 def run_plugin(api_key, base_url, plugin_directory, image_uuid):
+    """
+    Runs a plugin on a specified image identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        base_url (str): The base URL of the API.
+        plugin_directory (str): The directory of the plugin to run.
+        image_uuid (str): The UUID of the image on which to run the plugin.
+
+    Returns:
+        dict: The JSON response from the API containing the result of the plugin execution.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `base_url`, `plugin_directory`, `image_uuid`) is missing.
+        requests.exceptions.RequestException: If an error occurs during the request.
+
+    Example:
+        >>> run_plugin('your_api_key', 'https://example.com', 'plugin_directory', 'image_uuid')
+        {'status': 'success', 'message': 'Plugin execution completed'}
+    """
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
     assert plugin_directory, "Plugin directory is required"
@@ -275,6 +523,24 @@ def run_plugin(api_key, base_url, plugin_directory, image_uuid):
         return None
 
 def list_plugins(api_key, base_url):
+    """
+    Retrieves the list of available plugins using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        list: A list of available plugins.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `base_url`) is missing.
+        requests.exceptions.RequestException: If an error occurs during the request.
+
+    Example:
+        >>> list_plugins('your_api_key', 'https://example.com')
+        ['plugin_1', 'plugin_2', 'plugin_3']
+    """
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
 
@@ -291,6 +557,24 @@ def list_plugins(api_key, base_url):
         return []
 
 def list_iso_files(api_key, base_url):
+    """
+    Retrieves the list of available ISO files using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        dict: The JSON response from the API containing the list of available ISO files.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `base_url`) is missing.
+        requests.exceptions.RequestException: If an error occurs during the request.
+
+    Example:
+        >>> list_iso_files('your_api_key', 'https://example.com')
+        {'iso_files': ['file_1.iso', 'file_2.iso', 'file_3.iso']}
+    """
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
 
@@ -307,6 +591,26 @@ def list_iso_files(api_key, base_url):
         return None
 
 def recreate_folders(api_key, base_url, uuid_path, folders):
+   """
+    Recreates a list of folders for a resource identified by UUID path using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        base_url (str): The base URL of the API.
+        uuid_path (str): The UUID path of the resource for which to recreate the folders.
+        folders (list): A list of folders to recreate.
+
+    Returns:
+        dict: The JSON response from the API containing the result of the folder recreation.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `base_url`, `uuid_path`, `folders`) is missing.
+        requests.exceptions.RequestException: If an error occurs during the request.
+
+    Example:
+        >>> recreate_folders('your_api_key', 'https://example.com', 'resource_uuid_path', ['folder1', 'folder2', 'folder3'])
+        {'status': 'success', 'message': 'Folders recreated successfully'}
+    """
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
     assert uuid_path, "UUID path is required"
@@ -329,6 +633,28 @@ def recreate_folders(api_key, base_url, uuid_path, folders):
         return None
 
 def create_folders_in_qcow2(api_key, base_url, uuid_path, folders):
+    """
+    Creates folders within a qcow2 image for a resource identified by UUID path using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        base_url (str): The base URL of the API.
+        uuid_path (str): The UUID path of the resource for which to create the folders within the qcow2 image.
+        folders (list): A list of folders to create within the qcow2 image.
+
+    Returns:
+        bool: True if the folders were created successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `base_url`, `uuid_path`, `folders`) is missing.
+        requests.exceptions.HTTPError: If an HTTP error occurs during the request.
+        Exception: If an unexpected error occurs during the request.
+
+    Example:
+        >>> create_folders_in_qcow2('your_api_key', 'https://example.com', 'resource_uuid_path', ['folder1', 'folder2', 'folder3'])
+        Response: {'status': 'success', 'message': 'Folders created successfully'}
+        True
+    """
     assert api_key, "API key is required"
     assert base_url, "Base URL is required"
     assert uuid_path, "VMDK path is required"
