@@ -1559,12 +1559,52 @@ def string_to_uuid(input_string):
 
 # Save the values as a json file
 def save_config(values, filename):
+    """
+    Saves the configuration values to a JSON file.
+
+    Args:
+        values (dict): The configuration values to save.
+        filename (str): The name of the JSON file to save to.
+
+    Returns:
+        None
+
+    Example:
+        >>> config = {
+        >>>     'username': 'myuser',
+        >>>     'password': 'mypassword',
+        >>>     'server': 'example.com'
+        >>> }
+        >>> save_config(config, 'config.json')
+
+    Raises:
+        None
+
+    """
     # Save the configuration to the JSON file
     with open(filename, "w") as f:
         json.dump(values, f)
 
 # Load json file as values
 def load_config(filename):
+    """
+    Loads the configuration values from a JSON file.
+
+    Args:
+        filename (str): The name of the JSON file to load from.
+
+    Returns:
+        dict: The configuration values loaded from the JSON file.
+
+    Example:
+        >>> config = load_config('config.json')
+        >>> print(config)
+        {'username': 'myuser', 'password': 'mypassword', 'server': 'example.com'}
+
+    Raises:
+        None
+
+    """
     # Load the configuration from the JSON file if it exists
     if os.path.isfile(filename):
         with open(filename, "r") as f:
@@ -1625,6 +1665,41 @@ except Exception as e:
 def run_openssh(server_address, server_port, windows_share,
             share_login, share_password, replacement_share,
             forensic_image_path, uuid_folder, copy):
+    """
+    Runs the OpenSSH command to connect to a remote server and execute a command
+    that converts the local forensic image by accessing it by samba over reverse ssh.
+
+    Args:
+        server_address (str): The IP address or hostname of the remote server.
+        server_port (int): The port number to connect to on the remote server.
+        windows_share (str): The Windows share path on the remote server.
+        share_login (str): The login username for accessing the Windows share.
+        share_password (str): The password for accessing the Windows share.
+        replacement_share (str): The replacement path to use in the command.
+        forensic_image_path (str): The path of the forensic image on the remote server.
+        uuid_folder (str): The UUID folder name for the conversion process.
+        copy (bool): Flag indicating whether to copy the forensic image.
+
+    Returns:
+        None
+
+    Example:
+        >>> run_openssh(
+        >>>     server_address='192.168.0.100',
+        >>>     server_port=22,
+        >>>     windows_share='\\server\share',
+        >>>     share_login='username',
+        >>>     share_password='password',
+        >>>     replacement_share='/mnt/share',
+        >>>     forensic_image_path='\\server\share\image.bin',
+        >>>     uuid_folder='12345678',
+        >>>     copy=True
+        >>> )
+
+    Raises:
+        None
+
+    """            
     try:
 
 
@@ -1680,6 +1755,26 @@ def run_openssh(server_address, server_port, windows_share,
         print(e)
 
 def start_server_remotessh(server_address, server_port):
+    """
+    Starts the remote forensicVM server via SSH by executing a command.
+
+    Args:
+        server_address (str): The IP address or hostname of the remote server.
+        server_port (int): The port number to connect to on the remote server.
+
+    Returns:
+        None
+
+    Example:
+        >>> start_server_remotessh(
+        >>>     server_address='192.168.0.100',
+        >>>     server_port=22
+        >>> )
+
+    Raises:
+        None
+
+    """
     try:
         command = f"cd /forensicVM/bin; exec sudo /forensicVM/bin/run-django-screen"
 
@@ -1697,6 +1792,28 @@ def start_server_remotessh(server_address, server_port):
 
 
 def debug_remotessh(server_address, server_port, uuid_folder):
+    """
+    Starts an interactive debug session on the remote server via SSH.
+
+    Args:
+        server_address (str): The IP address or hostname of the remote server.
+        server_port (int): The port number to connect to on the remote server.
+        uuid_folder (str): The UUID folder to navigate to for the debug session.
+
+    Returns:
+        None
+
+    Example:
+        >>> debug_remotessh(
+        >>>     server_address='192.168.0.100',
+        >>>     server_port=22,
+        >>>     uuid_folder='12345678-1234-5678-1234-567812345678'
+        >>> )
+
+    Raises:
+        None
+
+    """
     try:
         command = f"cd /forensicVM/mnt/vm/{uuid_folder}; exec bash"
 
@@ -1714,6 +1831,29 @@ def debug_remotessh(server_address, server_port, uuid_folder):
 
 
 def ssh_background_session(server_address, server_port, windows_share):
+    """
+    Starts a background SSH session with port forwarding to access a Windows share.
+
+    Args:
+        server_address (str): The IP address or hostname of the remote server.
+        server_port (int): The port number to connect to on the remote server.
+        windows_share (str): The Windows share path to be accessed.
+
+    Returns:
+        int: The dynamically allocated remote port for the SSH session.
+
+    Example:
+        >>> remote_port = ssh_background_session(
+        >>>     server_address='192.168.0.100',
+        >>>     server_port=22,
+        >>>     windows_share='\\\\192.168.0.200\\ShareFolder'
+        >>> )
+        >>> print(remote_port)
+
+    Raises:
+        None
+
+    """
     try:
         private_key_path = os.path.expanduser("mykey")
 
@@ -1751,7 +1891,24 @@ def ssh_background_session(server_address, server_port, windows_share):
 
 
 def test_ssh(address, port):
+    """
+    Tests SSH connectivity to a remote host.
 
+    Args:
+        address (str): The IP address or hostname of the remote host.
+        port (int): The port number to connect to on the remote host.
+
+    Returns:
+        bool: True if the SSH connection was successful, False otherwise.
+
+    Example:
+        >>> result = test_ssh('192.168.0.100', 22)
+        >>> print(result)
+
+    Raises:
+        None
+
+    """
     try:
         private_key_path = os.path.expanduser("mykey")
 
@@ -1792,6 +1949,27 @@ def test_ssh(address, port):
 
 
 def run_command_ssh(ssh, window2, cmd):
+    """
+    Executes a command on a remote host via SSH and prints the output.
+
+    Args:
+        ssh (paramiko.SSHClient): The SSH client object connected to the remote host.
+        window2 (sg.Window): The PySimpleGUI window object to display the output.
+        cmd (str): The command to execute on the remote host.
+
+    Returns:
+        None
+
+    Example:
+        >>> ssh = paramiko.SSHClient()
+        >>> # Connect to the remote host...
+        >>> window = sg.Window("Output Window", layout)
+        >>> run_command_ssh(ssh, window, "ls -al")
+
+    Raises:
+        None
+
+    """
     # Run a command on the remote host and print the output
     # stdin, stdout, stderr = ssh.exec_command("sudo /forensicVM/bin/forensicv2v.sh")
     stdin, stdout, stderr = ssh.exec_command(cmd)
@@ -1815,6 +1993,24 @@ def run_command_ssh(ssh, window2, cmd):
             window2['-OUTPUT-'].update(current_output+"e:"+output, text_color='white')
 
 def test_windows_share(server_address, username, password):
+    """
+    Tests the connectivity to a Windows share.
+
+    Args:
+        server_address (str): The address of the Windows share.
+        username (str): The username for authentication.
+        password (str): The password for authentication.
+
+    Returns:
+        bool: True if the connectivity test is successful, False otherwise.
+
+    Example:
+        >>> test_windows_share("\\\\server\\share", "username", "password")
+
+    Raises:
+        subprocess.CalledProcessError: If the 'net use' command fails.
+
+    """
     # Use the 'net use' command to map a drive to the share
     cmd = 'net use {} /user:{} {}'.format(server_address, username, password)
     try:
@@ -1833,6 +2029,26 @@ def test_windows_share(server_address, username, password):
 
 
 def validate_server_address(address):
+    """
+    Validates the format of a server address.
+
+    Args:
+        address (str): The server address to validate.
+
+    Returns:
+        bool: True if the address is valid, False otherwise.
+
+    Example:
+        >>> validate_server_address("192.168.0.1")
+        True
+
+        >>> validate_server_address("https://example.com")
+        True
+
+        >>> validate_server_address("invalid_address")
+        False
+
+    """
     ip_regex = r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b"
     url_regex = r"\b(https?:\/\/)?[\w.-]+\.[a-zA-Z]{2,}(\S+)?\b"
     if re.match(ip_regex, address):
@@ -1845,12 +2061,33 @@ def validate_server_address(address):
 
 # Event handler for the file browse button
 def handle_file_browse(event, values, window):
+    """
+    Handle the file browse event.
+
+    Args:
+        event (str): The event triggered by the file browse button.
+        values (dict): The current values of the window elements.
+        window (sg.Window): The GUI window object.
+
+    """
     iso_file_path = values['-BROWSE-']
     window['-CDROM FILE-'].update(value=iso_file_path)
     window['-UPLOAD-'].update(disabled=False)
 
 
 def list_snapshots(forensic_api, uuid_folder, web_server_address):
+    """
+    List the snapshots associated with a forensic VM.
+
+    Args:
+        forensic_api (object): The forensic API object.
+        uuid_folder (str): The UUID folder of the forensic VM.
+        web_server_address (str): The address of the web server.
+
+    Returns:
+        list: A list of snapshot information.
+
+    """
     snapshot_info_list = []
 
     try:
@@ -1872,6 +2109,23 @@ def list_snapshots(forensic_api, uuid_folder, web_server_address):
 
 
 def formInit(values, window):
+    """
+    Initialize the form window by populating various elements with data retrieved from the forensic API.
+
+    It performs the following tasks:
+
+    Retrieves the UUID folder based on the forensic image path and case name.
+    Tests the API key and server address to ensure they are valid.
+    Retrieves the memory size of the forensic VM server and updates the memory slider in the form.
+    Retrieves the list of snapshots associated with the forensic VM and updates the snapshot list in the form.
+    Retrieves the list of available ISO files and updates the CD-ROM list in the form.
+    Retrieves the list of remote plugins and updates the plugin list in the form.
+
+    Args:
+        values (dict): A dictionary containing the form values.
+        window: The PySimpleGUI window object.
+
+    """
     forensic_image_path = values["forensic_image_path"]
     uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
     web_server_address = values["server_address"]
@@ -1928,6 +2182,24 @@ def formInit(values, window):
 # Form: All fields in the form
 
 def ForensicVMForm():
+    """
+    This function is used to create a forensic VM form with a user interface.
+
+    The function initializes a number of state variables, configures GUI theme, loads or creates the configuration from a JSON file,
+    creates different frames for performing tasks such as uploading, managing, deleting and listing CD-ROMs, converting forensic image 
+    to VM, screenshot management, memory dump creation, VM control, and various tools. The function also incorporates plugin management,
+    snapshot management and VM fine-tuning options.
+
+    Frames are arranged in tabs for convenient access, including tabs for virtualization, configuration, autopsy case details, 
+    and about info. The function continuously listens for events on the GUI and takes appropriate actions based on the event triggers.
+
+    It creates the window with the aforementioned layout and goes into an event loop where it waits for events to occur. These events
+    can be button presses, input changes etc. which are handled appropriately within the loop.
+
+    The function makes heavy use of PySimpleGUI library to design and control the GUI components.
+
+    This function does not take any parameters, and does not return any values. It runs indefinitely, until the window is closed.
+    """
     vm_stopped = True
     folders_created = False
     server_offline = False
