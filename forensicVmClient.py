@@ -1213,6 +1213,31 @@ def confirm_deletion_twice():
     
     
 def delete_vm(api_key, uuid, base_url):
+    """
+    Deletes a virtual machine identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the virtual machine to delete.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        bool: True if the virtual machine has been deleted successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `uuid`, `base_url`) is missing.
+        requests.exceptions.HTTPError: If an HTTP error occurs during the request.
+        Exception: If an unexpected error occurs.
+
+    Example:
+        >>> delete_vm('your_api_key', 'vm_uuid', 'https://example.com')
+        Are you sure you want to delete the VM? (1/2)
+        [Yes] [No]
+        Are you sure you want to delete the VM? (2/2)
+        [Yes] [No]
+        VM with UUID vm_uuid has been deleted.
+        True
+    """
     if not confirm_deletion_twice():
         print("VM deletion canceled.")
         return False
@@ -1234,7 +1259,27 @@ def delete_vm(api_key, uuid, base_url):
         print(f"Error: {response.status_code}")
         print(response.text)
         return False
+        
 def check_vm_exists(api_key, uuid, baseurl):
+    """
+    Checks if a virtual machine identified by UUID exists using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the virtual machine to check.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        bool: True if the virtual machine exists, False otherwise.
+
+    Raises:
+        requests.exceptions.RequestException: If an error occurs during the request.
+        Exception: If an unexpected error occurs.
+
+    Example:
+        >>> check_vm_exists('your_api_key', 'vm_uuid', 'https://example.com')
+        True
+    """
     try:
         url = f"{baseurl}/api/check-vm-exists/{uuid}/"
         headers = {"X-API-KEY": api_key}
@@ -1253,7 +1298,23 @@ def check_vm_exists(api_key, uuid, baseurl):
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}")
         return False
+
 def start_vm(api_key, uuid, baseurl):
+    """
+    Starts a virtual machine identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the virtual machine to start.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        dict: The response JSON data if the virtual machine is started successfully, None otherwise.
+
+    Example:
+        >>> start_vm('your_api_key', 'vm_uuid', 'https://example.com')
+        {'vm_started': True, 'message': 'VM started successfully.'}
+    """
     url = f"{baseurl}/api/start-vm/{uuid}/"
     headers = {"X-API-KEY": api_key}
 
@@ -1269,6 +1330,21 @@ def start_vm(api_key, uuid, baseurl):
         return None
 
 def stop_vm(api_key, uuid, baseurl):
+    """
+    Stops a virtual machine identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the virtual machine to stop.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        dict: The response JSON data if the virtual machine is stopped successfully, None otherwise.
+
+    Example:
+        >>> stop_vm('your_api_key', 'vm_uuid', 'https://example.com')
+        {'vm_stopped': True, 'message': 'VM stopped successfully.'}
+    """
     url = f"{baseurl}/api/stop-vm/{uuid}/"
     headers = {"X-API-KEY": api_key}
 
@@ -1283,6 +1359,31 @@ def stop_vm(api_key, uuid, baseurl):
         return None
 
 def get_forensic_image_info(api_key, uuid, baseurl):
+    """
+    Retrieves forensic image information for a virtual machine identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the virtual machine to retrieve forensic image information.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        tuple: A tuple containing the status code and the response JSON data if the information is retrieved successfully,
+               or the status code and error message if an error occurs.
+
+    Example:
+        >>> get_forensic_image_info('your_api_key', 'vm_uuid', 'https://example.com')
+        (0, {'forensic_image_info': { ... }})
+
+    Note:
+        - The status code 0 indicates success.
+        - The status code 1 indicates an unexpected error occurred.
+        - The status code other than 0 and 1 indicates access denied.
+
+    Raises:
+        Exception: If an unexpected error occurs.
+
+    """
     url = f'{baseurl}/api/forensic-image-vm-status/{uuid}/'
 
     headers = {'X-API-KEY': api_key}
@@ -1300,6 +1401,26 @@ def get_forensic_image_info(api_key, uuid, baseurl):
 
 
 def test_api_key(api_key, baseurl):
+    """
+    Tests the validity of an API key by making a test request to the API endpoint.
+
+    Args:
+        api_key (str): The API key to test.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        tuple: A tuple containing the status code and a message indicating the result of the test.
+            - If the status code is 0, the message is 'Access granted', indicating that the API key is valid.
+            - If the status code is other than 0, the message is 'Access denied', indicating that the API key is invalid.
+
+    Example:
+        >>> test_api_key('your_api_key', 'https://example.com')
+        (0, 'Access granted')
+
+    Raises:
+        Exception: If an unexpected error occurs during the test.
+
+    """
     url = baseurl + '/api/test/'
     headers = {'X-Api-Key': api_key}
     try:
@@ -1312,6 +1433,27 @@ def test_api_key(api_key, baseurl):
         return 1, str(e)
 
 def generate_and_send_public_key(baseurl, api_key, ssh_dir):
+    """
+    Generates an SSH key pair and sends the public key to the server.
+
+    Args:
+        base_url (str): The base URL of the server.
+        api_key (str): The API key required for authentication.
+        ssh_dir (str): The directory to store the SSH key pair.
+
+    Returns:
+        tuple: A tuple containing the message from the server response and the status code.
+            - The message indicates the result of adding the public key to the authorized keys.
+            - The status code indicates the status of the request.
+
+    Example:
+        >>> generate_and_send_public_key('https://example.com', 'your_api_key', '/path/to/ssh_dir')
+        ('Public key added to authorized keys', 200)
+
+    Raises:
+        Exception: If an unexpected error occurs during key generation or sending the public key to the server.
+
+    """
     # Generate SSH key pair
 
     if not os.path.exists(ssh_dir):
@@ -1349,11 +1491,32 @@ def generate_and_send_public_key(baseurl, api_key, ssh_dir):
     # else:
     #     return 'Failed to add public key to authorized keys'
     return response.json().get('message'), response.status_code
+
+
 # Define the filename for the JSON file
 filename = "config.json"
 icon_path = "forensicVMCLient.ico"
 
 def create_login_and_share(username, password, sharename, folderpath):
+    """
+    Creates a login and share using a batch file.
+
+    Args:
+        username (str): The username for the login.
+        password (str): The password for the login.
+        sharename (str): The name of the share.
+        folderpath (str): The path to the folder to be shared.
+
+    Returns:
+        None
+
+    Example:
+        >>> create_login_and_share('myuser', 'mypassword', 'myshare', 'C:\\shared_folder')
+
+    Raises:
+        None
+
+    """
     script_dir = os.path.dirname(os.path.abspath(__file__))
     batch_file = os.path.join(script_dir, 'create_user_and_share.bat')
     share_name = sharename.split('\\')[-1]  # extract the share_name part
@@ -1371,6 +1534,20 @@ def create_login_and_share(username, password, sharename, folderpath):
 
 
 def string_to_uuid(input_string):
+    """
+    Converts a string to a UUID using a namespace and input string.
+
+    Args:
+        input_string (str): The input string to convert to a UUID.
+
+    Returns:
+        UUID: The UUID generated from the input string.
+
+    Example:
+        >>> string_to_uuid('example')
+        UUID('9ce7f70f-070e-5d72-91a0-2f0ca6ad3d15')
+
+    """
     # Use a namespace for your application (theoretical site)
     namespace = uuid.uuid5(uuid.NAMESPACE_DNS, 'forensic.vm.mesi.ninja')
 
