@@ -703,12 +703,47 @@ def create_folders_in_qcow2_background(api, web_server_address, uuid_folder, cas
     # Create a thread and run the target function
     thread = threading.Thread(target=target_function)
     thread.start()
+
 def sanitize_string(s):
+    """
+    Sanitizes a string by replacing non-alphanumeric characters with underscores.
+
+    Args:
+        s (str): The string to sanitize.
+
+    Returns:
+        str: The sanitized string.
+
+    Raises:
+        AssertionError: If the input is not a string.
+
+    Example:
+        >>> sanitize_string('Hello World!')
+        'Hello_World'
+    """
     assert isinstance(s, str), 'Expecting a string!'
     return re.sub('[^0-9a-zA-Z]+', '_', s)
 
 
 def read_case_config(json_filepath):
+    """
+    Reads a JSON file containing case configuration data and returns a list of sanitized directory names.
+
+    Args:
+        json_filepath (str): The filepath of the JSON file to read.
+
+    Returns:
+        list: A list of sanitized directory names.
+
+    Raises:
+        AssertionError: If the JSON file does not exist.
+        IOError: If there is an error opening or reading the JSON file.
+        KeyError: If a required key is not found in the JSON data.
+
+    Example:
+        >>> read_case_config('case_config.json')
+        ['directory_name1', 'directory_name2', 'directory_name3']
+    """
     # Check if file exists
     assert os.path.isfile(json_filepath), f'File {json_filepath} does not exist!'
 
@@ -739,6 +774,28 @@ def read_case_config(json_filepath):
 
 
 def download_evidence(api_key, uuid, base_url, output_file):
+    """
+    Downloads evidence vmdk identified by UUID using the API endpoint and saves it to a local file.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the evidence to download.
+        base_url (str): The base URL of the API.
+        output_file (str): The path of the output file to save the downloaded evidence.
+
+    Returns:
+        bool: True if the evidence was downloaded successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `uuid`, `base_url`, `output_file`) is missing.
+        requests.exceptions.HTTPError: If an HTTP error occurs during the request.
+        Exception: If an unexpected error occurs during the download.
+
+    Example:
+        >>> download_evidence('your_api_key', 'evidence_uuid', 'https://example.com', 'output_file.bin')
+        Evidence downloaded to evidence.vmdk
+        True
+    """
     assert api_key, "API key is required"
     assert uuid, "UUID is required"
     assert base_url, "Base URL is required"
@@ -790,6 +847,28 @@ def download_evidence(api_key, uuid, base_url, output_file):
 
 
 def download_memory_dump(api_key, uuid, base_url, output_file):
+    """
+    Downloads a memory dump identified by UUID using the API endpoint and saves it to a local file.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the memory dump to download.
+        base_url (str): The base URL of the API.
+        output_file (str): The path of the output file to save the downloaded memory dump.
+
+    Returns:
+        bool: True if the memory dump was downloaded successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `uuid`, `base_url`, `output_file`) is missing.
+        requests.exceptions.HTTPError: If an HTTP error occurs during the request.
+        Exception: If an unexpected error occurs during the download.
+
+    Example:
+        >>> download_memory_dump('your_api_key', 'memory_dump_uuid', 'https://example.com', 'output_file.bin')
+        Memory dump downloaded to output_file.bin
+        True
+    """
     assert api_key, "API key is required"
     assert uuid, "UUID is required"
     assert base_url, "Base URL is required"
@@ -840,6 +919,28 @@ def download_memory_dump(api_key, uuid, base_url, output_file):
         return False
 
 def download_screenshots(api_key, uuid, base_url, output_file):
+    """
+    Downloads screenshots identified by UUID using the API endpoint and saves them to a local file.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the screenshots to download.
+        base_url (str): The base URL of the API.
+        output_file (str): The path of the output file to save the downloaded screenshots.
+
+    Returns:
+        bool: True if the screenshots were downloaded successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `uuid`, `base_url`, `output_file`) is missing.
+        requests.exceptions.HTTPError: If an HTTP error occurs during the request.
+        Exception: If an unexpected error occurs during the download.
+
+    Example:
+        >>> download_screenshots('your_api_key', 'screenshots_uuid', 'https://example.com', 'output_file.zip')
+        Screenshots downloaded to output_file.zip
+        True
+    """
     assert api_key, "API key is required"
     assert uuid, "UUID is required"
     assert base_url, "Base URL is required"
@@ -881,6 +982,27 @@ def download_screenshots(api_key, uuid, base_url, output_file):
         return False
 
 def screenshot_vm(api_key, uuid, base_url):
+    """
+    Takes a screenshot of a virtual machine identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the virtual machine to take a screenshot of.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        bool: True if the screenshot was taken successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `uuid`, `base_url`) is missing.
+        requests.exceptions.HTTPError: If an HTTP error occurs during the request.
+        Exception: If an unexpected error occurs.
+
+    Example:
+        >>> screenshot_vm('your_api_key', 'vm_uuid', 'https://example.com')
+        Screenshot taken successfully.
+        True
+    """
     assert api_key, "API key is required"
     assert uuid, "UUID is required"
     assert base_url, "Base URL is required"
@@ -907,7 +1029,29 @@ def screenshot_vm(api_key, uuid, base_url):
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}")
         return False
+
 def shutdown_vm(api_key, uuid, base_url):
+    """
+    Shuts down a virtual machine identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the virtual machine to shut down.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        bool: True if the virtual machine has been shut down successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `uuid`, `base_url`) is missing.
+        requests.exceptions.HTTPError: If an HTTP error occurs during the request.
+        Exception: If an unexpected error occurs.
+
+    Example:
+        >>> shutdown_vm('your_api_key', 'vm_uuid', 'https://example.com')
+        VM has been shut down.
+        True
+    """
     assert api_key, "API key is required"
     assert uuid, "UUID is required"
     assert base_url, "Base URL is required"
@@ -936,6 +1080,27 @@ def shutdown_vm(api_key, uuid, base_url):
         return False
 
 def reset_vm(api_key, uuid, base_url):
+    """
+    Resets a virtual machine identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the virtual machine to reset.
+        base_url (str): The base URL of the API.
+
+    Returns:
+        bool: True if the virtual machine has been reset successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `uuid`, `base_url`) is missing.
+        requests.exceptions.HTTPError: If an HTTP error occurs during the request.
+        Exception: If an unexpected error occurs.
+
+    Example:
+        >>> reset_vm('your_api_key', 'vm_uuid', 'https://example.com')
+        VM has been reset.
+        True
+    """
     assert api_key, "API key is required"
     assert uuid, "UUID is required"
     assert base_url, "Base URL is required"
@@ -964,6 +1129,28 @@ def reset_vm(api_key, uuid, base_url):
         return False
 
 def mount_folder(api_key, uuid, base_url, folder):
+    """
+    Mounts a folder on a virtual machine identified by UUID using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the virtual machine to mount the folder on.
+        base_url (str): The base URL of the API.
+        folder (str): The path of the folder to mount on the virtual machine.
+
+    Returns:
+        bool: True if the folder has been mounted successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `uuid`, `base_url`, `folder`) is missing.
+        requests.exceptions.HTTPError: If an HTTP error occurs during the request.
+        Exception: If an unexpected error occurs.
+
+    Example:
+        >>> mount_folder('your_api_key', 'vm_uuid', 'https://example.com', '/path/to/folder')
+        Folder '/path/to/folder' has been mounted.
+        True
+    """
     assert api_key, "API key is required"
     assert uuid, "UUID is required"
     assert base_url, "Base URL is required"
@@ -992,7 +1179,23 @@ def mount_folder(api_key, uuid, base_url, folder):
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}")
         return False
+
+
 def confirm_deletion_twice():
+    """
+    Displays a confirmation dialog twice, asking the user if they want to delete a VM.
+
+    Returns:
+        bool: True if the user confirms the deletion twice, False otherwise.
+
+    Example:
+        >>> confirm_deletion_twice()
+        Are you sure you want to delete the VM? (1/2)
+        [Yes] [No]
+        Are you sure you want to delete the VM? (2/2)
+        [Yes] [No]
+        True
+    """
     for i in range(2):
         confirmation_layout = [
             [sg.Text(f"Are you sure you want to delete the VM? ({i + 1}/2)")],
@@ -1007,6 +1210,8 @@ def confirm_deletion_twice():
         if event != "Yes":
             return False
     return True
+    
+    
 def delete_vm(api_key, uuid, base_url):
     if not confirm_deletion_twice():
         print("VM deletion canceled.")
