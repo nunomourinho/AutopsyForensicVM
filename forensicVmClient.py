@@ -15,7 +15,7 @@ from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
 
 def get_available_memory(api_key, site_url):
- """
+    """
     Retrieves the available memory in megabytes from a specified API VM.
 
     Args:
@@ -591,7 +591,7 @@ def list_iso_files(api_key, base_url):
         return None
 
 def recreate_folders(api_key, base_url, uuid_path, folders):
-   """
+    """
     Recreates a list of folders for a resource identified by UUID path using the API endpoint.
 
     Args:
