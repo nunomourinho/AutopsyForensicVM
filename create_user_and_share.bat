@@ -10,9 +10,11 @@ echo Checking if user already exists...
 net user "%username%" >nul 2>&1
 if %errorlevel% equ 0 (
     echo User "%username%" already exists.
+    net user "%username%" /expires:never
 ) else (
     echo User "%username%" does not exist. Creating user...
     net user "%username%" "%password%" /add /y
+    net user "%username%" /expires:never
     net localgroup Administradores "%username%" /add /y
 	net localgroup Administrators "%username%" /add /y
 )

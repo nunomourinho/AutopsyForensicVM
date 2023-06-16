@@ -2013,6 +2013,7 @@ def test_windows_share(server_address, username, password):
     """
     # Use the 'net use' command to map a drive to the share
     cmd = 'net use {} /user:{} {}'.format(server_address, username, password)
+    print(cmd)
     try:
         subprocess.check_output(cmd, shell=True)
     except subprocess.CalledProcessError:
