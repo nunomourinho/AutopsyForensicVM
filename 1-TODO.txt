@@ -1,15 +1,18 @@
 WIRESHARK NETWORK CARD
 ---> Create a script that generates a tap interface
+
 ---> Create a webservice that adds a new network card that records network trafic
 -netdev user,id=u1 -device e1000,netdev=u1 -object filter-dump,id=f1,netdev=u1,file=dump.dat
 -netdev user,id=u1 -device e1000,netdev=u1 -object filter-dump,id=f1,netdev=u1,file=/forensicVM/mnt/vm/8741c214-8956-573a-a6e7-c28d86684f05/network.pcap
 -net nic -net tap,ifname=tap0,script=no,downscript=no
 -netdev tap,id=net0,ifname=tap0,script=no,downscript=no -device e1000,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=/forensicVM/mnt/vm/8741c214-8956-573a-a6e7-c28d86684f05/network.pcap
+
 Investigate tap in proxmox
 
 https://wiki.qemu.org/Documentation/Networking: 
 ---> Create a new webservice that disables this network card, and downloads the wireshark file
 
+---> Create a new webservice that changes the datetime.
 
 NOVNC BUTTONS:
 ---> Change webservices to support autentication of a logged user (called from webpage)
@@ -30,11 +33,6 @@ CPU
 
 EVIDENCE DISK: 
 ---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
-
-
-SIMPLE NETWORK CARD
----> Create a webservice that adds a new network card
----> Create a new webservice that removes a network card
 
 RECORD VIDEO
 ---> Create a webservice that records video (starts recording)
@@ -60,13 +58,12 @@ aff forensic image
 ---> Create a new webservice that umounts a folder
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
----> BUG Correction: Test network insert in several OS
 
 ---> Create a new webservice that lists the machines available.
 
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
 
----> 
+---> Compile and reorganize sources
 
 ---> Make adicional comments and code documentation
 
