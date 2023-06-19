@@ -1,16 +1,14 @@
 WIRESHARK NETWORK CARD
----> Create a script that generates a tap interface
+---> Create a new autenticated webservice that starts the tap interface present from the qemu process processed with
+the UUID
 
----> Create a webservice that adds a new network card that records network trafic
--netdev user,id=u1 -device e1000,netdev=u1 -object filter-dump,id=f1,netdev=u1,file=dump.dat
--netdev user,id=u1 -device e1000,netdev=u1 -object filter-dump,id=f1,netdev=u1,file=/forensicVM/mnt/vm/8741c214-8956-573a-a6e7-c28d86684f05/network.pcap
--net nic -net tap,ifname=tap0,script=no,downscript=no
--netdev tap,id=net0,ifname=tap0,script=no,downscript=no -device e1000,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=/forensicVM/mnt/vm/8741c214-8956-573a-a6e7-c28d86684f05/network.pcap
+---> Create a new autenticated webservice that stops the tap interface present from the qemu process processed with
+the UUID and moves the network.pcap to pcap folder. If pcap folder does not exits, create it. Every network.pcap should
+be sequential.
 
-Investigate tap in proxmox
+---> Create a new autenthicated webservice that checks if a tap interface from the uuid process is up or down.
 
-https://wiki.qemu.org/Documentation/Networking: 
----> Create a new webservice that disables this network card, and downloads the wireshark file
+---> Create a new webservice that downloads the all wireshark files. It can be in a single zip file.
 
 ---> Create a new webservice that changes the datetime.
 
