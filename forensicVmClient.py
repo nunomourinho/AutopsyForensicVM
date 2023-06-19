@@ -14,6 +14,151 @@ import requests
 from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
 
+def download_pcap(api_key, uuid, base_url, output_file):
+    """
+    Downloads pcap files identified by UUID using the API endpoint and saves them to a local file.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        uuid (str): The UUID of the screenshots to download.
+        base_url (str): The base URL of the API.
+        output_file (str): The path of the output file to save the downloaded pcap files.
+
+    Returns:
+        bool: True if the pcap files were downloaded successfully, False otherwise.
+
+    Raises:
+        AssertionError: If any of the required arguments (`api_key`, `uuid`, `base_url`, `output_file`) is missing.
+        requests.exceptions.HTTPError: If an HTTP error occurs during the request.
+        Exception: If an unexpected error occurs during the download.
+
+    Example:
+        >>> download_pcap('your_api_key', 'screenshots_uuid', 'https://example.com', 'output_file.zip')
+        Pcap downloaded to output_file.zip
+        True
+    """
+    assert api_key, "API key is required"
+    assert uuid, "UUID is required"
+    assert base_url, "Base URL is required"
+    assert output_file, "Output file is required"
+
+    url = f"{base_url}/api/download_pcap/{uuid}/"
+    headers = {"X-API-KEY": api_key}
+
+    try:
+        response = requests.get(url, headers=headers, stream=True)
+        response.raise_for_status()
+
+        total_size = int(response.headers.get('Content-Length', 0))
+        bytes_downloaded = 0
+
+        with open(output_file, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=65536):
+                if chunk:
+                    f.write(chunk)
+                    bytes_downloaded += len(chunk)
+
+                    # Update the progress bar
+                    sg.one_line_progress_meter(
+                        "Downloading Pcap files",
+                        bytes_downloaded,
+                        total_size,
+                        "key",
+                        f"Downloaded {bytes_downloaded} / {total_size} bytes",
+                    )
+        print(f"Pcap files download downloaded to {output_file}")
+        return True
+
+    except requests.exceptions.HTTPError as e:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+        return False
+
+
+def check_tap_interface(base_url, uuid, api_key):
+    try:
+        # URL of the web service
+        url = f"{base_url}/api/check_tap/"
+
+        # The headers for the request
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Api-Key': api_key
+        }
+
+        # The data to send in the request body
+        data = {
+            'uuid': uuid,
+        }
+
+        # Send the POST request
+        response = requests.post(url, headers=headers, data=data)
+
+        # Check the response
+        if response.status_code == 200:
+            response_json = response.json()
+            return response_json['status']
+        else:
+            print(f"Error: {response.json()}")
+            return False
+    except Exception as e:
+        return False
+def stop_tap_interface(base_url, uuid, api_key):
+    # URL of the web service
+    url = f"{base_url}/api/stop_tap/"
+
+    # The headers for the request
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Api-Key': api_key
+    }
+
+    # The data to send in the request body
+    data = {
+        'uuid': uuid,
+    }
+
+    # Send the POST request
+    response = requests.post(url, headers=headers, data=data)
+
+    # Check the response
+    if response.status_code == 200:
+        print(f"Success: {response.json()}")
+        return True
+    else:
+        print(f"Error: {response.json()}")
+        return False
+
+
+def start_tap_interface(base_url, uuid, api_key):
+    # URL of the web service
+    url = f"{base_url}/api/start_tap/"
+
+    # The headers for the request
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Api-Key': api_key
+    }
+
+    # The data to send in the request body
+    data = {
+        'uuid': uuid,
+    }
+
+    # Send the POST request
+    response = requests.post(url, headers=headers, data=data)
+
+    # Check the response
+    if response.status_code == 200:
+        print(f"Success: {response.json()}")
+        return True
+    else:
+        print(f"Error: {response.json()}")
+        return False
+
 def get_available_memory(api_key, site_url):
     """
     Retrieves the available memory in megabytes from a specified API VM.
@@ -2179,6 +2324,19 @@ def formInit(values, window):
         except Exception as e:
             print(str(e))
 
+        try:
+            status=check_tap_interface(web_server_address, str(uuid_folder), forensic_api)
+            if status:
+                print(f" Network: {status}")
+                window['insert_network_button'].update(disabled=True)
+                window['remove_network_button'].update(disabled=False)
+            else:
+                print(f" Network: {status}")
+                window['insert_network_button'].update(disabled=False)
+                window['remove_network_button'].update(disabled=True)
+        except Exception as e:
+            print(str(e))
+
 
 # Form: All fields in the form
 
@@ -2318,8 +2476,6 @@ def ForensicVMForm():
     ])
 
     tools_frame = sg.Frame("Tools", [
-        [sg.Button("Insert network card", key="insert_network_button", size=(25, 1), visible=True,
-                   disabled=True)],
         [sg.Button("Import Evidence Disk", key="import_evidence_button", size=(25, 1), visible=True,
                    disabled=True)],
         [sg.Button("Analyse ForensicVM performance", key="open_forensic_netdata_button", size=(25, 1), visible=True,
@@ -2330,6 +2486,15 @@ def ForensicVMForm():
                    disabled=False)],
         [sg.Button("DEGUG: Remote ssh to folder", key="debug_ssh_button", size=(25, 1), visible=True,
                    disabled=False)]
+    ])
+
+    network_frame = sg.Frame("Network", [
+        [sg.Button("Enable network card", key="insert_network_button", size=(25, 1), visible=True,
+                   disabled=False)],
+        [sg.Button("Disable network card", key="remove_network_button", size=(25, 1), visible=True,
+                   disabled=False)],
+        [sg.Button("Download wireshark pcap files", key="download_wireshark_button", size=(25, 1), visible=True,
+                   disabled=False)],
     ])
 
     list_plugins_frame = sg.Frame('List', [
@@ -2393,7 +2558,7 @@ def ForensicVMForm():
         sg.Column([[tab_group]],
                    element_justification='left',
                    vertical_alignment='top'),
-        sg.Column([[screenshot_frame], [memory_frame], [tools_frame]],
+        sg.Column([[screenshot_frame], [memory_frame], [tools_frame], [network_frame]],
                    element_justification='left',
                    vertical_alignment='top')],
         [sg.Text("Cannot communicate with the ForensicVM Server. Please check access configuration on the "
@@ -2588,11 +2753,17 @@ def ForensicVMForm():
                     return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
                     #print(return_code)
                     #print(vm_status)
+                    if check_tap_interface(web_server_address, uuid_folder, forensic_api):
+                        window['insert_network_button'].update(disabled=True)
+                        window['remove_network_button'].update(disabled=False)
+                    else:
+                        window['insert_network_button'].update(disabled=False)
+                        window['remove_network_button'].update(disabled=True)
+
                     if vm_status.get("vm_status", "") == "running":
                         window["delete_vm_button"].update(disabled=True)
                         window["start_vm_button"].update(disabled=not False)
                         window["screenshot_vm_button"].update(disabled=not True)
-                        window["insert_network_button"].update(disabled=False)
                         window["download_memory_button"].update(disabled=not True)
                         window["shutdown_vm_button"].update(disabled=not True)
                         window["stop_vm_button"].update(disabled=not True)
@@ -2608,7 +2779,6 @@ def ForensicVMForm():
                         window["start_vm_button"].update(disabled=not True)
                         window["screenshot_vm_button"].update(disabled=not False)
                         window["download_memory_button"].update(disabled=not False)
-                        window["insert_network_button"].update(disabled=True)
                         window["shutdown_vm_button"].update(disabled=not False)
                         window["stop_vm_button"].update(disabled=not False)
                         window["reset_vm_button"].update(disabled=not False)
@@ -2760,17 +2930,56 @@ def ForensicVMForm():
                     print("Failed to eject CD-ROM")
             except Exception as e:
                  print(str(e))
+        elif event == 'download_wireshark_button':
+            forensic_image_path = values["forensic_image_path"]
+            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+            web_server_address = values["server_address"]
+            forensic_api = values["forensic_api"]
+            save_path = sg.popup_get_file('Choose the path to save the network pcap files',
+                                          save_as=True,
+                                          no_window=True,
+                                          default_extension=".zip",
+                                          default_path=f"{case_image_folder}/pcap.zip",
+                                          file_types=(("Zip files", "*.zip"),))
+            if save_path:
+                try:
+                    download_pcap(forensic_api, uuid_folder, web_server_address, save_path)
+                except Exception as e:
+                    sg.popup_error(f'Failed to download network pcap files {str(e)}')
         elif event == 'insert_network_button':
             try:
                 api_key = values["forensic_api"]
                 base_url = values["server_address"]
                 forensic_image_path = values["forensic_image_path"]
                 uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
-                response = insert_network_card(api_key, uuid_folder, base_url)
+                response = start_tap_interface(base_url, uuid_folder, api_key)
                 if response:
-                    print(response)
+                    if check_tap_interface(base_url, uuid_folder, api_key):
+                        print(response)
+                        sg.popup("Network card inserted")
+                        window['insert_network_button'].update(disabled=True)
+                        window['remove_network_button'].update(disabled=False)
                 else:
                     print("Failed to insert network card")
+                    sg.popup_error("Failed to insert network card")
+            except Exception as e:
+                 print(str(e))
+        elif event == 'remove_network_button':
+            try:
+                api_key = values["forensic_api"]
+                base_url = values["server_address"]
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                response = stop_tap_interface(base_url, uuid_folder, api_key)
+                if response:
+                    if not check_tap_interface(base_url, uuid_folder, api_key):
+                        print(response)
+                        sg.popup("Network card disabled")
+                        window['insert_network_button'].update(disabled=False)
+                        window['remove_network_button'].update(disabled=True)
+                else:
+                    print("Failed to disable network card")
+                    sg.popup_error("Failed to disable network card")
             except Exception as e:
                  print(str(e))
         elif event == '-INSERT-':
