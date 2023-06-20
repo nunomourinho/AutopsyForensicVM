@@ -4,7 +4,7 @@ attrs==22.1.0
 auto-py-to-exe==2.17.0
 Automat==20.2.0
 bcrypt==4.0.1
-bottle==0.12.19
+bottle==0.12.20
 bottle-websocket==0.2.9
 certifi==2022.12.7
 cffi==1.15.0
