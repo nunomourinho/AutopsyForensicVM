@@ -11,6 +11,7 @@ import os
 import sys
 import subprocess
 import requests
+from datetime import datetime
 from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
 
@@ -2253,6 +2254,15 @@ def list_snapshots(forensic_api, uuid_folder, web_server_address):
         sg.popup_ok("Error listing snapshots", title="Error")
         return []
 
+def validate_date(date_str):
+    """
+    Function to validate the date string against the format 'YYYY-MM-DDTHH:MM:SS'
+    """
+    try:
+        datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
+        return True
+    except ValueError:
+        return False
 
 def formInit(values, window):
     """
@@ -2526,11 +2536,20 @@ def ForensicVMForm():
         [snapshots_frame, delete_snapshot_frame],
     ])
 
+
+
     finetune_frame = sg.Frame('Memory Size (GB)', [
         [sg.Slider(range=(0, 128), default_value=0.128, orientation='h',
                    size=(40, 20),  resolution=0.1, key='-MB-SLIDER-'),
          sg.Button('CHANGE', size=(10, 2), key='-CHANGE-MB-')],
 
+    ])
+
+    data_frame = sg.Frame('Set VM Datetime', [
+        [sg.Text('Format: YYYY-MM-DDTHH:MM:SS'),
+        sg.InputText(key='date_input'),
+        sg.Button('Set', key='set_date_button'),
+        sg.Button('Reset', key='reset_date_button')],
     ])
 
     tab_group = sg.TabGroup([
@@ -2545,7 +2564,8 @@ def ForensicVMForm():
                 [snapshot_frame]
             ]),
             sg.Tab('Finetuning', [
-                [finetune_frame]
+                [finetune_frame],
+                [data_frame],
             ]),
         ]
     ])
@@ -2815,6 +2835,14 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == 'set_date_button':
+            try:
+                if validate_date(values['date_input']):
+                    sg.Popup('The date and time is valid. Date Changed. Please reboot the VM')
+                else:
+                    sg.popup_error('The date and time is invalid, please try again.')
+            except Exception as e:
+                print(str(e))
         elif event == '-CHANGE-MB-':
             try:
                 forensic_image_path = values["forensic_image_path"]

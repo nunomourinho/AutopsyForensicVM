@@ -1,4 +1,8 @@
+DATETIME
 ---> Create a new webservice that changes the datetime.
+ -rtc base=2023-06-05T11:00:00
+ -rtc base=2021-10-09T08:07:06 \
+http://liujunming.top/2022/08/27/RTC-virtualization-in-QEMU/
 
 NOVNC BUTTONS:
 ---> Change webservices to support autentication of a logged user (called from webpage)
@@ -13,12 +17,6 @@ FINETTUNING FIX:
 ---> After converting a image one should call updateinterface.
 ---> Centralize all actions in update interface!
 
-CPU
----> Create webservice that reads number of CPUS from script file
----> Create a button that changes the number of cpus of the vm on the script
-
-EVIDENCE DISK: 
----> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
 
 RECORD VIDEO
 ---> Create a webservice that records video (starts recording)
@@ -75,3 +73,11 @@ https://www.misp-project.org/ ---> Threat sharing plataform
 https://www.misp-project.org/feeds/ ---> Feeds that base of this project
 https://github.com/AlienVault-OTX/OTX-Python-SDK/blob/master/examples/is_malicious/is_malicious.py --> How using the api one can check if the file is malicious
 https://www.dan.me.uk/ ---> Ip addresses that sould be blocked
+
+EVIDENCE DISK: 
+---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
+
+
+CPU
+---> Create webservice that reads number of CPUS from script file
+---> Create a button that changes the number of cpus of the vm on the script
