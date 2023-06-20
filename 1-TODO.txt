@@ -30,6 +30,7 @@ AUTHENTICATION
 ---> Authentication: Integrate with google authentication. Use this link as a reference:
 https://www.section.io/engineering-education/django-google-oauth/
 
+---> Create aditional exceptions in the code
 
 SNAP MODE: Run a machine in snap mode:
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
