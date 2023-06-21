@@ -15,6 +15,34 @@ from datetime import datetime
 from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
 
+def remove_vm_datetime(base_url, uuid, api_key):
+    url = f"{base_url}/api/remove_vm_datetime/"
+    headers = {'X-API-KEY': api_key}
+    data = {'uuid': uuid}
+
+    response = requests.post(url, headers=headers, data=data)
+
+    if response.status_code == 200:
+        print('Success:', response.json())
+        return True
+    else:
+        print('Failed:', response.json())
+        return False
+
+def change_vm_datetime(base_url, uuid, datetime_str, api_key):
+    url = f"{base_url}/api/change_vm_datetime/"
+    headers = {'X-API-KEY': api_key}
+    data = {'uuid': uuid, 'datetime': datetime_str}
+    print(headers)
+
+    response = requests.post(url, headers=headers, data=data)
+
+    if response.status_code == 200:
+        print('Success:', response.json())
+        return True
+    else:
+        print('Failed:', response.json())
+        return False
 def download_pcap(api_key, uuid, base_url, output_file):
     """
     Downloads pcap files identified by UUID using the API endpoint and saves them to a local file.
@@ -2835,10 +2863,30 @@ def ForensicVMForm():
 
         if event == sg.WINDOW_CLOSED:
             break
+        elif event == 'reset_date_button':
+            try:
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                web_server_address = values["server_address"]
+                forensic_api = values["forensic_api"]
+                if remove_vm_datetime(web_server_address, uuid_folder, forensic_api):
+                    sg.Popup('Date reseted. Please reboot the VM')
+                else:
+                    sg.popup_error('Error reseting date.')
+            except Exception as e:
+                print(str(e))
         elif event == 'set_date_button':
             try:
                 if validate_date(values['date_input']):
-                    sg.Popup('The date and time is valid. Date Changed. Please reboot the VM')
+                    forensic_image_path = values["forensic_image_path"]
+                    uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                    web_server_address = values["server_address"]
+                    forensic_api = values["forensic_api"]
+                    #sg.Popup(f"{values['forensic_api']}")
+                    if change_vm_datetime(web_server_address, uuid_folder, values['date_input'], forensic_api):
+                        sg.Popup('The date and time is valid. Date Changed. Please reboot the VM')
+                    else:
+                        sg.popup_error('Error setting date.')
                 else:
                     sg.popup_error('The date and time is invalid, please try again.')
             except Exception as e:
