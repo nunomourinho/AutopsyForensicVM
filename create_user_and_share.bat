@@ -11,12 +11,16 @@ net user "%username%" >nul 2>&1
 if %errorlevel% equ 0 (
     echo User "%username%" already exists.
     net user "%username%" /expires:never
+    net user "%username%" /expires:never
+    WMIC USERACCOUNT WHERE Name='%username%' SET PasswordExpires=FALSE
 ) else (
     echo User "%username%" does not exist. Creating user...
     net user "%username%" "%password%" /add /y
     net user "%username%" /expires:never
     net localgroup Administradores "%username%" /add /y
 	net localgroup Administrators "%username%" /add /y
+    net user "%username%" /expires:never
+    WMIC USERACCOUNT WHERE Name='%username%' SET PasswordExpires=FALSE
 )
 
 echo Checking if folder already exists...
