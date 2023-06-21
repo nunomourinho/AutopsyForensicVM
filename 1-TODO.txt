@@ -1,9 +1,3 @@
-DATETIME
----> Create a new webservice that changes the datetime.
- -rtc base=2023-06-05T11:00:00
- -rtc base=2021-10-09T08:07:06 \
-http://liujunming.top/2022/08/27/RTC-virtualization-in-QEMU/
-
 NOVNC BUTTONS:
 ---> Change webservices to support autentication of a logged user (called from webpage)
 ---> Create ajax client to shutdown machine and change noVNC button actions
