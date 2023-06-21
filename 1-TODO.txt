@@ -1,6 +1,5 @@
 NOVNC BUTTONS:
----> Change webservices to support autentication of a logged user (called from webpage)
----> Create ajax client to shutdown machine and change noVNC button actions
+---> Create webservice client that screenshots the vm
 
 RECORD VIDEO
 ---> Create a webservice that records video (starts recording)
