@@ -1,5 +1,5 @@
-NOVNC BUTTONS:
----> Create webservice client that screenshots the vm
+---> Create a new webservice that lists the machines available.
+
 
 RECORD VIDEO
 ---> Create a webservice that records video (starts recording)
@@ -27,7 +27,6 @@ aff forensic image
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
----> Create a new webservice that lists the machines available.
 
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
 
