@@ -2574,10 +2574,9 @@ def ForensicVMForm():
     ])
 
     data_frame = sg.Frame('Set VM Datetime', [
-        [sg.Text('Format: YYYY-MM-DDTHH:MM:SS'),
-        sg.InputText(key='date_input'),
+        [sg.InputText(key='date_input'),
         sg.Button('Set', key='set_date_button'),
-        sg.Button('Reset', key='reset_date_button')],
+        sg.Button('Reset', key='reset_date_button')], [sg.Text('Format: YYYY-MM-DDTHH:MM:SS')],
     ])
 
     tab_group = sg.TabGroup([
@@ -3380,7 +3379,7 @@ def ForensicVMForm():
             return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
             print(vm_status)
             if return_code== 0:
-                webbrowser.open(f"{server_address}?port={vm_status['websocket_port']}&uuid={uuid_folder}")
+                webbrowser.open(f"{server_address}/screen?port={vm_status['websocket_port']}&uuid={uuid_folder}")
         elif event == "stop_vm_button":
             # get server address value
             print("Stop VM...")

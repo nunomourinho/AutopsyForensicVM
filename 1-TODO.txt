@@ -1,5 +1,5 @@
 ---> Create a new webservice that lists the machines available.
-
+---> Create a web interface that lists, start, stop, reset and shutdown a vm
 
 RECORD VIDEO
 ---> Create a webservice that records video (starts recording)
