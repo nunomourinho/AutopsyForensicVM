@@ -1,3 +1,7 @@
+NETWORK CONTROL
+--------> Create adicional pannel for network in novnc
+---> Activate network device and disable network device from novnc
+
 RECORD VIDEO
 ---> Create a webservice that records video (starts recording)
 ---> Create a webservice that stops video recording
@@ -9,6 +13,8 @@ AUTHENTICATION
 https://www.section.io/engineering-education/django-google-oauth/
 
 ---> Create aditional exceptions in the code
+
+---> Auto logout if uuid and port do not match any of the running machines
 
 SNAP MODE: Run a machine in snap mode:
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
