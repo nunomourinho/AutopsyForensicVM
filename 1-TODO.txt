@@ -1,7 +1,9 @@
 RECORD VIDEO
----> Create a webservice that records video (starts recording)
----> Create a webservice that stops video recording
----> Create a webservice that saves the video file
+---> Create a webservice that lists videos in the video directory
+---> Create the webservice client to show the list of videos
+---> Create a webservice that downloads a video from the video directory
+---> Create the webservice client to Download one video with a progress bar
+
 
 AUTHENTICATION
 ---> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
@@ -75,3 +77,7 @@ FINETTUNING FIX:
 
 Network firewall fix:
 ---> Review firewall rules
+
+VIDEO RECORDING
+---> Optimize video recording
+---> Record sound
