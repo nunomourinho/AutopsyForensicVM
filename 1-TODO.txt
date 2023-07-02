@@ -1,6 +1,8 @@
-VIDEO RECORDING
----> Optimize video recording
----> Record sound
+---> Make adicional comments and code documentation
+
+Network firewall fix:
+---> Review firewall rules
+
 
 AUTHENTICATION
 ---> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
@@ -9,7 +11,7 @@ https://www.section.io/engineering-education/django-google-oauth/
 
 ---> Create aditional exceptions in the code
 
----> Auto logout if uuid and port do not match any of the running machines
+
 
 SNAP MODE: Run a machine in snap mode:
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -29,8 +31,6 @@ aff forensic image
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
 
 ---> Compile and reorganize sources
-
----> Make adicional comments and code documentation
 
 ---> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
 
@@ -71,7 +71,10 @@ FINETTUNING FIX:
 ---> After converting a image one should call updateinterface.
 ---> Centralize all actions in update interface!
 
+Optional:
+---> Auto logout if uuid and port do not match any of the running machines -> Prevent bruteforce
 
-Network firewall fix:
----> Review firewall rules
+VIDEO RECORDING
+---> Record sound
+
 
