@@ -1,22 +1,13 @@
 ---> Make adicional comments and code documentation
-
-Network firewall fix:
----> Review firewall rules
-
-
-AUTHENTICATION
----> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
----> Authentication: Integrate with google authentication. Use this link as a reference:
-https://www.section.io/engineering-education/django-google-oauth/
-
----> Create aditional exceptions in the code
-
+---> create the readthedocs: https://readthedocs.org/
 
 
 SNAP MODE: Run a machine in snap mode:
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ---> Change forensic2v script so that in the snap mode it creates a new script file with mount script to mount the dd, efw or
 aff forensic image
+
+----> This service mounts the smb folder in background. Then, it detects and mounts the forensic image. Finaly it starts the machine
 
 ---> Create a new webservice that mounts a folder inside the other folder
 ---> Change the webservice to also mount the original forensic image
@@ -27,10 +18,19 @@ aff forensic image
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
+Network firewall fix:
+---> Review firewall rules
+
+---> Create aditional exceptions in the code
 
 ---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
 
 ---> Compile and reorganize sources
+
+AUTHENTICATION
+---> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
+---> Authentication: Integrate with google authentication. Use this link as a reference:
+https://www.section.io/engineering-education/django-google-oauth/
 
 ---> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
 
