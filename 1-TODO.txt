@@ -1,6 +1,9 @@
 ---> Make adicional comments and code documentation
 ---> create the readthedocs: https://readthedocs.org/
+https://sphinx-tutorial.readthedocs.io/step-1/
+https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst
 
+Registrar o doi da documentação criado no zenodo: https://zenodo.org/
 
 SNAP MODE: Run a machine in snap mode:
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -15,6 +18,8 @@ aff forensic image
 ---> Sequence to run: Determine free port on server, Create ssh connection with port redirect to samba port, mount samba share on mnt folder, mount image on efw or aff folder via script,      run the machine
 ---> Sequence to stop. Stop the machine, umount aff, umount mnt, terminate samba session
 ---> Create a new webservice that umounts a folder
+
+REUSE CODE!
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
