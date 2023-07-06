@@ -1835,6 +1835,99 @@ except Exception as e:
 
 # Rest of the code using the values
 
+def run_snap(server_address, server_port, windows_share,
+            share_login, share_password, replacement_share,
+            forensic_image_path, uuid_folder, copy):
+    """
+    Runs the OpenSSH command to connect to a remote server and execute a command
+    that runs the local forensic image by accessing it by samba over reverse ssh.
+
+    Args:
+        server_address (str): The IP address or hostname of the remote server.
+        server_port (int): The port number to connect to on the remote server.
+        windows_share (str): The Windows share path on the remote server.
+        share_login (str): The login username for accessing the Windows share.
+        share_password (str): The password for accessing the Windows share.
+        replacement_share (str): The replacement path to use in the command.
+        forensic_image_path (str): The path of the forensic image on the remote server.
+        uuid_folder (str): The UUID folder name for the conversion process.
+        copy (bool): Flag indicating whether to copy the forensic image.
+
+    Returns:
+        None
+
+    Example:
+        >>> run_openssh(
+        >>>     server_address='192.168.0.100',
+        >>>     server_port=22,
+        >>>     windows_share='\\server\share',
+        >>>     share_login='username',
+        >>>     share_password='password',
+        >>>     replacement_share='/mnt/share',
+        >>>     forensic_image_path='\\server\share\image.bin',
+        >>>     uuid_folder='12345678',
+        >>>     copy=True
+        >>> )
+
+    Raises:
+        None
+
+    """
+    try:
+
+
+        private_key_path = os.path.expanduser("mykey")
+
+        # Connect to remote host using SSH key authentication
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(server_address, username='forensicinvestigator', key_filename=private_key_path, port=server_port)
+        # Get an available remote port
+        transport = ssh.get_transport()
+        remote_port = transport.request_port_forward("", 0)
+        # Close the connection
+        ssh.close()
+
+        # Replacing the common path with an empty string and replacing backslashes with forward slashes
+        new_path = forensic_image_path.replace(replacement_share, "").replace("\\", "/")
+
+
+        print(windows_share)
+        # Removing the backslashes and splitting the address into host and share components
+        temp = windows_share.replace("\\\\", "")
+        print(temp)
+        samba_host, samba_share = temp.split("\\")
+
+        # Creating the port forwarding string and assigning it to result
+        reverse_ssh_foward = f"-R {remote_port}:{samba_host}:445"
+        print(reverse_ssh_foward)
+
+
+        # Prepare the command to run the convertor
+        command = f'sudo /forensicVM/bin/run_snap_1 ' \
+                  f'--windows-share {samba_share} ' \
+                  f'--share-login {share_login} ' \
+                  f'--share-password {share_password} ' \
+                  f'--forensic-image-path {new_path} ' \
+                  f'--folder-uuid {uuid_folder} ' \
+                  f'--copy {copy} ' \
+                  f'--share-port {remote_port}'
+
+        ssh_command ="start cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i " \
+                     + os.path.dirname(os.path.abspath(__file__))+ \
+                     "\\mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+                     + str(server_address)\
+                     + " -p " + str(server_port)\
+                     + " " + reverse_ssh_foward + " " + command
+
+        print(ssh_command)
+        # Run the command redirecting local samba port to a free open port remote\ly
+        os.system(ssh_command)
+
+    except Exception as e:
+        print(e)
+
+
 
 def run_openssh(server_address, server_port, windows_share,
             share_login, share_password, replacement_share,
@@ -3251,7 +3344,33 @@ def ForensicVMForm():
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
-            start_vm(forensic_api, uuid_folder, web_server_address)
+            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+            print(vm_status)
+            if vm_status["running_mode"]=="snap":
+                server_address = values["ssh_server_address"]
+                server_port = values["ssh_server_port"]
+                windows_share = values["folder_share_server"]
+                share_login = values["share_login"]
+                share_password = values["share_password"]
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                copy = "copy"
+                replacement_share = values["equivalence"]
+
+                # Run in snapshot mode
+                run_snap(server_address,
+                         server_port,
+                         windows_share,
+                         share_login,
+                         share_password,
+                         replacement_share,
+                         forensic_image_path,
+                         uuid_folder,
+                         copy)
+
+            else:
+                start_vm(forensic_api, uuid_folder, web_server_address)
+
         elif event == "save_button":
             try:
                 # Save the configuration to the JSON file
@@ -3357,14 +3476,14 @@ def ForensicVMForm():
                     window["open_forensic_vm_button"].update(disabled=not True)
                     window["open_forensic_shell_button"].update(disabled=not True)
                     window["open_forensic_netdata_button"].update(disabled=not True)
-                elif vm_status.get("vm_status", "") == "stopped":
-                    sg.popup("The vm exists and is stopped.\n Starting the VM in the remote server.\n")
+                #elif vm_status.get("vm_status", "") == "stopped":
+                    #sg.popup("The vm exists and is stopped.\n Starting the VM in the remote server.\n")
                     # TODO: Start the VM in the remote_port
-                    remote_port = ssh_background_session(server_address, server_port, windows_share)
-                    if start_vm(forensic_api, uuid_folder, web_server_address) == "running":
-                        sg.popup("The machine is running.\n No actions required")
-                    else:
-                        sg.popup_error("Could not start the VM:\n")
+                    #remote_port = ssh_background_session(server_address, server_port, windows_share)
+                    #if start_vm(forensic_api, uuid_folder, web_server_address) == "running":
+                        #sg.popup("The machine is running.\n No actions required")
+                    #else:
+                        #sg.popup_error("Could not start the VM:\n")
                 else:
                     continue
 
