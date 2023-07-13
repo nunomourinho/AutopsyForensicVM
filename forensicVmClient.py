@@ -1474,6 +1474,7 @@ def delete_vm(api_key, uuid, base_url):
     """
     if not confirm_deletion_twice():
         print("VM deletion canceled.")
+        sg.Popup("VM deletion canceled.")
         return False
 
     url = f"{base_url}/api/delete-vm/{uuid}/"
@@ -1485,13 +1486,16 @@ def delete_vm(api_key, uuid, base_url):
         result = response.json()
         if result['vm_deleted']:
             print(f"VM with UUID {uuid} has been deleted.")
+            sg.Popup(f"VM with UUID {uuid} has been deleted.")
             return True
         else:
             print(f"Error deleting VM: {result['error']}")
+            sg.popup_error(f"Error deleting VM: {result['error']}")
             return False
     else:
         print(f"Error: {response.status_code}")
         print(response.text)
+        sg.popup_error(f"Error: {response.status_code}")
         return False
         
 def check_vm_exists(api_key, uuid, baseurl):
@@ -4023,7 +4027,7 @@ def ForensicVMForm():
                 if vm_status.get("vm_status", "") == "stopped":
                     # If the VM status is "stopped", proceed with deleting the VM
                     delete_vm(forensic_api, uuid_folder, web_server_address)
-
+                    
                 else:
                     sg.popup_error("Vm is not stopped. Delete not possible")
                     # Display a popup error message indicating that the VM delete failed
