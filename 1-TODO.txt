@@ -1,26 +1,20 @@
----> Make adicional comments and code documentation
----> create the readthedocs: https://readthedocs.org/
-https://sphinx-tutorial.readthedocs.io/step-1/
-https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst
+Reorganize:
+---> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
+---> Compile and reorganize sources
 
-Registrar o doi da documentação criado no zenodo: https://zenodo.org/
+---> Make adicional docstrings in code
 
-SNAP MODE: Run a machine in snap mode:
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
----> Change forensic2v script so that in the snap mode it creates a new script file with mount script to mount the dd, efw or
-aff forensic image
+Setup:
+Make plugin setup
 
-----> This service mounts the smb folder in background. Then, it detects and mounts the forensic image. Finaly it starts the machine
 
----> Create a new webservice that mounts a folder inside the other folder
----> Change the webservice to also mount the original forensic image
+Tests:
+---> Make Unit tests - With tabnine
 
----> Sequence to run: Determine free port on server, Create ssh connection with port redirect to samba port, mount samba share on mnt folder, mount image on efw or aff folder via script,      run the machine
----> Sequence to stop. Stop the machine, umount aff, umount mnt, terminate samba session
----> Create a new webservice that umounts a folder
+---> Make test integration
 
-REUSE CODE!
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+---> Register documentation doi in zenodo: https://zenodo.org/
+---> Register code doi in zenodo: https://zenodo.org/
 
 
 Network firewall fix:
@@ -28,18 +22,35 @@ Network firewall fix:
 
 ---> Create aditional exceptions in the code
 
----> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
-
----> Compile and reorganize sources
 
 AUTHENTICATION
 ---> Multifactor autentication: https://django-two-factor-auth.readthedocs.io/en/stable/index.html
 ---> Authentication: Integrate with google authentication. Use this link as a reference:
 https://www.section.io/engineering-education/django-google-oauth/
 
----> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
 
----> Create function to list and delete shares
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+CPU
+---> Create webservice that reads number of CPUS from script file
+---> Create a button that changes the number of cpus of the vm on the script
+
+INIT FIX:
+---> Make the system detected if is called by parameter. It it is, load is inicial configuration from autopsy. 
+Now it is wrongly reading he local json config first. Watchout for samba share before convertion. Check the autofill path
+
+
+FINETTUNING FIX: 
+---> After converting a image one should call updateinterface.
+---> Centralize all actions in update interface!
+
+Optional:
+---> Auto logout if uuid and port do not match any of the running machines -> Prevent bruteforce
+
+VIDEO RECORDING
+---> Record sound
+
 
 AUTOMATED MALWARE DETECTION:
 
@@ -62,24 +73,6 @@ https://www.dan.me.uk/ ---> Ip addresses that sould be blocked
 EVIDENCE DISK: 
 ---> Create the fields in the interface needed to resize the virtual forensic analysis drive (size)
 
+---> BONUS: Authentication: Integrate with autenticacao.gov (Portugal)
 
-CPU
----> Create webservice that reads number of CPUS from script file
----> Create a button that changes the number of cpus of the vm on the script
-
-INIT FIX:
----> Make the system detected if is called by parameter. It it is, load is inicial configuration from autopsy. 
-Now it is wrongly reading he local json config first. Watchout for samba share before convertion. Check the autofill path
-
-
-FINETTUNING FIX: 
----> After converting a image one should call updateinterface.
----> Centralize all actions in update interface!
-
-Optional:
----> Auto logout if uuid and port do not match any of the running machines -> Prevent bruteforce
-
-VIDEO RECORDING
----> Record sound
-
-
+---> Create function to list and delete shares
