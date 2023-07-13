@@ -16,6 +16,17 @@ from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
 
 def remove_vm_datetime(base_url, uuid, api_key):
+    """
+    Removes the datetime for a virtual machine specified by UUID.
+
+    Args:
+        base_url (str): The base URL of the API.
+        uuid (str): The UUID of the virtual machine.
+        api_key (str): The API key for authentication.
+
+    Returns:
+        bool: True if the datetime was successfully removed, False otherwise.
+    """
     url = f"{base_url}/api/remove_vm_datetime/"
     headers = {'X-API-KEY': api_key}
     data = {'uuid': uuid}
@@ -30,6 +41,18 @@ def remove_vm_datetime(base_url, uuid, api_key):
         return False
 
 def change_vm_datetime(base_url, uuid, datetime_str, api_key):
+    """
+    Changes the datetime for a virtual machine specified by UUID.
+
+    Args:
+        base_url (str): The base URL of the API.
+        uuid (str): The UUID of the virtual machine.
+        datetime_str (str): The new datetime in string format.
+        api_key (str): The API key for authentication.
+
+    Returns:
+        bool: True if the datetime was successfully changed, False otherwise.
+    """
     url = f"{base_url}/api/change_vm_datetime/"
     headers = {'X-API-KEY': api_key}
     data = {'uuid': uuid, 'datetime': datetime_str}
@@ -43,6 +66,7 @@ def change_vm_datetime(base_url, uuid, datetime_str, api_key):
     else:
         print('Failed:', response.json())
         return False
+
 def download_pcap(api_key, uuid, base_url, output_file):
     """
     Downloads pcap files identified by UUID using the API endpoint and saves them to a local file.
@@ -108,6 +132,17 @@ def download_pcap(api_key, uuid, base_url, output_file):
 
 
 def check_tap_interface(base_url, uuid, api_key):
+    """
+    Checks the status of the TAP interface for a virtual machine specified by UUID.
+
+    Args:
+        base_url (str): The base URL of the API.
+        uuid (str): The UUID of the virtual machine.
+        api_key (str): The API key for authentication.
+
+    Returns:
+        Union[str, bool]: The status of the TAP interface if the request was successful, False otherwise.
+    """
     try:
         # URL of the web service
         url = f"{base_url}/api/check_tap/"
@@ -135,7 +170,19 @@ def check_tap_interface(base_url, uuid, api_key):
             return False
     except Exception as e:
         return False
+
 def stop_tap_interface(base_url, uuid, api_key):
+    """
+    Stops the TAP interface for a virtual machine specified by UUID.
+
+    Args:
+        base_url (str): The base URL of the API.
+        uuid (str): The UUID of the virtual machine.
+        api_key (str): The API key for authentication.
+
+    Returns:
+        bool: True if the TAP interface was successfully stopped, False otherwise.
+    """
     # URL of the web service
     url = f"{base_url}/api/stop_tap/"
 
@@ -163,6 +210,18 @@ def stop_tap_interface(base_url, uuid, api_key):
 
 
 def start_tap_interface(base_url, uuid, api_key):
+    """
+    Starts the TAP interface for a virtual machine specified by UUID.
+
+    Args:
+        base_url (str): The base URL of the API.
+        uuid (str): The UUID of the virtual machine.
+        api_key (str): The API key for authentication.
+
+    Returns:
+        bool: True if the TAP interface was successfully started, False otherwise.
+    """
+
     # URL of the web service
     url = f"{base_url}/api/start_tap/"
 
@@ -2573,7 +2632,7 @@ def ForensicVMForm():
     - Other frames for managing CD-ROMs (list_frame, cdrom_frame, upload_frame, delete_frame)
     """
 
-    # Create the frames
+    # Create a frame for converting a forensic image to a virtual machine
     convert_frame = sg.Frame("Convert forensic Image to VM", [
         [sg.Button("Virtualize - a) Convert to VM",
                    tooltip="Connect to Forensic VM Server and virtualize the forensic Image",
@@ -2583,16 +2642,19 @@ def ForensicVMForm():
                    key="link_to_vm_button", size=(25, 2), visible=True, disabled=False)]
     ])
 
+    # Create a frame for taking screenshots
     screenshot_frame = sg.Frame("Screenshot", [
         [sg.Button("Screenshot", key="screenshot_vm_button", size=(25, 2), visible=True, disabled=True)],
         [sg.Button("Save screenshots", key="save_screenshots_vm_button", size=(25, 2), visible=True, disabled=True)]
     ])
 
+    # Create a frame for making and downloading a memory dump
     memory_frame = sg.Frame("Make and download memory dump", [
         [sg.Button("Make and download memory dump", key="download_memory_button", size=(25, 2), visible=True,
                    disabled=True)]
     ])
 
+    # Create a frame for VM control options
     vm_control_frame = sg.Frame("VM Control", [
         [sg.Button("Open ForensicVM", key="open_forensic_vm_button", size=(25, 2), visible=True, disabled=True)],
         [sg.Button("Start VM", key="start_vm_button", size=(25, 2), visible=True, disabled=True)],
@@ -2605,6 +2667,7 @@ def ForensicVMForm():
                    disabled=True,
                    button_color=('white', '#A00000'))]
     ])
+
 
     tools_frame = sg.Frame("Tools", [
         [sg.Button("Import Evidence Disk", key="import_evidence_button", size=(25, 1), visible=True,
@@ -2619,6 +2682,7 @@ def ForensicVMForm():
                    disabled=False)]
     ])
 
+    # Create a frame for various tools
     network_frame = sg.Frame("Network", [
         [sg.Button("Enable network card", key="insert_network_button", size=(25, 1), visible=True,
                    disabled=False)],
@@ -2628,37 +2692,42 @@ def ForensicVMForm():
                    disabled=False)],
     ])
 
+    # Create a frame for listing remote plugins
     list_plugins_frame = sg.Frame('List', [
         [sg.Button('List Remote Plugins', key='-LIST PLUGINS-', disabled=False)]
     ])
 
+   # Create a frame for running a selected plugin
     run_plugin_frame = sg.Frame('Run', [
         [sg.Button('Run Selected Plugin', key='-RUN PLUGIN-', disabled=False)]
     ])
 
+    # Create a frame for plugin management
     plugins_frame = sg.Frame('Plugin Management', [
         [sg.Listbox([], size=(61, 21), key='-PLUGIN LIST-', enable_events=True)],
         [list_plugins_frame, run_plugin_frame],
     ])
 
+    # Create a frame for snapshot management
     snapshots_frame = sg.Frame('Snapshot management', [
         [sg.Button('List Remote Snapshots', key='-LIST SNAPSHOTS-', disabled=False),
         sg.Button('Create new', key='-CREATE SNAPSHOT-', disabled=False),
         sg.Button('Rollback', key='-ROLLBACK SNAPSHOT-', disabled=False)],
     ])
 
-
+    # Create a frame for snapshot deletion (Danger Zone!)
     delete_snapshot_frame = sg.Frame('Danger Zone!', [
         [sg.Button('Delete ???', key='-DELETE SNAPSHOT-', disabled=False)]
     ])
 
+    # Create a frame for snapshot management
     snapshot_frame = sg.Frame('Snapshot Management', [
         [sg.Listbox([], size=(61, 21), key='-SNAPSHOT-LIST-', enable_events=True)],
         [snapshots_frame, delete_snapshot_frame],
     ])
 
 
-
+    # Create a frame for memory size fine-tuning
     finetune_frame = sg.Frame('Memory Size (GB)', [
         [sg.Slider(range=(0, 128), default_value=0.128, orientation='h',
                    size=(40, 20),  resolution=0.1, key='-MB-SLIDER-'),
@@ -2666,12 +2735,14 @@ def ForensicVMForm():
 
     ])
 
+    # Create a frame for setting VM datetime
     data_frame = sg.Frame('Set VM Datetime', [
         [sg.InputText(key='date_input'),
         sg.Button('Set', key='set_date_button'),
         sg.Button('Reset', key='reset_date_button')], [sg.Text('Format: YYYY-MM-DDTHH:MM:SS')],
     ])
 
+    # Create a tab group for organizing different sections
     tab_group = sg.TabGroup([
         [
             sg.Tab('Media', [
@@ -2690,7 +2761,7 @@ def ForensicVMForm():
         ]
     ])
 
-    # Define the layout of the virtualize tab
+    # Define the layout for the virtualize tab
     virtualize_layout = [
         [sg.Column([[convert_frame], [vm_control_frame]],
                    element_justification='left',
@@ -2709,6 +2780,7 @@ def ForensicVMForm():
 
     # Create the virtualize tab
     virtualize_tab = sg.Tab("Virtualize", virtualize_layout, element_justification="left")
+    
     # layout for the configuration tab
     config_layout = [
         [sg.Frame("Forensic VM Server Configuration",
@@ -2804,6 +2876,8 @@ def ForensicVMForm():
     ]),
             ]
     ]
+
+    # Create a tab for Autopsy case
     autopsy_tab = sg.Tab("Autopsy case", autopsy_layout, key="autopsy_tab")
 
 
@@ -2817,15 +2891,19 @@ def ForensicVMForm():
                                    "part of a Master's degree in Cybersecurity Engineering at Escola Superior de "
                                    "Tecnologia e Gestão de Beja. All rights reserved.", size=(65, 3), disabled=True)],
     ]
+
+    # Create a tab for the About section
     about_tab = sg.Tab("About", about_layout, element_justification="center")
 
+    # Define the layout for the output section
     output_layout = [
-#        [sg.Output(size=(100, 25), key="-OUTPUT-",
-#                   background_color='black',
-#                   text_color='white',
-#                   font=('Courier New', 12))]
+        [sg.Output(size=(100, 25), key="-OUTPUT-",
+                   background_color='black',
+                   text_color='white',
+                   font=('Courier New', 12))]
     ]
 
+    # Create a tab for the Output Console
     output_tab = sg.Tab("Output Console", output_layout, element_justification="left")
 
     # Create the layout for the window
@@ -2837,15 +2915,16 @@ def ForensicVMForm():
     ]
 
 
-    # Create the window
-
+    # Create the main application window
     window = sg.Window("Autopsy ForensicVM Client", layout, element_justification="center", icon=icon_path)
-
 
 
     # Event loop
     while True:
+        # Read events from the window with a timeout of 1000 milliseconds (1 second)
         event, values = window.read(timeout=1000)
+
+        # Check if the event is a timeout event
         if event == sg.TIMEOUT_EVENT:
 
             # Test if the vm exists
@@ -2854,9 +2933,17 @@ def ForensicVMForm():
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
             server_ok = 1
+            # Check if the server is not offline
+            # The server_offline variable indicates whether the server is offline or not
+
+            # Call the test_api_key() function to test the forensic API key
             if not server_offline:
                 server_ok, _ = test_api_key(forensic_api, web_server_address)
                 if server_ok != 0:
+                    # Check if the server is okay (the forensic API key is valid)
+                    # The server_ok variable stores the result of the test_api_key() function
+
+                    # Disable certain buttons and display an alert message
                     window["convert_to_vm_button"].update(disabled=not False)
                     window["link_to_vm_button"].update(disabled=not False)
                     window["alert_server_off"].update(visible=True)
@@ -2875,14 +2962,27 @@ def ForensicVMForm():
                     server_offline = True
 
             if server_ok == 0:
+                # Check if the server is not okay (the forensic API key is invalid)
+                # The server_ok variable stores the result of the test_api_key() function
+
                 if first_run:
+                    # Check if it is the first run of the application
+                    # The first_run variable indicates whether it is the first run or not
+
+                    # Perform the initial setup of the form
                     formInit(values, window)
                     first_run = False
+                
                 window["alert_server_off"].update(visible=False)
+                # Hide the alert message indicating that the server is offline
+
                 vm_folder_exists = check_vm_exists(forensic_api, uuid_folder, web_server_address)
-                #print(f" vm_folder_exists: {vm_folder_exists}")
+
                 if vm_folder_exists:
-                    #print("DEBUG: VM EXISTS")
+                    # Check if the VM folder exists
+                    # The vm_folder_exists variable indicates whether the VM folder exists or not
+
+                    # Disable or enable buttons based on the VM folder status
                     window["convert_to_vm_button"].update(disabled=not False)
                     window["link_to_vm_button"].update(disabled=not False)
                     window["delete_vm_button"].update(disabled=False)
@@ -2890,17 +2990,34 @@ def ForensicVMForm():
                     window["open_forensic_shell_button"].update(disabled=not True)
                     window["open_forensic_netdata_button"].update(disabled=not True)
                     window["save_screenshots_vm_button"].update(disabled=not True)
+
+                    # Call the get_forensic_image_info() function to retrieve forensic image information
                     return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
-                    #print(return_code)
-                    #print(vm_status)
+                    # The get_forensic_image_info() function retrieves information about the forensic image and returns the result in return_code and 
+                    # vm_status variables
+                    # The forensic_api, uuid_folder, and web_server_address are the parameters passed to the function                    
+
                     if check_tap_interface(web_server_address, uuid_folder, forensic_api):
+                        # Check if the TAP interface exists for the VM
+                        # The check_tap_interface() function is called with the web server address, UUID folder, and forensic API as parameters
+
+                        # Update button properties based on the result of the TAP interface check
                         window['insert_network_button'].update(disabled=True)
                         window['remove_network_button'].update(disabled=False)
+                        # Disable the "Insert Network" button and enable the "Remove Network" button
                     else:
+                        # If the TAP interface does not exist for the VM
+
+                        # Update button properties based on the result of the TAP interface check                        
                         window['insert_network_button'].update(disabled=False)
                         window['remove_network_button'].update(disabled=True)
+                        # Enable the "Insert Network" button and disable the "Remove Network" button                        
 
                     if vm_status.get("vm_status", "") == "running":
+                        # Check if the VM status is "running"
+                        # The vm_status dictionary is checked for the "vm_status" key and its value is compared to "running"
+
+                        # Update button properties based on the VM status                        
                         window["delete_vm_button"].update(disabled=True)
                         window["start_vm_button"].update(disabled=not False)
                         window["screenshot_vm_button"].update(disabled=not True)
@@ -2914,7 +3031,13 @@ def ForensicVMForm():
                         window["recreate_evidence_disk_button"].update(disabled=True)
                         window["-RUN PLUGIN-"].update(disabled=True)
                         vm_stopped = False
+                        # Set the vm_stopped variable to False to indicate that the VM is not stopped                        
+
                     elif vm_status.get("vm_status", "") == "stopped":
+                        # Check if the VM status is "stopped"
+                        # The vm_status dictionary is checked for the "vm_status" key and its value is compared to "stopped"
+
+                        # Update button properties based on the VM status                        
                         window["delete_vm_button"].update(disabled=False, visible=True)
                         window["start_vm_button"].update(disabled=not True)
                         window["screenshot_vm_button"].update(disabled=not False)
@@ -2927,12 +3050,22 @@ def ForensicVMForm():
                         window["save_screenshots_vm_button"].update(disabled=not True)
                         window["-RUN PLUGIN-"].update(disabled=False)
                         vm_stopped = True
+                        # Set the vm_stopped variable to True to indicate that the VM is stopped
+
                         if not folders_created:
+                            # Check if the evidence folders with Autopsy tags for the VM have not been created yet
+                            # The folders_created variable indicates whether the folders have been created or not
+
+                            # Retrieve the necessary values from the form                            
                             forensic_image_path = values["forensic_image_path"]
                             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                             web_server_address = values["server_address"]
                             forensic_api = values["forensic_api"]
+
+                            # Create the necessary folders in the Qcow2 background                            
                             create_folders_in_qcow2_background(forensic_api, web_server_address, uuid_folder, case_tags)
+                            # The create_folders_in_qcow2_background() function is called with the necessary parameters to create the folders
+
                             folders_created = True
                 else:
                     window["convert_to_vm_button"].update(disabled=False)
