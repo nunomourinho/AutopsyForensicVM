@@ -3296,7 +3296,7 @@ def ForensicVMForm():
 
                 # Display a popup message indicating the successful creation of the snapshot
                 sg.popup(f"Snapshot created")
-                
+
             except Exception as e:                
                 # Catch any exceptions that occur during the execution of the code block
                 print(str(e))
@@ -3305,61 +3305,119 @@ def ForensicVMForm():
 
 
         elif event == '-LIST SNAPSHOTS-':
+            # Check if the event is the "-LIST SNAPSHOTS-" button event
+            # The event variable is checked against the string value '-LIST SNAPSHOTS-'
+
+            # Retrieve the necessary values from the form
             forensic_api = values["forensic_api"]
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
+
+            # Call the list_snapshots() function to retrieve the list of snapshots
             snapshot_info_list=list_snapshots(forensic_api, uuid_folder, web_server_address)
+
+             # Update the snapshot list in the UI with the retrieved snapshot information
             window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
 
 
         elif event == 'start_server_ssh_button':
+            # Check if the event is the "start_server_ssh_button" button event
+            # The event variable is checked against the string value 'start_server_ssh_button'
+
+            # Retrieve the necessary values from the form            
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             server_address = values["ssh_server_address"]
             server_port = values["ssh_server_port"]
+
+            # Call the start_server_remotessh() function to start the remote SSH server
             start_server_remotessh(server_address, server_port)
 
 
         elif event == 'debug_ssh_button':
+            # Check if the event is the "debug_ssh_button" button event
+            # The event variable is checked against the string value 'debug_ssh_button'
+
+            # Retrieve the necessary values from the form
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             server_address = values["ssh_server_address"]
             server_port = values["ssh_server_port"]
+
+            # Call the debug_remotessh() function to perform remote SSH debugging
             debug_remotessh(server_address, server_port,uuid_folder )
+
+
         elif event == 'recreate_evidence_disk_button':
+            # Check if the event is the "recreate_evidence_disk_button" button event
+            # The event variable is checked against the string value 'recreate_evidence_disk_button'
+
+            # Show a confirmation dialog to confirm deleting the evidence disk
             response = sg.PopupYesNo('Do you want delete the evidence disk?', title='Confirmation')
             if response == 'Yes':
+                # If the user confirms deleting the evidence disk, show another confirmation dialog for extra confirmation
                 response_2 = sg.PopupYesNo('ARE YOU REALLY SURE?', title='Confirmation')
+
                 if response_2 == 'Yes':
+                    # If the user confirms again, proceed with recreating the evidence disk
+                    # Retrieve the necessary values from the form                    
                     forensic_image_path = values["forensic_image_path"]
                     uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                     web_server_address = values["server_address"]
                     forensic_api = values["forensic_api"]
+
+                    # Call the recreate_folders() function to recreate the evidence disk folders
                     recreate_folders(forensic_api, web_server_address, uuid_folder, case_tags)
                     folders_created = True
+
+                    # Display a success message                  
                     print('Evidence Drive recreated')
                     sg.popup("Evidence Drive recreated")
             else:
-                print('User clicked No')
+                # If the user chooses not to delete the evidence disk, display a message
+                print('Delete action aborted')
+
+
         elif event == '-EJECT-':
+            # Check if the event is the "-EJECT-" button event
+            # The event variable is checked against the string value '-EJECT-'
+
             try:
+                # Try to execute the following code block, which handles the CD-ROM ejection process
+
+                # Retrieve the necessary values from the form                
                 api_key = values["forensic_api"]
                 base_url = values["server_address"]
                 forensic_image_path = values["forensic_image_path"]
                 uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+
+                # Call the eject_cdrom() function to eject the CD-ROM                
                 response = eject_cdrom(api_key, base_url, uuid_folder)
+
                 if response:
+                    # If the response is not empty, print the response (e.g., success message)
                     print(response)
+                    sg.popup("CD-ROM ejected")
                 else:
+                    # If the response is empty, print a failure message
                     print("Failed to eject CD-ROM")
+                    sg.popup_error("Failed to eject CD-ROM")
             except Exception as e:
                  print(str(e))
+
+
         elif event == 'download_wireshark_button':
+            # Check if the event is the "download_wireshark_button" button event
+            # The event variable is checked against the string value 'download_wireshark_button'
+
+            # Retrieve the necessary values from the form
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
+
+            # Prompt the user to choose the path to save the network pcap files
             save_path = sg.popup_get_file('Choose the path to save the network pcap files',
                                           save_as=True,
                                           no_window=True,
@@ -3367,85 +3425,176 @@ def ForensicVMForm():
                                           default_path=f"{case_image_folder}/pcap.zip",
                                           file_types=(("Zip files", "*.zip"),))
             if save_path:
+                # If a save path is selected by the user, proceed to download the network pcap files
+
                 try:
+                    # Try to download the network pcap files using the download_pcap() function
                     download_pcap(forensic_api, uuid_folder, web_server_address, save_path)
+                    sg.popup(f"Network pcap files downloaded and saved at {save_path}")
+
                 except Exception as e:
+                    # If an exception occurs during the execution of the code block, display an error popup
                     sg.popup_error(f'Failed to download network pcap files {str(e)}')
+
+
         elif event == 'insert_network_button':
+            # Check if the event is the "insert_network_button" button event
+            # The event variable is checked against the string value 'insert_network_button'
+
             try:
+                # Try to execute the code block within the try block
+
+                # Retrieve the necessary values from the form                
                 api_key = values["forensic_api"]
                 base_url = values["server_address"]
                 forensic_image_path = values["forensic_image_path"]
                 uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+        
+                # Start the TAP interface by calling the start_tap_interface() function                
                 response = start_tap_interface(base_url, uuid_folder, api_key)
+
                 if response:
+                    # If the TAP interface was successfully started, check if the interface is active
                     if check_tap_interface(base_url, uuid_folder, api_key):
-                        print(response)
+                        # If the interface is active, display a success message and update button states
+                        print(response)                        
                         sg.popup("Network card inserted")
+
+                        # Update the button states
                         window['insert_network_button'].update(disabled=True)
                         window['remove_network_button'].update(disabled=False)
                 else:
+                    # If the TAP interface failed to start, display an error message
                     print("Failed to insert network card")
                     sg.popup_error("Failed to insert network card")
+
             except Exception as e:
+                 # If an exception occurs during the execution of the code block, print the exception message
                  print(str(e))
+                 sg.popup_error(f'Failed to enable network card {str(e)}')
+
+
         elif event == 'remove_network_button':
+            # Check if the event is the "remove_network_button" button event
+            # The event variable is checked against the string value 'remove_network_button'
             try:
+                # Try to execute the code block within the try block
+
+                # Retrieve the necessary values from the form                
                 api_key = values["forensic_api"]
                 base_url = values["server_address"]
                 forensic_image_path = values["forensic_image_path"]
                 uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+
+                # Stop the TAP interface by calling the stop_tap_interface() function               
                 response = stop_tap_interface(base_url, uuid_folder, api_key)
                 if response:
+                    # If the TAP interface was successfully stopped, check if the interface is disabled
+
                     if not check_tap_interface(base_url, uuid_folder, api_key):
+                        # If the interface is disabled, display a success message and update button states
                         print(response)
                         sg.popup("Network card disabled")
+
+                        # Update the button states
                         window['insert_network_button'].update(disabled=False)
                         window['remove_network_button'].update(disabled=True)
                 else:
+                    # If disabling the TAP interface failed, display an error message
                     print("Failed to disable network card")
                     sg.popup_error("Failed to disable network card")
+
             except Exception as e:
+                # If an exception occurs during the execution of the code block, print the exception message                 
                  print(str(e))
+                 sg.popup_error(f'Failed to disable network card {str(e)}')
+
+
         elif event == '-INSERT-':
+            # Check if the event is the "-INSERT-" event
+            # The event variable is checked against the string value '-INSERT-'
+
             try:
+                # Try to execute the code block within the try block
+
+                # Retrieve the necessary values from the form                
                 api_key = values["forensic_api"]
                 base_url = values["server_address"]
                 forensic_image_path = values["forensic_image_path"]
                 uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                 selected_files = values['-CDROM LIST-']
+
                 if selected_files:
+                    # Check if any CD-ROM file is selected
                     iso_filename = selected_files[0]
+
+                    # Insert the CD-ROM by calling the insert_cdrom() function
                     response = insert_cdrom(api_key, base_url, uuid_folder, iso_filename)
+
                     if response:
+                        # If the CD-ROM was successfully inserted, display a success message
+
                         print(response)
+                        sg.popup("CD-ROM inserted")
                     else:
+                        # If inserting the CD-ROM failed, display an error message
+
                         print("Failed to insert CD-ROM")
+                        sg.popup_error("Failed to insert CD-ROM")
+
             except Exception as e:
+                 # If an exception occurs during the execution of the code block, print the exception message
+
                  print(str(e))
+                 sg.popup_error(f'Failed to insert CD-ROM {str(e)}')
+
+
+
         elif event == '-RUN PLUGIN-':
+            # Check if the event is the "-RUN PLUGIN-" event
+            # The event variable is checked against the string value '-RUN PLUGIN-'
+
             try:
+                # Try to execute the code block within the try block
+
+                # Retrieve the necessary values from the form                
                 api_key = values["forensic_api"]
                 base_url = values["server_address"]
                 forensic_image_path = values["forensic_image_path"]
                 uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                 selected_files = values['-PLUGIN LIST-']
+
                 if selected_files:
+                    # Check if any plugin file is selected
                     pattern = r'\((.*?)\)'
                     matches = re.findall(pattern, selected_files[0])
 
                     # Check if any matches found
                     if matches:
                         plugin_dir = matches[0]
+
+                        # Run the selected plugin by calling the run_plugin() function
                         response = run_plugin(api_key, base_url, plugin_dir, uuid_folder)
+
                         if response:
+                            # If the plugin was successfully run, print the response
+
                             print(response)
+                            sg.popup("Plugin run")
                         else:
+                            # If running the plugin failed, print an error message
+
                             print("Failed to run plugin")
-                        print(plugin_dir)
+                            sg.popup_error("Failed to run plugin")
+                        
 
             except Exception as e:
+                 # If an exception occurs during the execution of the code block, print the exception message
+
                  print(str(e))
+                 sg.popup_error(f'Failed to run plugin {str(e)}')
+
+
         elif event == '-DELETE-':
             # Get the selected ISO file from the Listbox
             try:
@@ -3469,6 +3618,9 @@ def ForensicVMForm():
                             print(str(e))
             except Exception as e:
                 print(str(e))
+
+
+
         elif event == '-BROWSE-':
             try:
                 save_path = sg.popup_get_file('Choose iso file',
