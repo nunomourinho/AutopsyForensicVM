@@ -3233,37 +3233,77 @@ def ForensicVMForm():
 
 
         elif event == '-ROLLBACK SNAPSHOT-':
+            # Check if the event is the "-ROLLBACK SNAPSHOT-" button event
+            # The event variable is checked against the string value '-ROLLBACK SNAPSHOT-'
+
             try:
+                # Attempt to execute the following code block
+
+                # Retrieve the necessary values from the form
                 forensic_image_path = values["forensic_image_path"]
                 uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                 web_server_address = values["server_address"]
                 forensic_api = values["forensic_api"]
                 selected_files = values['-SNAPSHOT-LIST-']
+
                 if selected_files:
+                    # Check if any snapshot is selected from the snapshot list                    
                     snap_filename = selected_files[0]
-                    # Find out the snapshot name from inside the file name
+                    # Get the selected snapshot filename
+
+                    # Find out the snapshot name from inside the file name using regular expression 
                     match = re.search(r'\((.*?)\)', snap_filename)
                     if match:
                         snapshot_name =match.group(1)
+                        # Extract the snapshot name from the matched group
+
+                        # Call the rollback_snapshot() function to rollback to the specified snapshot
                         rollback_snapshot(forensic_api, web_server_address, uuid_folder, snapshot_name)
+
+                        # Update the snapshot list after rollback                    
                         snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
                         window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
+
+                        # Display a popup message indicating the successful rollback to the snapshot
                         sg.popup(f"Reverted to snapshot {snapshot_name}")
 
             except Exception as e:
+                # Catch any exceptions that occur during the execution of the code block
                 print(str(e))
+                # Print the error message to the console
+
+
+
         elif event == '-CREATE SNAPSHOT-':
+            # Check if the event is the "-CREATE SNAPSHOT-" button event
+            # The event variable is checked against the string value '-CREATE SNAPSHOT-'
+
             try:
+                # Attempt to execute the following code block
+
+                # Retrieve the necessary values from the form                
                 forensic_image_path = values["forensic_image_path"]
                 uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                 web_server_address = values["server_address"]
                 forensic_api = values["forensic_api"]
+
+                # Call the create_snapshot() function to create a new snapshot                
                 create_snapshot(forensic_api, uuid_folder, web_server_address)
+
+                # Update the snapshot list after creating a new snapshot
                 snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
                 window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
+
+                # Display a popup message indicating the successful creation of the snapshot
                 sg.popup(f"Snapshot created")
-            except Exception as e:
+                
+            except Exception as e:                
+                # Catch any exceptions that occur during the execution of the code block
                 print(str(e))
+                # Print the error message to the console
+
+
+
         elif event == '-LIST SNAPSHOTS-':
             forensic_api = values["forensic_api"]
             forensic_image_path = values["forensic_image_path"]
