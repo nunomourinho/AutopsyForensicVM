@@ -4253,25 +4253,63 @@ def ForensicVMForm():
             
 
         elif event == "open_forensic_vm_button":
-            # get server address value
-            print("Open ForensicVM Webserver...")
-            server_address = values["server_address"]
-            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
-            print(vm_status)
-            if return_code== 0:
-                webbrowser.open(f"{server_address}/screen?port={vm_status['websocket_port']}&uuid={uuid_folder}")
-                
-        elif event == "stop_vm_button":
-            # get server address value
-            print("Stop VM...")
-            forensic_api = values["forensic_api"]
-            forensic_image_path = values["forensic_image_path"]
-            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
-            web_server_address = values["server_address"]
+            # Check if the event is the "open_forensic_vm_button" event
 
-            stop_result = stop_vm(forensic_api, uuid_folder, web_server_address)
-            if stop_result:
-                print(f"VM stopped: {stop_result['vm_stopped']}")
+            try:
+                # get server address value
+                print("Open ForensicVM Webserver...")
+
+                 # Extract the necessary values from the form
+                server_address = values["server_address"]
+                return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+                # Call the get_forensic_image_info function to retrieve information about the forensic image
+
+                print(vm_status)
+                if return_code== 0:
+                    webbrowser.open(f"{server_address}/screen?port={vm_status['websocket_port']}&uuid={uuid_folder}")
+                else:
+                    sg.popup_error(f"Error getting image information {vm_status}")
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f"Error opening browser {str(e)}")
+
+
+
+
+        elif event == "stop_vm_button":
+            # Check if the event is the "stop_vm_button" event
+            try:
+                # Try to execute the code block within the try block
+
+                # get server address value                
+                forensic_api = values["forensic_api"]
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                web_server_address = values["server_address"]
+
+                # Call the stop_vm function to stop the VM
+                stop_result = stop_vm(forensic_api, uuid_folder, web_server_address)
+
+                if stop_result:
+                    # If the stop_result is not None, the VM was stopped successfully            
+                    print(f"VM stopped: {stop_result['vm_stopped']}")
+                    sg.popup(f"VM stopped: {stop_result['vm_stopped']}")
+                else:
+                    # If the stop_result is None, there was an error stopping the VM            
+                    sg.popup_error("Could not stop the VM")
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f"Error stopping VM {str(e)}")
+                # Show an error message indicating that the VM could not be stopped
+
+
+
 
 
         elif event == "open_forensic_shell_button":
@@ -4279,23 +4317,27 @@ def ForensicVMForm():
             print("Open ForensicVM Webserver...")
             server_address = values["server_address"] + "/shell"
             webbrowser.open(server_address)
+
         elif event == "open_forensic_netdata_button":
             # get server address value
             print("Open ForensicVM Webserver...")
             server_address = values["server_address"] + "/netdata"
             webbrowser.open(server_address)
+
         elif event == "test_ssh_connect":
             # get server address value
             if test_ssh(values['ssh_server_address'], values['ssh_server_port']):
                 sg.popup("Connected successfully!")
             else:
                 sg.popup_error("Could not connect to the server")
+
         elif event == "test_windows_share":
             # get server address value
             if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):
                 sg.popup("Connected successfully!")
             else:
                 sg.popup_error("Could not connect to the server")
+
         elif event == "test_forensicServer_connect":
             server_address = values["server_address"]
             forensic_api = values["forensic_api"]
@@ -4305,6 +4347,7 @@ def ForensicVMForm():
             else:
                 sg.popup("Connected successfully!\n" + message)
                 server_offline = False
+
         elif event == "copy-ssh-key-to-server":
             ssh_dir = os.path.dirname(os.path.abspath(__file__))
             message, status_code = generate_and_send_public_key(values["server_address"], values["forensic_api"],
@@ -4313,12 +4356,14 @@ def ForensicVMForm():
                 sg.popup_error(message)
             else:
                 sg.popup(message)
+
         elif event == "autofill_share":
             # Get the values from the PySimpleGUI window
             new_equivalence = os.path.dirname(os.path.realpath(image_path_arg))
             window.Element('equivalence').update(value=new_equivalence)
             new_share_folder = "\\\\127.0.0.1\\" + os.path.basename(new_equivalence)
             window.Element('folder_share_server').update(value=new_share_folder)
+
         elif event == "create_windows_share":
             try:
                 # Get the values from the PySimpleGUI window
