@@ -3068,6 +3068,9 @@ def ForensicVMForm():
 
                             folders_created = True
                 else:
+                    # If the VM status is neither "running" nor "stopped"
+
+                    # Update button properties based on the VM status
                     window["convert_to_vm_button"].update(disabled=False)
                     window["link_to_vm_button"].update(disabled=False)
                     window["delete_vm_button"].update(disabled=True)
@@ -3077,6 +3080,10 @@ def ForensicVMForm():
                     window["save_screenshots_vm_button"].update(disabled=True)
                     window["start_vm_button"].update(disabled=True)
             elif not server_offline:
+                # Check if the server is not offline
+                # The server_offline variable is checked for its negation
+
+                # Update button properties based on the server status                
                 window["convert_to_vm_button"].update(disabled=not True)
                 window["link_to_vm_button"].update(disabled=not True)
                 window["delete_vm_button"].update(disabled=not False)
@@ -3087,67 +3094,144 @@ def ForensicVMForm():
 
 
         if event == sg.WINDOW_CLOSED:
+            # Check if the event is a window close event
+            # The event variable is checked against sg.WINDOW_CLOSED            
             break
+            # Exit the loop to stop the program execution
+
+
         elif event == 'reset_date_button':
+            # Check if the event is the "reset_date_button" button event
+            # The event variable is checked against the string value 'reset_date_button'
+
             try:
+                # Attempt to execute the following code block
+
+                # Retrieve the necessary values from the form                
                 forensic_image_path = values["forensic_image_path"]
                 uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                 web_server_address = values["server_address"]
                 forensic_api = values["forensic_api"]
+                # Call the remove_vm_datetime() function to reset the VM's date and time
                 if remove_vm_datetime(web_server_address, uuid_folder, forensic_api):
+                    # If the date and time reset is successful
+
+                    # Display a popup message indicating that the date has been reset
                     sg.Popup('Date reseted. Please reboot the VM')
                 else:
+                    # If there was an error resetting the date and time                    
                     sg.popup_error('Error reseting date.')
+                    # Display a popup error message
             except Exception as e:
+                # Catch any exceptions that occur during the execution of the code block
+
                 print(str(e))
+                # Print the error message to the console
+
+
+
         elif event == 'set_date_button':
+            # Check if the event is the "set_date_button" button event
+            # The event variable is checked against the string value 'set_date_button'
+
             try:
+                # Attempt to execute the following code block
+
+                # Validate the input date and time
                 if validate_date(values['date_input']):
+                    # If the date and time is valid
+
+                    # Retrieve the necessary values from the form                    
                     forensic_image_path = values["forensic_image_path"]
                     uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                     web_server_address = values["server_address"]
                     forensic_api = values["forensic_api"]
-                    #sg.Popup(f"{values['forensic_api']}")
+
+                    # Call the change_vm_datetime() function to set the VM's date and time                    
                     if change_vm_datetime(web_server_address, uuid_folder, values['date_input'], forensic_api):
+                        # If the date and time is successfully set                        
                         sg.Popup('The date and time is valid. Date Changed. Please reboot the VM')
+                        # Display a popup message indicating that the date and time is changed
                     else:
+                        # If the input date and time is invalid
                         sg.popup_error('Error setting date.')
+                        # Display a popup error message
                 else:
+                    # Catch any exceptions that occur during the execution of the code block
                     sg.popup_error('The date and time is invalid, please try again.')
+                    # Print the error message to the console
             except Exception as e:
                 print(str(e))
+
+
         elif event == '-CHANGE-MB-':
+            # Check if the event is the "-CHANGE-MB-" button event
+            # The event variable is checked against the string value '-CHANGE-MB-'
             try:
+                # Attempt to execute the following code block
+
+                # Retrieve the necessary values from the form
                 forensic_image_path = values["forensic_image_path"]
                 uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                 web_server_address = values["server_address"]
                 forensic_api = values["forensic_api"]
+
+                # Call the change_memory_size() function to change the VM's memory size
                 change_memory_size(forensic_api, web_server_address, uuid_folder, values["-MB-SLIDER-"] * 1024)
+
+                # Display a popup message indicating the successful memory size change
                 sg.popup(f"Memory size changed to {values['-MB-SLIDER-']} GB")
             except Exception as e:
+                # Catch any exceptions that occur during the execution of the code block
                 print(str(e))
+                # Print the error message to the console                                
+
+
         elif event == '-DELETE SNAPSHOT-':
+            # Check if the event is the "-DELETE SNAPSHOT-" button event
+            # The event variable is checked against the string value '-DELETE SNAPSHOT-'
+
             try:
+                # Attempt to execute the following code block
+
+                # Retrieve the necessary values from the form                
                 forensic_image_path = values["forensic_image_path"]
                 uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
                 web_server_address = values["server_address"]
                 forensic_api = values["forensic_api"]
                 selected_files = values['-SNAPSHOT-LIST-']
                 if selected_files:
-                    snap_filename = selected_files[0]
-                    # Find out the snapshot name from inside the file name
+                    # Check if any snapshot is selected from the snapshot list                    
+
+                    snap_filename = selected_files[0]                    
+                    # Get the selected snapshot filename
+
+                    # Find out the snapshot name from inside the file name using regular expression                    
                     match = re.search(r'\((.*?)\)', snap_filename)
                     if match:
                         snapshot_name =match.group(1)
+                        # Extract the snapshot name from the matched group                        
+
                         if sg.PopupYesNo("Are you sure you want to delete the snapshot " +
                                          snapshot_name + "?", title="") == "Yes":
+                            # Display a popup confirmation message to confirm snapshot deletion
+
+                            # Call the delete_snapshot() function to delete the specified snapshot                                  
                             delete_snapshot(forensic_api, web_server_address, uuid_folder, snapshot_name)
+
+                            # Update the snapshot list after deletion                           
                             snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
                             window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
+
+                            # Display a popup message indicating the successful deletion of the snapshot
                             sg.popup(f"Deleted snapshot {snapshot_name}")
 
-            except Exception as e:
+            except Exception as e:                
+                # Catch any exceptions that occur during the execution of the code block
                 print(str(e))
+                # Print the error message to the console          
+
+
         elif event == '-ROLLBACK SNAPSHOT-':
             try:
                 forensic_image_path = values["forensic_image_path"]

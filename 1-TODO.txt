@@ -3,6 +3,7 @@ Reorganize:
 ---> Compile and reorganize sources
 
 ---> Make adicional docstrings in code
+---> Create button to update folders (offline)
 
 Setup:
 Make plugin setup
