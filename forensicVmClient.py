@@ -3726,26 +3726,49 @@ def ForensicVMForm():
 
 
         elif event == '-LIST PLUGINS-':
-
+            # Check if the event is the "-LIST PLUGINS-" event
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
+
             try:
+                # Try to execute the code block within the try block
+
+                # Call the list_plugins function to list the available plugins
                 plugins = list_plugins(forensic_api, web_server_address)
+
                 if plugins:
+                    # If plugins are successfully listed, update the Listbox with the plugin information
                     plugin_list = []
+
                     for plugin in plugins:
+                        # Iterate over each plugin and extract the necessary information
+
                         plugin_dir = plugin.get('plugin_dir')
-                        print(plugin_dir)
+                        #print(plugin_dir)
+
                         plugin_name = plugin.get('plugin_name')
-                        print(plugin_name)
+                        #print(plugin_name)
+
                         plugin_description = plugin.get('plugin_description')
-                        print(plugin_description)
+                        #print(plugin_description)
+
+                        # Append the formatted plugin information to the plugin_list
                         plugin_list.append(f"{plugin_name} - {plugin_description} ({plugin_dir}) ")
 
+                    # Update the Listbox with the updated plugin_list
                     window['-PLUGIN LIST-'].update(plugin_list)
+                    sg.popup("Plugins listed")
+
             except Exception as e:
+                # If an exception occurs during the execution of the code block, print the exception message
                 print(str(e))
+                sg.popup_error(f'Failed to list plugins {str(e)}')
+
+
+
         elif event == "save_screenshots_vm_button":
+            # Check if the event is the "save_screenshots_vm_button" event
+
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
@@ -3756,9 +3779,32 @@ def ForensicVMForm():
                                           default_extension=".zip",
                                           default_path=f"{case_image_folder}/screenshots.zip",
                                           file_types=(("Zip files", "*.zip"),))
-            if save_path:
-                download_screenshots(forensic_api, uuid_folder, web_server_address, save_path)
+            try:
+                # Try to execute the code block within the try block
+
+                if save_path:
+                    # If a valid save path is selected, proceed with downloading the screenshots
+
+                    download_screenshots(forensic_api, uuid_folder, web_server_address, save_path)
+                    # Call the download_screenshots function to download the screenshots
+
+                    sg.popup("Screenshots downloaded")
+                    # Display a popup message to indicate that the screenshots have been downloaded
+
+                else:
+                    sg.popup_error("Canceled to download screenshots")
+                    # Display a popup error message indicating that the user canceled the screenshot download
+
+            except Exception as e:       
+                # If an exception occurs during the execution of the code block, display an error popup
+                         
+                sg.popup_error(f'Failed to download screenshots {str(e)}')
+
+
+
         elif event == "import_evidence_button":
+            # Check if the event is the "import_evidence_button" event            
+
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
@@ -3769,29 +3815,111 @@ def ForensicVMForm():
                                           default_extension=".vmdk",
                                           default_path=f"{case_image_folder}/evidence.vmdk",
                                           file_types=(("vmdk disk", "*.vmdk"),))
-            if save_path:
-                download_evidence(forensic_api, uuid_folder, web_server_address, save_path)
+            try:
+                # Try to execute the code block within the try block
+
+                if save_path:
+                    # If a valid save path is selected, proceed with downloading the evidence disk
+
+                    download_evidence(forensic_api, uuid_folder, web_server_address, save_path)
+                    # Call the download_evidence function to download the evidence disk
+
+                    sg.popup(f"Evidence disk downloaded and saved to {save_path}. Close to open path in explorer. Then import the evidence disk in Autopsy Software")
+                    # Display a popup message to indicate that the evidence disk has been downloaded and saved to the specified path
+
+                    saved_path = os.path.dirname(save_path)
+                    subprocess.Popen(f'explorer {saved_path}')
+                    # Open the saved path in the file explorer
+
+                else:
+                    sg.popup_error("Canceled to download evidence disk")
+                    # Display a popup error message indicating that the user canceled the evidence disk download
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f'Failed to download evidence {str(e)}')
+
+
         elif event == "download_memory_button":
+            # Check if the event is the "download_memory_button" event
+
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
+
             save_path = sg.popup_get_file('Choose the path to save the screenshots',
                                           save_as=True,
                                           no_window=True,
                                           default_extension=".dump",
                                           default_path=f"{case_image_folder}/memory.dump",
                                           file_types=(("Dump files", "*.dump"),))
-            if save_path:
-                download_memory_dump(forensic_api, uuid_folder, web_server_address, save_path)
+
+            try:
+                # Try to execute the code block within the try block
+
+                if save_path:
+                    # If a valid save path is selected, proceed with downloading the memory dump
+
+                    download_memory_dump(forensic_api, uuid_folder, web_server_address, save_path)
+                     # Call the download_memory_dump function to download the memory dump
+
+                    sg.popup(f"Memory dump downloaded and saved to {save_path}. Close to open path in explorer. Then import the memory dump in Autopsy Software")
+                    # Display a popup message to indicate that the memory dump has been downloaded and saved to the specified path
+
+                    saved_path = os.path.dirname(save_path)
+                    subprocess.Popen(f'explorer {saved_path}')
+                    # Open the saved path in the file explorer
+
+                else:
+                    sg.popup_error("Canceled to download memory dump")
+                    # Display a popup error message indicating that the user canceled the memory dump download
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup(f'Failed to download memory dump {str(e)}')
+
+
+
         elif event == "screenshot_vm_button":
+            # Check if the event is the "screenshot_vm_button" event            
+
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
-            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
-            if vm_status.get("vm_status", "") == "running":
-                screenshot_vm(forensic_api, uuid_folder, web_server_address)
+
+            try:
+                # Try to execute the code block within the try block
+
+                return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+                # Call the get_forensic_image_info function to retrieve information about the forensic image
+
+                
+                if vm_status.get("vm_status", "") == "running":
+                    # If the VM status is "running", proceed with taking a screenshot
+
+                    screenshot_vm(forensic_api, uuid_folder, web_server_address)
+                    # Call the screenshot_vm function to take a screenshot of the VM
+
+                    sg.popup("Screenshot taken")
+                    # Display a popup message to indicate that the screenshot has been taken
+                else:
+                    sg.popup_error("Vm is not running. Screenshot not possible")
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f'Failed to take screenshot {str(e)}')
+                # Display a popup error message indicating the error
+
+
+
         elif event == "reset_vm_button":
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
@@ -3800,6 +3928,8 @@ def ForensicVMForm():
             return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
             if vm_status.get("vm_status", "") == "running":
                 reset_vm(forensic_api, uuid_folder, web_server_address)
+
+
         elif event == "shutdown_vm_button":
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
@@ -3808,6 +3938,8 @@ def ForensicVMForm():
             return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
             if vm_status.get("vm_status", "") == "running":
                 shutdown_vm(forensic_api, uuid_folder, web_server_address)
+
+
         elif event == "delete_vm_button":
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
@@ -3816,6 +3948,8 @@ def ForensicVMForm():
             return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
             if vm_status.get("vm_status", "") == "stopped":
                 delete_vm(forensic_api, uuid_folder, web_server_address)
+
+
         elif event == "start_vm_button":
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
@@ -3847,6 +3981,7 @@ def ForensicVMForm():
 
             else:
                 start_vm(forensic_api, uuid_folder, web_server_address)
+
 
         elif event == "save_button":
             try:
