@@ -4313,58 +4313,177 @@ def ForensicVMForm():
 
 
         elif event == "open_forensic_shell_button":
-            # get server address value
-            print("Open ForensicVM Webserver...")
-            server_address = values["server_address"] + "/shell"
-            webbrowser.open(server_address)
+            # Check if the event is the "open_forensic_shell_button" event
+
+            try:
+                # get server address value
+                print("Open ForensicVM Webserver...")
+                # Extract the necessary value from the form
+                server_address = values["server_address"] + "/shell"
+
+                # Open the web browser to the specified server address
+                webbrowser.open(server_address)
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f"Error opening browser {str(e)}")
+
+
 
         elif event == "open_forensic_netdata_button":
-            # get server address value
-            print("Open ForensicVM Webserver...")
-            server_address = values["server_address"] + "/netdata"
-            webbrowser.open(server_address)
+            # Check if the event is the "open_forensic_netdata_button" event
+
+            try:
+                
+                print("Open ForensicVM Webserver...")
+                
+                # Extract the necessary value from the form
+                # get server address value
+                server_address = values["server_address"] + "/netdata"
+
+                # Open the web browser to the specified server address
+                webbrowser.open(server_address)
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f"Error opening browser {str(e)}")
+
+
 
         elif event == "test_ssh_connect":
-            # get server address value
-            if test_ssh(values['ssh_server_address'], values['ssh_server_port']):
-                sg.popup("Connected successfully!")
-            else:
-                sg.popup_error("Could not connect to the server")
+            # Check if the event is the "test_ssh_connect" event
+
+            try:
+                # Try to execute the code
+
+                # Call the test_ssh function to check the SSH connection
+                if test_ssh(values['ssh_server_address'], values['ssh_server_port']):
+                    # If the SSH connection is successful, display a success popup message            
+                    sg.popup("Connected successfully!")
+                else:
+                    # If the SSH connection fails, display an error popup message            
+                    sg.popup_error("Could not connect to the server")
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f"Error testing SSH connection {str(e)}")
+                # Show an error message indicating that the SSH connection could not be established
+
+
 
         elif event == "test_windows_share":
-            # get server address value
-            if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):
-                sg.popup("Connected successfully!")
-            else:
-                sg.popup_error("Could not connect to the server")
+            # Check if the event is the "test_windows_share" event
+
+            try:                
+
+                # Call the test_windows_share function to check the Windows share connection        
+                if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):
+                    # If the Windows share connection is successful, display a success popup message
+                    sg.popup("Connected successfully!")\
+                    
+                else:
+                    # If the Windows share connection fails, display an error popup message            
+                    sg.popup_error("Could not connect to the server")
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f"Error testing Windows share {str(e)}")
+
+
 
         elif event == "test_forensicServer_connect":
-            server_address = values["server_address"]
-            forensic_api = values["forensic_api"]
-            return_code, message= test_api_key(forensic_api, server_address)
-            if return_code != 0:
-                sg.popup_error("Could not connect to the server:\n" +  message)
-            else:
-                sg.popup("Connected successfully!\n" + message)
-                server_offline = False
+            # Check if the event is the "test_forensicServer_connect" event
+
+            try:
+                # Try to execute the code
+
+                # Extract the necessary values from the form
+                server_address = values["server_address"]
+                forensic_api = values["forensic_api"]
+
+                # Call the test_api_key function to test the connection to the Forensic Server API        
+                return_code, message= test_api_key(forensic_api, server_address)
+
+                if return_code != 0:
+                    # If the connection fails, display an error popup message
+                    sg.popup_error("Could not connect to the server:\n" +  message)
+
+                else:
+                    # If the connection is successful, display a success popup message            
+                    sg.popup("Connected successfully!\n" + message)
+                    server_offline = False
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f"Error testing Server API Connection {str(e)}")
+
+
 
         elif event == "copy-ssh-key-to-server":
-            ssh_dir = os.path.dirname(os.path.abspath(__file__))
-            message, status_code = generate_and_send_public_key(values["server_address"], values["forensic_api"],
-                                                                ssh_dir)
-            if status_code!= 200:
-                sg.popup_error(message)
-            else:
-                sg.popup(message)
+            # Check if the event is the "copy-ssh-key-to-server" event
+
+            try:
+                # Try to execute the code
+
+                # Get the SSH directory path
+                ssh_dir = os.path.dirname(os.path.abspath(__file__))
+                
+                # Call the generate_and_send_public_key function to generate and send the public key to the server
+                message, status_code = generate_and_send_public_key(values["server_address"], values["forensic_api"],
+                                                                    ssh_dir)
+                
+                if status_code!= 200:
+                    # If the operation fails, display an error popup message
+                    sg.popup_error(message)
+                else:
+                    # If the operation is successful, display a success popup message            
+                    sg.popup(message)
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f"Error creating SSH key {str(e)}")
+
+
 
         elif event == "autofill_share":
-            # Get the values from the PySimpleGUI window
-            new_equivalence = os.path.dirname(os.path.realpath(image_path_arg))
-            window.Element('equivalence').update(value=new_equivalence)
-            new_share_folder = "\\\\127.0.0.1\\" + os.path.basename(new_equivalence)
-            window.Element('folder_share_server').update(value=new_share_folder)
+             # Check if the event is the "autofill_share" event
+
+            try:
+                # Get the values from the PySimpleGUI window
+                new_equivalence = os.path.dirname(os.path.realpath(image_path_arg))
+
+                # Update the value of the 'equivalence' input field in the window with the new equivalence value        
+                window.Element('equivalence').update(value=new_equivalence)
+
+                # Create the Windows share folder path using the new equivalence value        
+                new_share_folder = "\\\\127.0.0.1\\" + os.path.basename(new_equivalence)
+
+                # Update the value of the 'folder_share_server' input field in the window with the new share folder path        
+                window.Element('folder_share_server').update(value=new_share_folder)
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f"Error autofilling windows share {str(e)}")
+
+
 
         elif event == "create_windows_share":
+            # Check if the event is the "create_windows_share" event
+
             try:
                 # Get the values from the PySimpleGUI window
                 new_equivalence=os.path.dirname(os.path.realpath(image_path_arg))
@@ -4377,8 +4496,11 @@ def ForensicVMForm():
 
                 # Call the create_login_and_share function with the entered values
                 create_login_and_share(username, password, sharename, folderpath)
+
             except Exception as e:
-                sg.popup_error(e)
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                sg.popup_error(f"Error creating windows share {str(e)}")
 
 
 if __name__ == '__main__':
