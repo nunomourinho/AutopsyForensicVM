@@ -3596,67 +3596,135 @@ def ForensicVMForm():
 
 
         elif event == '-DELETE-':
-            # Get the selected ISO file from the Listbox
+            # Check if the event is the "-DELETE-" event
+            # The event variable is checked against the string value '-DELETE-'
+            
             try:
+                # Try to execute the code block within the try block
+
+                # Get the selected ISO file from the Listbox                
                 selected_files = values['-CDROM LIST-']
-                print(selected_files)
+                
                 if selected_files:
+                    # Check if any ISO file is selected
                     iso_filename = selected_files[0]
-                    # Call the delete_iso function
+
+                    # Call the delete_iso function to delete the selected ISO file                    
                     api_key = values["forensic_api"]
                     base_url = values["server_address"]
                     deleted = delete_iso(api_key, base_url, iso_filename)
+
                     if deleted:
+                        # If the ISO file was successfully deleted, update the Listbox with the remaining ISO files
+
                         web_server_address = values["server_address"]
                         forensic_api = values["forensic_api"]
                         try:
+                            # Attempt to list the ISO files again after the deletion
                             iso_files = list_iso_files(forensic_api, web_server_address)
+
                             if iso_files:
+                                # If ISO files are successfully listed, update the Listbox with the updated ISO files
+
+                                sg.popup("ISO files deleted")
                                 print(iso_files)
                                 window['-CDROM LIST-'].update(iso_files['iso_files'])
+
                         except Exception as e:
+                            # If an exception occurs while listing ISO files, print the exception message
+
                             print(str(e))
+                            sg.popup_error(f'Failed to list ISO files {str(e)}')
+                    else:
+                        # If deleting the ISO file failed, display an error message
+                        sg.popup_error("Failed to delete ISO file")
+
             except Exception as e:
+                # If an exception occurs during the execution of the code block, print the exception message
                 print(str(e))
+                sg.popup_error(f'Failed to delete ISO file {str(e)}')
 
 
 
         elif event == '-BROWSE-':
+            # Check if the event is the "-BROWSE-" event
+
             try:
+                # Try to execute the code block within the try block
+
+                # Open a file dialog to browse and select an ISO file                
                 save_path = sg.popup_get_file('Choose iso file',
                                               save_as=False,
                                               no_window=True,
                                               default_extension=".iso",
                                               file_types=(("Iso Files", "*.iso"),))
+
                 if save_path:
+                    # Check if a file path is selected                    
                     api_key = values["forensic_api"]
                     base_url = values["server_address"]
+
+                    # Call the upload_iso function to upload the selected ISO file
                     result = upload_iso(api_key, base_url, save_path)
+
                     if result:
+                        # If the ISO file upload is successful, display a success message
+
                         sg.popup('Upload successful')
+
+                        
                         web_server_address = values["server_address"]
                         forensic_api = values["forensic_api"]
+                        
                         try:
+                            # Attempt to list the ISO files again after the upload
+
                             iso_files = list_iso_files(forensic_api, web_server_address)
                             if iso_files:
-                                print(iso_files)
+                                # If ISO files are successfully listed, update the Listbox with the updated ISO files    
+
                                 window['-CDROM LIST-'].update(iso_files['iso_files'])
+
                         except Exception as e:
+                            # If an exception occurs while listing ISO files, print the exception message
                             print(str(e))
+                            sg.popup_error(f'Failed to list ISO files {str(e)}')
+
                     else:
+                        # If the ISO file upload fails, display an error message
+
                         sg.popup_error('Upload failed')
+
             except Exception as e:
+                # If an exception occurs during the execution of the code block, print the exception message
+
                 print(str(e))
+                sg.popup_error(f'Failed to upload ISO file {str(e)}')
+
+
         elif event == '-LIST-':
+            # Check if the event is the "-LIST-" event
+            # The event variable is checked against the string value '-LIST-'
+
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
             try:
+                # Try to execute the code block within the try block
+
+                # Call the list_iso_files function to list the available ISO files
                 iso_files = list_iso_files(forensic_api, web_server_address)
+
                 if iso_files:
-                    print(iso_files)
+                    # If ISO files are successfully listed, update the Listbox with the updated ISO files                    
                     window['-CDROM LIST-'].update(iso_files['iso_files'])
+                    sg.popup("ISO files listed")
+
             except Exception as e:
+                # If an exception occurs during the execution of the code block, print the exception message
+                sg.popup_error(f'Failed to list ISO files {str(e)}')
                 print(str(e))
+
+
         elif event == '-LIST PLUGINS-':
 
             web_server_address = values["server_address"]
