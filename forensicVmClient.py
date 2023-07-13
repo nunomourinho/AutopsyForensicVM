@@ -4081,26 +4081,44 @@ def ForensicVMForm():
 
 
         elif event == "save_button":
+            # Check if the event is the "save_button" event
+
             try:
+                # Try to execute the code block within the try block
+
                 # Save the configuration to the JSON file
                 save_config(values, filename)
 
+                # Create a dictionary containing the image-related values to be saved
                 image_values = {
                     "folder_share_server": values["folder_share_server"],
                     "share_login": values["share_login"],
                     "share_password": values["share_password"],
                     "equivalence": values["equivalence"]
                 }
+
+                # Save the image-related values to a separate JSON file in the case image folder
                 save_config(image_values, case_image_folder + "\\image-share.json")
+
                 print("Configuration saved successfully!")
                 sg.popup("Configuration saved successfully!")
+                # Display a popup message to indicate that the configuration has been saved
+
             except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
                 print(str(e))
                 sg.popup_error(str(e))
+                # Display a popup error message indicating that the configuration save failed
+
+
         elif event == "convert_to_vm_button":
+            # Check if the event is the "convert_to_vm_button" event
 
             print("Copy and convert...")
+            sg.popup("The conversion will start in command window. Please do not close it until the conversion is finished...")
 
+            # Extract the necessary values from the form
             server_address = values["ssh_server_address"]
             server_port = values["ssh_server_port"]
             windows_share = values["folder_share_server"]
@@ -4111,94 +4129,128 @@ def ForensicVMForm():
             copy = "copy"
             replacement_share = values["equivalence"]
 
-            # Run the remote openssh command
-            run_openssh(server_address,
-                        server_port,
-                        windows_share,
-                        share_login,
-                        share_password,
-                        replacement_share,
-                        forensic_image_path,
-                        uuid_folder,
-                        copy)
+            try:
+                # Try to execute the code block within the try block
 
-            print("Convert")
-            window["convert_to_vm_button"].update(disabled=not False)
-            window["link_to_vm_button"].update(disabled=not False)
-            window["import_evidence_button"].update(disabled=not True)
-            window["open_forensic_vm_button"].update(disabled=not True)
-            window["stop_vm_button"].update(disabled=not True)
-            window["reset_vm_button"].update(disabled=not True)
-            window["open_forensic_shell_button"].update(disabled=not True)
-            window["open_forensic_netdata_button"].update(disabled=not True)
+                # Run the remote openssh command to copy and convert the forensic image        
+                run_openssh(server_address,
+                            server_port,
+                            windows_share,
+                            share_login,
+                            share_password,
+                            replacement_share,
+                            forensic_image_path,
+                            uuid_folder,
+                            copy)
+
+                print("Convert")
+                sg.popup("Forensic Image converted sucessfully to a ForensicVM")
+                # Display a popup message to indicate that the forensic image has been converted
+
+                # Update the state of the buttons after the conversion is complete
+                window["convert_to_vm_button"].update(disabled=not False)
+                window["link_to_vm_button"].update(disabled=not False)
+                window["import_evidence_button"].update(disabled=not True)
+                window["open_forensic_vm_button"].update(disabled=not True)
+                window["stop_vm_button"].update(disabled=not True)
+                window["reset_vm_button"].update(disabled=not True)
+                window["open_forensic_shell_button"].update(disabled=not True)
+                window["open_forensic_netdata_button"].update(disabled=not True)
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+                
+                print(str(e))
+                sg.popup_error(f"Error converting VM to a forensic VM {str(e)}")
+                # Display a popup error message indicating that the forensic image conversion failed
+                
 
         elif event == "link_to_vm_button":
+            # Check if the event is the "link_to_vm_button" event
 
-            print("Link...")
+            try:
+                # Try to execute the code block within the try block
 
-            server_address = values["ssh_server_address"]
-            server_port = values["ssh_server_port"]
-            windows_share = values["folder_share_server"]
-            share_login = values["share_login"]
-            share_password = values["share_password"]
-            forensic_image_path = values["forensic_image_path"]
-            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
-            copy = "snap"
-            replacement_share = values["equivalence"]
+                print("Link...")
+                sg.popup("The conversion will start in command window. Please do not close it until the conversion is finished...")
+                # Sucessfull message to indicate that the forensic image has been linked
 
-            web_server_address = values["server_address"]
-            forensic_api = values["forensic_api"]
-            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+                # Extract the necessary values from the form
+                server_address = values["ssh_server_address"]
+                server_port = values["ssh_server_port"]
+                windows_share = values["folder_share_server"]
+                share_login = values["share_login"]
+                share_password = values["share_password"]
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                copy = "snap"
+                replacement_share = values["equivalence"]
+                web_server_address = values["server_address"]
+                forensic_api = values["forensic_api"]
 
-            if return_code != 0:
-                if return_code!= 404:
+                return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+                # Call the get_forensic_image_info function to retrieve information about the forensic image
+
+                if return_code != 0:
+                    
+                    if return_code!= 404:
+                        # Error getting information about the forensic image
+                        sg.popup_error("Could not connect to the server:\n" + vm_status)
+
+                    else:
+                        # Run the remote openssh command to convert the image to a VM
+                        run_openssh(server_address,
+                                    server_port,
+                                    windows_share,
+                                    share_login,
+                                    share_password,
+                                    replacement_share,
+                                    forensic_image_path,
+                                    uuid_folder,
+                                    copy)
+                        
+                        sg.popup("Forensic Image linked sucessfully to the a new VM")
+                        # Display a popup message to indicate that the forensic image has been linked
+
+                        # Update the state of the buttons after the linking process is complete                
+                        window["convert_to_vm_button"].update(disabled=not False)
+                        window["link_to_vm_button"].update(disabled=not False)
+                        window["import_evidence_button"].update(disabled=not True)
+                        window["stop_vm_button"].update(disabled=not True)
+                        window["reset_vm_button"].update(disabled=not True)
+                        window["open_forensic_vm_button"].update(disabled=not True)
+                        window["open_forensic_shell_button"].update(disabled=not True)
+                        window["open_forensic_netdata_button"].update(disabled=not True)
+                else:
+                    # Display error message to indicate that could not connect to the server
+                    print(vm_status)
                     sg.popup_error("Could not connect to the server:\n" + vm_status)
-                else:
-                    # Run the remote openssh command to convert the image to a VM
-                    run_openssh(server_address,
-                                server_port,
-                                windows_share,
-                                share_login,
-                                share_password,
-                                replacement_share,
-                                forensic_image_path,
-                                uuid_folder,
-                                copy)
 
-                    window["convert_to_vm_button"].update(disabled=not False)
-                    window["link_to_vm_button"].update(disabled=not False)
-                    window["import_evidence_button"].update(disabled=not True)
-                    window["stop_vm_button"].update(disabled=not True)
-                    window["reset_vm_button"].update(disabled=not True)
-                    window["open_forensic_vm_button"].update(disabled=not True)
-                    window["open_forensic_shell_button"].update(disabled=not True)
-                    window["open_forensic_netdata_button"].update(disabled=not True)
-            else:
-                print(vm_status)
-                if vm_status.get("vm_status", "") == "running":
-                    sg.popup("The machine is running.\n No actions required")
-                    window["convert_to_vm_button"].update(disabled=not False)
-                    window["link_to_vm_button"].update(disabled=not False)
-                    window["import_evidence_button"].update(disabled=not True)
-                    window["stop_vm_button"].update(disabled=not True)
-                    window["reset_vm_button"].update(disabled=not True)
-                    window["open_forensic_vm_button"].update(disabled=not True)
-                    window["open_forensic_shell_button"].update(disabled=not True)
-                    window["open_forensic_netdata_button"].update(disabled=not True)
-                #elif vm_status.get("vm_status", "") == "stopped":
-                    #sg.popup("The vm exists and is stopped.\n Starting the VM in the remote server.\n")
-                    # TODO: Start the VM in the remote_port
-                    #remote_port = ssh_background_session(server_address, server_port, windows_share)
-                    #if start_vm(forensic_api, uuid_folder, web_server_address) == "running":
-                        #sg.popup("The machine is running.\n No actions required")
-                    #else:
-                        #sg.popup_error("Could not start the VM:\n")
-                else:
-                    continue
+                    if vm_status.get("vm_status", "") == "running":
+                        # Show message to indicate that the machine is running and no actions are required
+                        sg.popup("The machine is running.\n No actions required")
 
+                        # Update the state of the buttons after the linking process is complete
+                        window["convert_to_vm_button"].update(disabled=not False)
+                        window["link_to_vm_button"].update(disabled=not False)
+                        window["import_evidence_button"].update(disabled=not True)
+                        window["stop_vm_button"].update(disabled=not True)
+                        window["reset_vm_button"].update(disabled=not True)
+                        window["open_forensic_vm_button"].update(disabled=not True)
+                        window["open_forensic_shell_button"].update(disabled=not True)
+                        window["open_forensic_netdata_button"].update(disabled=not True)
 
+                    else:                        
+                        continue
 
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
 
+                print(str(e))                    
+                sg.popup_error(f"Error converting VM to a forensic VM {str(e)}")
+                # Display a popup error message indicating that the forensic image conversion failed
+                    
+            
 
         elif event == "open_forensic_vm_button":
             # get server address value
@@ -4208,6 +4260,7 @@ def ForensicVMForm():
             print(vm_status)
             if return_code== 0:
                 webbrowser.open(f"{server_address}/screen?port={vm_status['websocket_port']}&uuid={uuid_folder}")
+                
         elif event == "stop_vm_button":
             # get server address value
             print("Stop VM...")
