@@ -3921,33 +3921,108 @@ def ForensicVMForm():
 
 
         elif event == "reset_vm_button":
+            # Check if the event is the "reset_vm_button" event
+
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
-            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
-            if vm_status.get("vm_status", "") == "running":
-                reset_vm(forensic_api, uuid_folder, web_server_address)
+
+            try:
+                # Try to execute the code block within the try block
+
+                return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+                # Call the get_forensic_image_info function to retrieve information about the forensic image
+
+                if vm_status.get("vm_status", "") == "running":
+                    # If the VM status is "running", proceed with resetting the VM
+
+                    reset_vm(forensic_api, uuid_folder, web_server_address)
+                    # Call the reset_vm function to reset the VM
+
+                    sg.popup("Vm reset")
+                    # Display a popup message to indicate that the VM has been reset
+
+                else:
+                    # If the VM status is not "running", display an error popup message
+
+                    sg.popup_error("Vm is not running. Reset not possible")
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f'Failed to reset vm {str(e)}')
+                # Display a popup error message indicating that the VM reset failed
 
 
         elif event == "shutdown_vm_button":
+            # Check if the event is the "shutdown_vm_button" event
+            # Shutdown the VM
+
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
-            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
-            if vm_status.get("vm_status", "") == "running":
-                shutdown_vm(forensic_api, uuid_folder, web_server_address)
+
+            try:
+                # Try to execute the code block within the try block
+
+                return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+                # Call the get_forensic_image_info function to retrieve information about the forensic image
+
+                if vm_status.get("vm_status", "") == "running":
+                    # If the VM status is "running", proceed with shutting down the VM
+
+                    shutdown_vm(forensic_api, uuid_folder, web_server_address)
+                    # Call the shutdown_vm function to shut down the VM
+
+                    sg.popup("Vm shutdown")
+                    # Display a popup message to indicate that the VM has been shutdown
+
+                else:
+                    sg.popup_error("Vm is not running. Shutdown not possible")
+
+                    # Display a popup error message indicating that the VM shutdown failed
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f'Failed to shutdown vm {str(e)}')
+                # Display a popup error message indicating that the VM shutdown failed
 
 
         elif event == "delete_vm_button":
+            # Check if the event is the "delete_vm_button" event
+
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
-            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
-            if vm_status.get("vm_status", "") == "stopped":
-                delete_vm(forensic_api, uuid_folder, web_server_address)
+
+            try:
+                # Try to execute the code block within the try block
+
+                return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+                # Call the get_forensic_image_info function to retrieve information about the forensic image
+
+                if vm_status.get("vm_status", "") == "stopped":
+                    # If the VM status is "stopped", proceed with deleting the VM
+                    delete_vm(forensic_api, uuid_folder, web_server_address)
+
+                    sg.popup("Vm deleted")
+                    # Display a popup message to indicate that the VM has been deleted
+                else:
+                    sg.popup_error("Vm is not stopped. Delete not possible")
+                    # Display a popup error message indicating that the VM delete failed
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f'Failed to delete vm {str(e)}')
+                # Display a popup error message indicating that the VM delete failed
 
 
         elif event == "start_vm_button":
