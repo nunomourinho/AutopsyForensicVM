@@ -5,6 +5,9 @@ Reorganize:
 ---> Make adicional docstrings in code
 ---> Create button to update folders (offline)
 
+Plugin git project:
+---> Make a separate plugin git project
+
 Setup:
 Make plugin setup
 
