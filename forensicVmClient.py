@@ -4026,36 +4026,58 @@ def ForensicVMForm():
 
 
         elif event == "start_vm_button":
+            # Check if the event is the "start_vm_button" event
+
             forensic_image_path = values["forensic_image_path"]
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             web_server_address = values["server_address"]
             forensic_api = values["forensic_api"]
-            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
-            print(vm_status)
-            if vm_status["running_mode"]=="snap":
-                server_address = values["ssh_server_address"]
-                server_port = values["ssh_server_port"]
-                windows_share = values["folder_share_server"]
-                share_login = values["share_login"]
-                share_password = values["share_password"]
-                forensic_image_path = values["forensic_image_path"]
-                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
-                copy = "copy"
-                replacement_share = values["equivalence"]
 
-                # Run in snapshot mode
-                run_snap(server_address,
-                         server_port,
-                         windows_share,
-                         share_login,
-                         share_password,
-                         replacement_share,
-                         forensic_image_path,
-                         uuid_folder,
-                         copy)
+            try:
+                # Try to execute the code block within the try block
+                return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+                # Call the get_forensic_image_info function to retrieve information about the forensic image
 
-            else:
-                start_vm(forensic_api, uuid_folder, web_server_address)
+                #print(vm_status)
+
+                if vm_status["running_mode"]=="snap":
+                    # If the VM is in snapshot mode, execute the code block for snapshot mode
+
+                    server_address = values["ssh_server_address"]
+                    server_port = values["ssh_server_port"]
+                    windows_share = values["folder_share_server"]
+                    share_login = values["share_login"]
+                    share_password = values["share_password"]
+                    forensic_image_path = values["forensic_image_path"]
+                    uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                    copy = "copy"
+                    replacement_share = values["equivalence"]
+
+                    # Run ForensicVM in snapshot mode
+                    run_snap(server_address,
+                            server_port,
+                            windows_share,
+                            share_login,
+                            share_password,
+                            replacement_share,
+                            forensic_image_path,
+                            uuid_folder,
+                            copy)
+                    
+                    sg.popup("ForensicVM started in snap mode. Do not close the command window. Please minimize it and processed to vm control")
+                    # Display a popup message to indicate that the VM has been started in snap mode
+
+                else:
+                    # If the VM is not in snapshot mode, execute the code block for normal mode
+
+                    start_vm(forensic_api, uuid_folder, web_server_address)
+                    sg.popup("ForensicVm started in normal mode")
+
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f'Failed to start vm {str(e)}')
 
 
         elif event == "save_button":
