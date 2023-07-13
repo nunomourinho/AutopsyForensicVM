@@ -1063,7 +1063,8 @@ def download_evidence(api_key, uuid, base_url, output_file):
                     if not progress_bar:
                         break
         if progress_bar:
-            sg.popup(f"Evidence downloaded to {output_file}")
+            sg.popup(f"Evidence downloaded to {output_file}. Opening path in explorer. \nPlease import this image into" \
+                      " Autopsy Case")
             return True
         else:
             sg.popup_error("Download canceled by user")
@@ -2805,8 +2806,8 @@ def ForensicVMForm():
                                  default_text=config.get("ssh_server_address", ""), size=(20,1)),
                    sg.InputText(key="ssh_server_port",
                                  default_text=config.get("ssh_server_port", ""),size=(8,1)),
-                   sg.Button("Test Ssh connection", key="test_ssh_connect"),
-                   sg.Button("Copy ssh key to server", key="copy-ssh-key-to-server")
+                   sg.Button("Copy ssh key to server", key="copy-ssh-key-to-server"),
+                   sg.Button("Test Ssh connection", key="test_ssh_connect")                   
                    ],
                   ]
                   )],
@@ -2825,9 +2826,10 @@ def ForensicVMForm():
         [sg.Text("Local ou remote path to share:"),sg.InputText(key="equivalence",
                                                                 default_text=image_config.get("equivalence",
                                                                                               config.get("equivalence", ""))),
-         sg.Button("Test windows share", key="test_windows_share"),
          sg.Button("Autofill info", key="autofill_share"),
-         sg.Button("Create share", key="create_windows_share")],
+         sg.Button("Create share", key="create_windows_share"),
+         sg.Button("Test windows share", key="test_windows_share")],
+         
 
                   ]
                   )],
@@ -3430,7 +3432,11 @@ def ForensicVMForm():
                 try:
                     # Try to download the network pcap files using the download_pcap() function
                     download_pcap(forensic_api, uuid_folder, web_server_address, save_path)
-                    sg.popup(f"Network pcap files downloaded and saved at {save_path}")
+
+                    saved_path = os.path.dirname(save_path)                    
+                    sg.popup(f"Network pcap files downloaded and saved at {save_path}. Opening path")
+                    os.startfile(saved_path)
+                    
 
                 except Exception as e:
                     # If an exception occurs during the execution of the code block, display an error popup
@@ -3787,9 +3793,14 @@ def ForensicVMForm():
 
                     download_screenshots(forensic_api, uuid_folder, web_server_address, save_path)
                     # Call the download_screenshots function to download the screenshots
-
-                    sg.popup("Screenshots downloaded")
-                    # Display a popup message to indicate that the screenshots have been downloaded
+                    
+                    saved_path = os.path.dirname(save_path)
+                    sg.popup(f"Screenshots downloaded. Opening path {saved_path} in explorer")                    
+                    os.startfile(saved_path)
+                                        
+                    # Open path in explorer and display a popup message to indicate that the 
+                    # screenshots have been downloaded
+                    
 
                 else:
                     sg.popup_error("Canceled to download screenshots")
@@ -3824,11 +3835,13 @@ def ForensicVMForm():
                     download_evidence(forensic_api, uuid_folder, web_server_address, save_path)
                     # Call the download_evidence function to download the evidence disk
 
-                    sg.popup(f"Evidence disk downloaded and saved to {save_path}. Close to open path in explorer. Then import the evidence disk in Autopsy Software")
+                    #sg.popup(f"Evidence disk downloaded and saved to {save_path}. Close to open path in explorer. Then import the evidence disk in Autopsy Software")
                     # Display a popup message to indicate that the evidence disk has been downloaded and saved to the specified path
-
+                    
                     saved_path = os.path.dirname(save_path)
-                    subprocess.Popen(f'explorer {saved_path}')
+                    #sg.popup(f"Downloaded Evidence disk. Opening path {saved_path} in explorer")                    
+                    os.startfile(saved_path)
+
                     # Open the saved path in the file explorer
 
                 else:
@@ -4011,8 +4024,6 @@ def ForensicVMForm():
                     # If the VM status is "stopped", proceed with deleting the VM
                     delete_vm(forensic_api, uuid_folder, web_server_address)
 
-                    sg.popup("Vm deleted")
-                    # Display a popup message to indicate that the VM has been deleted
                 else:
                     sg.popup_error("Vm is not stopped. Delete not possible")
                     # Display a popup error message indicating that the VM delete failed
@@ -4132,30 +4143,34 @@ def ForensicVMForm():
             try:
                 # Try to execute the code block within the try block
 
-                # Run the remote openssh command to copy and convert the forensic image        
-                run_openssh(server_address,
-                            server_port,
-                            windows_share,
-                            share_login,
-                            share_password,
-                            replacement_share,
-                            forensic_image_path,
-                            uuid_folder,
-                            copy)
+                if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):  
+                    # Run the remote openssh command to copy and convert the forensic image        
+                    run_openssh(server_address,
+                                server_port,
+                                windows_share,
+                                share_login,
+                                share_password,
+                                replacement_share,
+                                forensic_image_path,
+                                uuid_folder,
+                                copy)
 
-                print("Convert")
-                sg.popup("Forensic Image converted sucessfully to a ForensicVM")
-                # Display a popup message to indicate that the forensic image has been converted
+                    print("Convert")
+                    sg.popup("Forensic Image converted sucessfully to a ForensicVM")
+                    # Display a popup message to indicate that the forensic image has been converted
 
-                # Update the state of the buttons after the conversion is complete
-                window["convert_to_vm_button"].update(disabled=not False)
-                window["link_to_vm_button"].update(disabled=not False)
-                window["import_evidence_button"].update(disabled=not True)
-                window["open_forensic_vm_button"].update(disabled=not True)
-                window["stop_vm_button"].update(disabled=not True)
-                window["reset_vm_button"].update(disabled=not True)
-                window["open_forensic_shell_button"].update(disabled=not True)
-                window["open_forensic_netdata_button"].update(disabled=not True)
+                    # Update the state of the buttons after the conversion is complete
+                    window["convert_to_vm_button"].update(disabled=not False)
+                    window["link_to_vm_button"].update(disabled=not False)
+                    window["import_evidence_button"].update(disabled=not True)
+                    window["open_forensic_vm_button"].update(disabled=not True)
+                    window["stop_vm_button"].update(disabled=not True)
+                    window["reset_vm_button"].update(disabled=not True)
+                    window["open_forensic_shell_button"].update(disabled=not True)
+                    window["open_forensic_netdata_button"].update(disabled=not True)
+                else:
+                    sg.popup_error("The image windows share does not exist, is not accessible or from a previous image. " \
+                                           " Please check the configuration tab")
 
             except Exception as e:
                 # If an exception occurs during the execution of the code block, display an error popup
@@ -4199,28 +4214,36 @@ def ForensicVMForm():
 
                     else:
                         # Run the remote openssh command to convert the image to a VM
-                        run_openssh(server_address,
-                                    server_port,
-                                    windows_share,
-                                    share_login,
-                                    share_password,
-                                    replacement_share,
-                                    forensic_image_path,
-                                    uuid_folder,
-                                    copy)
                         
-                        sg.popup("Forensic Image linked sucessfully to the a new VM")
-                        # Display a popup message to indicate that the forensic image has been linked
+                        if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):  
+                            # Check if the windows share exists and is accessible
+                            
+                            # Run the remote openssh command to convert the image to a VM                       
+                            run_openssh(server_address,
+                                        server_port,
+                                        windows_share,
+                                        share_login,
+                                        share_password,
+                                        replacement_share,
+                                        forensic_image_path,
+                                        uuid_folder,
+                                        copy)
+                            
+                            sg.popup("Forensic Image linked sucessfully to the a new VM")
+                            # Display a popup message to indicate that the forensic image has been linked
 
-                        # Update the state of the buttons after the linking process is complete                
-                        window["convert_to_vm_button"].update(disabled=not False)
-                        window["link_to_vm_button"].update(disabled=not False)
-                        window["import_evidence_button"].update(disabled=not True)
-                        window["stop_vm_button"].update(disabled=not True)
-                        window["reset_vm_button"].update(disabled=not True)
-                        window["open_forensic_vm_button"].update(disabled=not True)
-                        window["open_forensic_shell_button"].update(disabled=not True)
-                        window["open_forensic_netdata_button"].update(disabled=not True)
+                            # Update the state of the buttons after the linking process is complete                
+                            window["convert_to_vm_button"].update(disabled=not False)
+                            window["link_to_vm_button"].update(disabled=not False)
+                            window["import_evidence_button"].update(disabled=not True)
+                            window["stop_vm_button"].update(disabled=not True)
+                            window["reset_vm_button"].update(disabled=not True)
+                            window["open_forensic_vm_button"].update(disabled=not True)
+                            window["open_forensic_shell_button"].update(disabled=not True)
+                            window["open_forensic_netdata_button"].update(disabled=not True)
+                        else:
+                            sg.popup_error("The image windows share does not exist, is not accessible or from a previous image. " \
+                                           " Please check the configuration tab")
                 else:
                     # Display error message to indicate that could not connect to the server
                     print(vm_status)
