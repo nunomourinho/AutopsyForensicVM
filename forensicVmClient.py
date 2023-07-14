@@ -917,7 +917,7 @@ def create_folders_in_qcow2(api_key, base_url, uuid_path, folders):
 
 def create_folders_in_qcow2_background(api, web_server_address, uuid_folder, case_tags):
     """
-    Run the create_folders_in_vmdk function in the background using a separate thread.
+    Run the create_folders_in_qcow2 function
 
     Args:
         api (str): Forensic API
@@ -933,9 +933,11 @@ def create_folders_in_qcow2_background(api, web_server_address, uuid_folder, cas
         create_folders_in_qcow2(api, web_server_address, uuid_folder, case_tags)
         print("Folders created")
 
+    target_function()
+
     # Create a thread and run the target function
-    thread = threading.Thread(target=target_function)
-    thread.start()
+    #thread = threading.Thread(target=target_function)
+    #thread.start()
 
 def sanitize_string(s):
     """
@@ -2449,7 +2451,7 @@ def validate_date(date_str):
     except ValueError:
         return False
 
-def formInit(values, window):
+def formInit(values, window, folders_created = False, case_tags = {}):
     """
     Initialize the form window by populating various elements with data retrieved from the forensic API.
 
@@ -2467,6 +2469,7 @@ def formInit(values, window):
         window: The PySimpleGUI window object.
 
     """
+    sg.popup("Initializing the form. Press ok and please wait a couple of seconds...")
     forensic_image_path = values["forensic_image_path"]
     uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
     web_server_address = values["server_address"]
@@ -2531,6 +2534,29 @@ def formInit(values, window):
                 window['remove_network_button'].update(disabled=True)
         except Exception as e:
             print(str(e))
+        
+        try:
+            # Call the get_forensic_image_info() function to retrieve forensic image information
+            return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
+
+            if not folders_created and vm_status.get("vm_status", "") == "stopped":
+                # Check if the evidence folders with Autopsy tags for the VM have not been created yet
+                # The folders_created variable indicates whether the folders have been created or not
+
+                # Retrieve the necessary values from the form                            
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                web_server_address = values["server_address"]
+                forensic_api = values["forensic_api"]
+
+                # Create the necessary folders in the Qcow2 background                            
+                create_folders_in_qcow2_background(forensic_api, web_server_address, uuid_folder, case_tags)
+                # The create_folders_in_qcow2_background() function is called with the necessary parameters to create the folders
+
+                folders_created = True
+        except Exception as e:
+            print(str(e))
+
 
 
 # Form: All fields in the form
@@ -2554,14 +2580,14 @@ def ForensicVMForm():
 
     This function does not take any parameters, and does not return any values. It runs indefinitely, until the window is closed.
     """
-    vm_stopped = True
+    vm_stopped = True    
     folders_created = False
     server_offline = False
     first_run = True
     # Set the theme
     sg.theme("DefaultNoMoreNagging")
-    # Define the filename for the JSON file
 
+    # Define the filename for the JSON file
     filename = "config.json"
     icon_path = "forensicVMCLient.ico"
     # Load the configuration from the JSON file if it exists
@@ -2976,7 +3002,7 @@ def ForensicVMForm():
                     # The first_run variable indicates whether it is the first run or not
 
                     # Perform the initial setup of the form
-                    formInit(values, window)
+                    formInit(values, window, folders_created, case_tags)
                     first_run = False
                 
                 window["alert_server_off"].update(visible=False)
@@ -3058,21 +3084,7 @@ def ForensicVMForm():
                         vm_stopped = True
                         # Set the vm_stopped variable to True to indicate that the VM is stopped
 
-                        if not folders_created:
-                            # Check if the evidence folders with Autopsy tags for the VM have not been created yet
-                            # The folders_created variable indicates whether the folders have been created or not
-
-                            # Retrieve the necessary values from the form                            
-                            forensic_image_path = values["forensic_image_path"]
-                            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
-                            web_server_address = values["server_address"]
-                            forensic_api = values["forensic_api"]
-
-                            # Create the necessary folders in the Qcow2 background                            
-                            create_folders_in_qcow2_background(forensic_api, web_server_address, uuid_folder, case_tags)
-                            # The create_folders_in_qcow2_background() function is called with the necessary parameters to create the folders
-
-                            folders_created = True
+ 
                 else:
                     # If the VM status is neither "running" nor "stopped"
 
