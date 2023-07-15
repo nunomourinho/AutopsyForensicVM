@@ -35,18 +35,32 @@ from java.io import FileWriter
 from org.json.simple import JSONArray, JSONObject
 from org.sleuthkit.datamodel import SleuthkitCase
 
+from org.sleuthkit.autopsy.ingest import IngestModuleGlobalSettingsPanel
+from org.sleuthkit.autopsy.ingest import IngestModuleIngestJobSettings
+from org.sleuthkit.autopsy.ingest import IngestModuleIngestJobSettingsPanel
+import java.awt.image.BufferedImage
+from javax.imageio import ImageIO
+from java.net import URL
+from javax.swing import ImageIcon
+from java.io import File
+
 # Add filemanager capabilities
 from org.sleuthkit.autopsy.casemodule.services import FileManager
 
 
 class MesiVMModuleFactory(IngestModuleFactoryAdapter):
-    moduleName = "Forensic VM"
+    moduleName = "Forensic VM Client"
 
     def getModuleDisplayName(self):
         return self.moduleName
 
     def getModuleDescription(self):
-        return "Virtualize datasource."
+        return "Virtualization of forensic images"
+        #return "The ForensicVM client plugin in Autopsy enables the virtualization of forensic images, simplifying the "\
+        #       "analysis of digital evidence. It provides control over the virtualized environment, ensuring a "\
+        #       "smooth and efficient investigation process. Its synergistic operation with the ForensicVM server "\
+        #       "offers a powerful toolset for forensic investigations, facilitating meticulous scrutiny of forensic "\
+        #       "images in a virtualized context."
 
     def getModuleVersionNumber(self):
         return "1.0"
@@ -56,6 +70,12 @@ class MesiVMModuleFactory(IngestModuleFactoryAdapter):
 
     def createDataSourceIngestModule(self, ingestOptions):
         return RunVMIngestModule()
+
+    def getIngestJobSettingsPanel(self, settings):
+        if not isinstance(settings, GenericIngestModuleJobSettings):
+            raise IllegalArgumentException("Expected settings argument to be instanceof GenericIngestModuleJobSettings")
+        self.settings = settings
+        return MesiPanel(self.settings)
 
 
 class RunVMIngestModule(DataSourceIngestModule):
@@ -150,3 +170,45 @@ class RunVMIngestModule(DataSourceIngestModule):
                     self.log(LEVEL.warning, "Error deleting the incomplete report file")
 
         return IngestModule.ProcessResult.OK
+
+
+class MesiPanel(IngestModuleIngestJobSettingsPanel):
+
+    def __init__(self, settings):
+        self.local_settings = settings
+        self.initComponents()
+        self.customizeComponents()
+
+    # Code for event handling...
+
+    def initComponents(self):
+        self.setLayout(None)
+
+        lblNewLabel_2 = JLabel("May take a while... Please be patient")
+        lblNewLabel_2.setHorizontalAlignment(SwingConstants.LEFT)
+        lblNewLabel_2.setFont(Font("Tahoma", Font.BOLD, 14))
+        lblNewLabel_2.setBackground(Color.YELLOW)
+        lblNewLabel_2.setBounds(10, 227, 347, 23)
+        self.add(lblNewLabel_2)
+
+        # Adding image to panel
+        #image_path = "forensicVMClient.png"  # assuming this is the correct filename
+        #image = ImageIO.read(File(image_path))
+        #scaled_image = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH)
+        #image_label = JLabel(ImageIcon(scaled_image))
+        #image_label.setBounds(10, 20, 200, 200)
+        #self.add(image_label)
+
+        # Adding multiline text
+        multiline_text = "<html>Line1<br>Line2<br>Line3<br>Line4</html>"
+        text_label = JLabel(multiline_text)
+        text_label.setFont(Font("Tahoma", Font.BOLD | Font.ITALIC, 11))
+        text_label.setHorizontalAlignment(SwingConstants.LEFT)
+        text_label.setBounds(10, 250, 243, 60)
+        self.add(text_label)
+
+    def customizeComponents(self):
+        pass
+    # Return the settings used
+    def getSettings(self):
+        return self.local_settings
