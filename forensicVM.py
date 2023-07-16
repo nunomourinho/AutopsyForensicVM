@@ -1,3 +1,14 @@
+from __builtin__ import str
+from java.awt import Panel, BorderLayout, EventQueue, GridLayout, GridBagLayout, GridBagConstraints, Font, Color      
+from java.awt.event import ActionListener, ActionEvent 
+from java.lang import IllegalArgumentException
+from java.lang import System
+from java.util.logging import Level
+from javax.swing import BoxLayout
+from javax.swing import JCheckBox
+from javax.swing import JFrame, JLabel, JButton, JTextField, JComboBox, JTextField, JProgressBar, JMenuBar, JMenuItem, JTabbedPane, JPasswordField, JCheckBox, SwingConstants, BoxLayout, JPanel
+from javax.swing.border import TitledBorder, EtchedBorder, EmptyBorder
+from mailbox import _PartialFile
 import traceback
 import jarray
 import inspect
@@ -43,7 +54,45 @@ from javax.imageio import ImageIO
 from java.net import URL
 from javax.swing import ImageIcon
 from java.io import File
+from __builtin__ import str
+from java.awt import Panel, BorderLayout, EventQueue, GridLayout, GridBagLayout, GridBagConstraints, Font, Color      
+from java.awt.event import ActionListener, ActionEvent 
+from java.lang import IllegalArgumentException
+from java.lang import System
+from java.util.logging import Level
+from javax.swing import BoxLayout
+from javax.swing import JCheckBox
+from javax.swing import JFrame, JLabel, JButton, JTextField, JComboBox, JTextField, JProgressBar, JMenuBar, JMenuItem, JTabbedPane, JPasswordField, JCheckBox, SwingConstants, BoxLayout, JPanel
+from javax.swing.border import TitledBorder, EtchedBorder, EmptyBorder
+from mailbox import _PartialFile
+from org.apache.commons.codec.digest import DigestUtils
+from org.sleuthkit.autopsy.casemodule import Case
+from org.sleuthkit.autopsy.casemodule.services import Blackboard
+from org.sleuthkit.autopsy.casemodule.services import FileManager
+from org.sleuthkit.autopsy.casemodule.services import Services
+from org.sleuthkit.autopsy.coreutils import Logger
+from org.sleuthkit.autopsy.ingest import DataSourceIngestModule
+from org.sleuthkit.autopsy.ingest import FileIngestModule
+from org.sleuthkit.autopsy.ingest import GenericIngestModuleJobSettings
 
+from org.sleuthkit.autopsy.ingest import IngestMessage
+from org.sleuthkit.autopsy.ingest import IngestModule
+from org.sleuthkit.autopsy.ingest import IngestModuleFactoryAdapter
+from org.sleuthkit.autopsy.ingest import IngestModuleGlobalSettingsPanel
+from org.sleuthkit.autopsy.ingest import IngestModuleIngestJobSettings
+from org.sleuthkit.autopsy.ingest import IngestModuleIngestJobSettingsPanel
+from org.sleuthkit.autopsy.ingest import IngestServices
+from org.sleuthkit.autopsy.ingest import ModuleDataEvent
+from org.sleuthkit.autopsy.ingest.IngestModule import IngestModuleException
+from org.sleuthkit.datamodel import AbstractFile, TskData
+from org.sleuthkit.datamodel import BlackboardArtifact
+from org.sleuthkit.datamodel import BlackboardAttribute
+from org.sleuthkit.datamodel import ReadContentInputStream
+from org.sleuthkit.datamodel import SleuthkitCase
+from java.awt import SystemColor
+import _hashlib
+import inspect
+import jarray
 # Add filemanager capabilities
 from org.sleuthkit.autopsy.casemodule.services import FileManager
 
@@ -68,14 +117,20 @@ class MesiVMModuleFactory(IngestModuleFactoryAdapter):
     def isDataSourceIngestModuleFactory(self):
         return True
 
-    def createDataSourceIngestModule(self, ingestOptions):
-        return RunVMIngestModule()
-
+    def getDefaultIngestJobSettings(self):
+        return GenericIngestModuleJobSettings()
+   
+    def hasIngestJobSettingsPanel(self):
+        return False
+    
     def getIngestJobSettingsPanel(self, settings):
         if not isinstance(settings, GenericIngestModuleJobSettings):
-            raise IllegalArgumentException("Expected settings argument to be instanceof GenericIngestModuleJobSettings")
+            raise IllegalArgumentException("MESI: Expected settings argument to be instanceof GenericIngestModuleJobSettings")
         self.settings = settings
-        return MesiPanel(self.settings)
+        return MesiVMPanel(self.settings)
+        
+    def createDataSourceIngestModule(self, ingestOptions):
+        return RunVMIngestModule()
 
 
 class RunVMIngestModule(DataSourceIngestModule):
@@ -98,6 +153,14 @@ class RunVMIngestModule(DataSourceIngestModule):
         self.pathToBAT = File(bat_path)
         if not self.pathToBAT.exists():
             raise IngestModuleException("MESI.BAT was not found in module folder " + bat_path)
+        
+        bat_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mesi-debug.bat")
+        self.pathToBAT = File(bat_path)
+        if not self.pathToBAT.exists():
+            bat_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "forensicVmClient.exe")
+            self.pathToBAT = File(bat_path)
+            if not self.pathToBAT.exists():
+                raise IngestModuleException("MESI.BAT was not found in module folder " + bat_path)
 
 
     def add_tags_to_json(self, case_path):
@@ -172,43 +235,87 @@ class RunVMIngestModule(DataSourceIngestModule):
         return IngestModule.ProcessResult.OK
 
 
-class MesiPanel(IngestModuleIngestJobSettingsPanel):
+class MesiVMPanel(IngestModuleIngestJobSettingsPanel):
+    # Note, we can't use a self.settings instance variable.
+    # Rather, self.local_settings is used.
+    # https://wiki.python.org/jython/UserGuide#javabean-properties
+    # Jython Introspector generates a property - 'settings' on the basis
+    # of getSettings() defined in this class. Since only getter function
+    # is present, it creates a read-only 'settings' property. This auto-
+    # generated read-only property overshadows the instance-variable -
+    # 'settings'
 
+    # We get passed in a previous version of the settings so that we can
+    # prepopulate the UI
+    # TODO: Update this for your UI
     def __init__(self, settings):
         self.local_settings = settings
         self.initComponents()
         self.customizeComponents()
 
-    # Code for event handling...
+    # TODO: Update this for your UI
+    def cMD5Event(self, event):
+        if self.cMD5.isSelected():
+            self.local_settings.setSetting("md5", "true")
+        else:
+            self.local_settings.setSetting("md5", "false")
 
+# TODO: Update this for your UI
+    def cSHA1Event(self, event):
+        if self.cSHA1.isSelected():
+            self.local_settings.setSetting("sha1", "true")
+        else:
+            self.local_settings.setSetting("Sha1", "false")
+
+    def cSHA256Event(self, event):
+        if self.cSHA256.isSelected():
+            self.local_settings.setSetting("sha256", "true")
+        else:
+            self.local_settings.setSetting("Sha256", "false")
+
+
+    def cSHA384Event(self, event):
+        if self.cSHA384.isSelected():
+            self.local_settings.setSetting("sha384", "true")
+        else:
+            self.local_settings.setSetting("Sha384", "false")
+
+
+    def cSHA512Event(self, event):
+        if self.cSHA512.isSelected():
+            self.local_settings.setSetting("sha512", "true")
+        else:
+            self.local_settings.setSetting("Sha512", "false")
+
+    def cTAGGED_FILESEvent(self, event):
+        if self.cSHA512.isSelected():
+            self.local_settings.setSetting("tagged_files", "true")
+        else:
+            self.local_settings.setSetting("tagget_files", "false")
+   
+    
+    # TODO: Update this for your UI
     def initComponents(self):
+                
         self.setLayout(None)
+                
+        lblNewLabel = JLabel("GPL 3.0 Source: https://github.com/mesi2020/autopsy")
+        lblNewLabel.setForeground(SystemColor.textHighlight);
+        lblNewLabel.setBounds(10, 281, 317, 14)
+        self.add(lblNewLabel)
+   
+   
 
-        lblNewLabel_2 = JLabel("May take a while... Please be patient")
-        lblNewLabel_2.setHorizontalAlignment(SwingConstants.LEFT)
-        lblNewLabel_2.setFont(Font("Tahoma", Font.BOLD, 14))
-        lblNewLabel_2.setBackground(Color.YELLOW)
-        lblNewLabel_2.setBounds(10, 227, 347, 23)
-        self.add(lblNewLabel_2)
-
-        # Adding image to panel
-        #image_path = "forensicVMClient.png"  # assuming this is the correct filename
-        #image = ImageIO.read(File(image_path))
-        #scaled_image = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH)
-        #image_label = JLabel(ImageIcon(scaled_image))
-        #image_label.setBounds(10, 20, 200, 200)
-        #self.add(image_label)
-
-        # Adding multiline text
-        multiline_text = "<html>Line1<br>Line2<br>Line3<br>Line4</html>"
-        text_label = JLabel(multiline_text)
-        text_label.setFont(Font("Tahoma", Font.BOLD | Font.ITALIC, 11))
-        text_label.setHorizontalAlignment(SwingConstants.LEFT)
-        text_label.setBounds(10, 250, 243, 60)
-        self.add(text_label)
-
+       
+    # TODO: Update this for your UI
     def customizeComponents(self):
-        pass
+        try:
+            self.cSHA1.setSelected(self.local_settings.getSettings("sha1") == "true")
+            self.cMD5.setSelected(self.local_settings.getSetting("md5") == "true")                                    
+        except:
+            pass
+    
+
     # Return the settings used
     def getSettings(self):
         return self.local_settings

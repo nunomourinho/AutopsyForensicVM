@@ -14,6 +14,58 @@ import requests
 from datetime import datetime
 from requests_toolbelt import MultipartEncoder
 from urllib.parse import urljoin
+try:
+    import pyi_splash
+except:
+    pass
+
+def resource_path(relative_path):
+    """
+    Get the absolute path to a resource, suitable for both development and PyInstaller environments.
+    
+    In a PyInstaller environment, a temporary folder is created to store bundled resources, 
+    and its path can be accessed via sys._MEIPASS. In a development environment, the current 
+    directory is used as the base path.
+
+    Args:
+        relative_path (str): The relative path to the resource.
+
+    Returns:
+        str: The absolute path to the resource.
+
+    Raises:
+        Exception: If unable to access PyInstaller's _MEIPASS variable.
+    """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS        
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    print(f"resource_path={os.path.join(base_path, relative_path)}, pwd={os.path.abspath('.')}")
+    return os.path.join(base_path, relative_path)
+
+def executable_path(file_path):
+    """
+    Get the absolute path to an executable file, suitable for both development and PyInstaller environments.
+    
+    In a PyInstaller environment, the application's directory path can be accessed via sys.executable. 
+    In a development environment, the directory path of the __file__ is used as the base path.
+
+    Args:
+        file_path (str): The relative file path to the executable.
+
+    Returns:
+        str: The absolute path to the executable.
+    """
+    if getattr(sys, 'frozen', False):
+        application_path = os.path.dirname(sys.executable)
+    elif __file__:
+        application_path = os.path.dirname(__file__)
+
+    print(f"executale_path={os.path.join(application_path, file_path)}, pwd={os.path.dirname(__file__)}")
+    return(os.path.join(application_path, file_path))
+
 
 def remove_vm_datetime(base_url, uuid, api_key):
     """
@@ -1734,7 +1786,7 @@ def generate_and_send_public_key(baseurl, api_key, ssh_dir):
 
 
 # Define the filename for the JSON file
-filename = "config.json"
+filename = executable_path("config.json")
 icon_path = "forensicVMCLient.ico"
 
 def create_login_and_share(username, password, sharename, folderpath):
@@ -1758,10 +1810,17 @@ def create_login_and_share(username, password, sharename, folderpath):
 
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    batch_file = os.path.join(script_dir, 'create_user_and_share.bat')
+    #batch_file = os.path.join(script_dir, 'create_user_and_share.bat')
+    batch_file = resource_path("create_user_and_share.bat")
+    nircmdc_file = resource_path("nircmdc.exe")
+
     share_name = sharename.split('\\')[-1]  # extract the share_name part
 
-    cmd = '"{}\\nircmdc" elevate cmd /c {} "{}" "{}" "{}" ""{}""'.format(os.getcwd(),batch_file, username,
+    #cmd = '"{}\\nircmdc" elevate cmd /c {} "{}" "{}" "{}" ""{}""'.format(os.getcwd(),batch_file, username,
+    #                                                                password, share_name.replace(" ", ""),
+    #                                                                folderpath)
+
+    cmd = '"{}" elevate cmd /c {} "{}" "{}" "{}" ""{}""'.format(nircmdc_file,batch_file, username,
                                                                     password, share_name.replace(" ", ""),
                                                                     folderpath)
 
@@ -1885,10 +1944,10 @@ try:
         case_image_folder = case_directory_arg + "\\" + uuid_folder
         os.makedirs(case_image_folder, exist_ok=True)
 
-        save_config(values, "case-config.json")
+        save_config(values, executable_path("case-config.json"))
     else:
         # Load the configuration from the JSON file
-        config = load_config("case-config.json")
+        config = load_config(executable_path("case-config.json"))
         image_path_arg = config.get("image_path_arg", "")
         case_directory_arg = config.get("case_directory_arg", "")
         case_name_arg = config.get("case_name_arg", "")
@@ -1942,7 +2001,7 @@ def run_snap(server_address, server_port, windows_share,
     try:
 
 
-        private_key_path = os.path.expanduser("mykey")
+        private_key_path = os.path.expanduser(executable_path("mykey"))
 
         # Connect to remote host using SSH key authentication
         ssh = paramiko.SSHClient()
@@ -1979,12 +2038,19 @@ def run_snap(server_address, server_port, windows_share,
                   f'--copy {copy} ' \
                   f'--share-port {remote_port}'
 
-        ssh_command ="start cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i " \
-                     + os.path.dirname(os.path.abspath(__file__))+ \
-                     "\\mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
-                     + str(server_address)\
+        ssh_command ="start cmd /c " + resource_path("ssh.exe") +  " -t -i " \
+                     + executable_path("mykey") + \
+                     " -oStrictHostKeyChecking=no forensicinvestigator@" \
+                     + str(server_address) \
                      + " -p " + str(server_port)\
                      + " " + reverse_ssh_foward + " " + command
+        
+        #ssh_command ="start cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i " \
+        #             + os.path.dirname(os.path.abspath(__file__))+ \
+        #             "\\mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+        #             + str(server_address)\
+        #             + " -p " + str(server_port)\
+        #             + " " + reverse_ssh_foward + " " + command
 
         print(ssh_command)
         # Run the command redirecting local samba port to a free open port remote\ly
@@ -2036,7 +2102,7 @@ def run_openssh(server_address, server_port, windows_share,
     try:
 
 
-        private_key_path = os.path.expanduser("mykey")
+        private_key_path = os.path.expanduser(executable_path("mykey"))
 
         # Connect to remote host using SSH key authentication
         ssh = paramiko.SSHClient()
@@ -2073,12 +2139,18 @@ def run_openssh(server_address, server_port, windows_share,
                   f'--copy {copy} ' \
                   f'--share-port {remote_port}'
 
-        ssh_command ="start /wait cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i " \
-                     + os.path.dirname(os.path.abspath(__file__))+ \
-                     "\\mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+        ssh_command ="start /wait cmd /c " + resource_path("ssh.exe") + " -t -i " + executable_path("mykey")\
+                     + " -oStrictHostKeyChecking=no forensicinvestigator@" \
                      + str(server_address)\
                      + " -p " + str(server_port)\
                      + " " + reverse_ssh_foward + " " + command
+        
+        #ssh_command ="start /wait cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i " \
+        #             + os.path.dirname(os.path.abspath(__file__))+ \
+        #             "\\mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+        #             + str(server_address)\
+        #             + " -p " + str(server_port)\
+        #             + " " + reverse_ssh_foward + " " + command
 
         print(ssh_command)
         # Run the command redirecting local samba port to a free open port remote\ly
@@ -2111,9 +2183,15 @@ def start_server_remotessh(server_address, server_port):
     try:
         command = f"cd /forensicVM/bin; exec sudo /forensicVM/bin/run-django-screen"
 
-        ssh_command ="start /wait cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i " \
-                     + os.path.dirname(os.path.abspath(__file__))+ \
-                     "\\mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+        #ssh_command ="start /wait cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i " \
+        #             + os.path.dirname(os.path.abspath(__file__))+ \
+        #             "\\mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+        #             + str(server_address)\
+        #             + " -p " + str(server_port)\
+        #             + " " + command
+
+        ssh_command ="start /wait cmd /c " + resource_path("ssh.exe") + " -t -i " + executable_path("mykey")\
+                     + " -oStrictHostKeyChecking=no forensicinvestigator@"\
                      + str(server_address)\
                      + " -p " + str(server_port)\
                      + " " + command
@@ -2150,12 +2228,18 @@ def debug_remotessh(server_address, server_port, uuid_folder):
     try:
         command = f"cd /forensicVM/mnt/vm/{uuid_folder}; exec bash"
 
-        ssh_command ="start /wait cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i " \
-                     + os.path.dirname(os.path.abspath(__file__))+ \
-                     "\\mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+        ssh_command ="start /wait cmd /c " + resource_path("ssh.exe") + " -t -i " + executable_path("mykey")\
+                     + " -oStrictHostKeyChecking=no forensicinvestigator@"\
                      + str(server_address)\
                      + " -p " + str(server_port)\
                      + " " + command
+
+        #ssh_command ="start /wait cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i " \
+        #             + os.path.dirname(os.path.abspath(__file__))+ \
+        #             "\\mykey -oStrictHostKeyChecking=no forensicinvestigator@" \
+        #             + str(server_address)\
+        #             + " -p " + str(server_port)\
+        #             + " " + command
 
         os.system(ssh_command)
 
@@ -2188,7 +2272,7 @@ def ssh_background_session(server_address, server_port, windows_share):
 
     """
     try:
-        private_key_path = os.path.expanduser("mykey")
+        private_key_path = os.path.expanduser(executable_path("mykey"))
 
         # Connect to remote host using SSH key authentication
         ssh = paramiko.SSHClient()
@@ -2211,7 +2295,7 @@ def ssh_background_session(server_address, server_port, windows_share):
         # Creating the port forwarding string and assigning it to result
         reverse_ssh_foward = f"-R {remote_port}:{samba_host}:445"
 
-        ssh_command ="start cmd /c " + os.path.dirname(os.path.abspath(__file__))+ "\\ssh.exe -t -i mykey " \
+        ssh_command ="start cmd /c " + resource_path("ssh.exe")+ " -t -i "  + executable_path("mykey") + \
                                                                                    "-oStrictHostKeyChecking=no " \
                                                                                    "forensicinvestigator@" \
                      + str(server_address)\
@@ -2243,7 +2327,7 @@ def test_ssh(address, port):
 
     """
     try:
-        private_key_path = os.path.expanduser("mykey")
+        private_key_path = os.path.expanduser(executable_path("mykey"))
 
         ###ssh_key.write_private_key_file(private_key_path)
 
@@ -2469,7 +2553,7 @@ def formInit(values, window, folders_created = False, case_tags = {}):
         window: The PySimpleGUI window object.
 
     """
-    sg.popup("Initializing the form. Press ok and please wait a couple of seconds...")
+    #sg.popup("Initializing the form. Press ok and please wait a couple of seconds...")
     forensic_image_path = values["forensic_image_path"]
     uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
     web_server_address = values["server_address"]
@@ -2540,6 +2624,10 @@ def formInit(values, window, folders_created = False, case_tags = {}):
             return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
 
             if not folders_created and vm_status.get("vm_status", "") == "stopped":
+                try:
+                    pyi_splash.update_text("Updating Autopsy folders...")
+                except:
+                    pass                
                 # Check if the evidence folders with Autopsy tags for the VM have not been created yet
                 # The folders_created variable indicates whether the folders have been created or not
 
@@ -2554,7 +2642,19 @@ def formInit(values, window, folders_created = False, case_tags = {}):
                 # The create_folders_in_qcow2_background() function is called with the necessary parameters to create the folders
 
                 folders_created = True
+                try:
+                    pyi_splash.close()
+                except:
+                    pass
+            try:
+                pyi_splash.close()
+            except:
+                pass
         except Exception as e:
+            try:
+                pyi_splash.close()
+            except:
+                pass
             print(str(e))
 
 
@@ -2588,13 +2688,14 @@ def ForensicVMForm():
     sg.theme("DefaultNoMoreNagging")
 
     # Define the filename for the JSON file
-    filename = "config.json"
-    icon_path = "forensicVMCLient.ico"
+    filename = executable_path("config.json")
+    icon_path = resource_path("forensicVMCLient.ico")
     # Load the configuration from the JSON file if it exists
     if os.path.isfile(filename):
         config = load_config(filename)
     else:
         config = {}
+
     if 'case_image_folder' in locals():
         if os.path.isfile(case_image_folder + "\\image-share.json"):
             image_config = load_config(case_image_folder + "\\image-share.json")
@@ -2602,6 +2703,7 @@ def ForensicVMForm():
             image_config = {}
     else:
         image_config = {}
+
     case_tag_path = case_directory_arg + "\\case_tags.json"
     if os.path.isfile(case_tag_path):
         case_tags = read_case_config(case_tag_path)
@@ -2916,7 +3018,7 @@ def ForensicVMForm():
     # Create the about tab
     about_layout = [
         [sg.Text("Forensic VM Client", font=("Helvetica", 20), justification="center")],
-        [sg.Image("forensicVMClient.png")],
+        [sg.Image(resource_path("forensicVMClient.png"))],
         [sg.Text("Version 1.0", justification="center")],
         [sg.Text("This software is provided as-is, without warranty of any kind. Use at your own risk.")],
         [sg.Multiline(default_text="Copyright (c) 2023 Nuno Mourinho - This software was created as "
@@ -2992,6 +3094,11 @@ def ForensicVMForm():
                     window["open_forensic_netdata_button"].update(disabled=not False)
                     window["-RUN PLUGIN-"].update(disabled=True)
                     server_offline = True
+                    try:
+                        pyi_splash.close()
+                    except:
+                        pass
+
 
             if server_ok == 0:
                 # Check if the server is not okay (the forensic API key is invalid)
@@ -4475,7 +4582,8 @@ def ForensicVMForm():
                 # Try to execute the code
 
                 # Get the SSH directory path
-                ssh_dir = os.path.dirname(os.path.abspath(__file__))
+                ssh_dir = executable_path("")
+                #os.path.dirname(os.path.abspath(__file__))
                 
                 # Call the generate_and_send_public_key function to generate and send the public key to the server
                 message, status_code = generate_and_send_public_key(values["server_address"], values["forensic_api"],
@@ -4543,4 +4651,11 @@ def ForensicVMForm():
 
 
 if __name__ == '__main__':
+    try:
+        pyi_splash.update_text("Initialising ForensicVM Forms")
+    except:
+        pass
+    print(executable_path("forensicVmClient.exe"))
+    print(resource_path("forensicVmClient.exe"))
+    
     ForensicVMForm()
