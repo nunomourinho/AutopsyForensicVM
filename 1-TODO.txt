@@ -1,13 +1,3 @@
-Reorganize:
----> Reorganize project: Create a folder with the external bin files, create a folder for config files, change code accordingly
----> Compile and reorganize sources
-
----> Make adicional docstrings in code
----> Create button to update folders (offline)
-
-Plugin git project:
----> Make a separate plugin git project
-
 Setup:
 Make plugin setup
 
