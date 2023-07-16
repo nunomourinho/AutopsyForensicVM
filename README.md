@@ -1,5 +1,5 @@
 # Autopsy ForensicVM client
-[![DOI](https://zenodo.org/badge/628277916.svg)](https://zenodo.org/badge/latestdoi/628277916)
+[![Documentation Status](https://readthedocs.org/projects/forensicvm-server-and-client-documentation/badge/?version=latest)](https://forensicvm-server-and-client-documentation.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/628277916.svg)](https://zenodo.org/badge/latestdoi/628277916)
 
 Documentation and manuals: [ForensicVM Server and Client Documentation](https://forensicvm-server-and-client-documentation.readthedocs.io/)
 
