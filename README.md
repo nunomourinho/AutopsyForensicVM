@@ -1,4 +1,5 @@
 # Autopsy ForensicVM client
+[![DOI](https://zenodo.org/badge/628277916.svg)](https://zenodo.org/badge/latestdoi/628277916)
 
 Documentation and manuals: [ForensicVM Server and Client Documentation](https://forensicvm-server-and-client-documentation.readthedocs.io/)
 
@@ -58,3 +59,19 @@ ForensicVM can be utilized in various scenarios, including but not limited to:
 In each of these scenarios, ForensicVM contributes to the analysis and understanding of digital evidence, aiding in investigations, incident mitigation, training, and maintaining a secure work environment.
 
 Documentation and manuals: [ForensicVM Server and Client Documentation](https://forensicvm-server-and-client-documentation.readthedocs.io/)
+
+
+## 📖 Citation
+
+Reference to cite if you use AutopsyForensicVM in a paper:
+```
+@software{Mourinho_AutopsyForensicVM_2023,
+author = {Mourinho, Nuno},
+doi = {10.5281/zenodo.8152434},
+month = {07},
+title = {{Autopsy ForensicVM Client}},
+url = {https://github.com/nunomourinho/AutopsyForensicVM},
+year = {2023}
+}
+
+
