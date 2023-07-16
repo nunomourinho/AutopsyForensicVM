@@ -1,5 +1,8 @@
 # Autopsy ForensicVM client
 
+Documentation and manuals: [ForensicVM Server and Client Documentation](https://forensicvm-server-and-client-documentation.readthedocs.io/)
+
+
 ## Introduction
 
 The Autopsy ForensicVM client is an innovative tool designed to streamline the process of digital forensics. It leverages advanced virtualization technology to enable secure and efficient analysis of forensic images. The client is specifically developed for cybersecurity professionals, digital forensics investigators, and information security teams.
@@ -53,3 +56,5 @@ ForensicVM can be utilized in various scenarios, including but not limited to:
 - Corporate Audits and Investigations
 
 In each of these scenarios, ForensicVM contributes to the analysis and understanding of digital evidence, aiding in investigations, incident mitigation, training, and maintaining a secure work environment.
+
+Documentation and manuals: [ForensicVM Server and Client Documentation](https://forensicvm-server-and-client-documentation.readthedocs.io/)
