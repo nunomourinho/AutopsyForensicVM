@@ -1,7 +1,7 @@
 import pytest
 import os
 import sys
-from forensicVMClient import resource_path
+from forensicVmClient import resource_path
 
 def test_resource_path_in_dev_env(monkeypatch):
     # Mock the abspath function to always return '/path/to/development'
