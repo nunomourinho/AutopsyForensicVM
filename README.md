@@ -1,5 +1,5 @@
 # Autopsy ForensicVM client
-[![Actions Status](https://github.com/nunomourinho/AutopsyForensicVM/workflows/Python Application/badge.svg)](https://github.com/nunomourinho/AutopsyForensicVM/actions)[![DOI](https://zenodo.org/badge/628277916.svg)](https://zenodo.org/badge/latestdoi/628277916) [![Documentation Status](https://readthedocs.org/projects/forensicvm-server-and-client-documentation/badge/?version=latest)](https://forensicvm-server-and-client-documentation.readthedocs.io/en/latest/?badge=latest)
+[![Actions Status](https://github.com/nunomourinho/AutopsyForensicVM/workflows/Python%20application/badge.svg)](https://github.com/nunomourinho/AutopsyForensicVM/actions)[![DOI](https://zenodo.org/badge/628277916.svg)](https://zenodo.org/badge/latestdoi/628277916) [![Documentation Status](https://readthedocs.org/projects/forensicvm-server-and-client-documentation/badge/?version=latest)](https://forensicvm-server-and-client-documentation.readthedocs.io/en/latest/?badge=latest)
 
 
 Documentation and manuals: [ForensicVM Server and Client Documentation](https://forensicvm-server-and-client-documentation.readthedocs.io/)
