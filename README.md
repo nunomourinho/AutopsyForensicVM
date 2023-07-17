@@ -1,5 +1,5 @@
 # Autopsy ForensicVM client
-[![Documentation Status](https://readthedocs.org/projects/forensicvm-server-and-client-documentation/badge/?version=latest)](https://forensicvm-server-and-client-documentation.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/628277916.svg)](https://zenodo.org/badge/latestdoi/628277916)
+[![DOI](https://zenodo.org/badge/628277916.svg)](https://zenodo.org/badge/latestdoi/628277916) [![Documentation Status](https://readthedocs.org/projects/forensicvm-server-and-client-documentation/badge/?version=latest)](https://forensicvm-server-and-client-documentation.readthedocs.io/en/latest/?badge=latest)
 
 Documentation and manuals: [ForensicVM Server and Client Documentation](https://forensicvm-server-and-client-documentation.readthedocs.io/)
 
@@ -67,7 +67,7 @@ Reference to cite if you use AutopsyForensicVM in a paper:
 ```
 @software{Mourinho_AutopsyForensicVM_2023,
 author = {Mourinho, Nuno},
-doi = {10.5281/zenodo.8152434},
+doi = {10.5281/zenodo.8153316},
 month = {07},
 title = {{Autopsy ForensicVM Client}},
 url = {https://github.com/nunomourinho/AutopsyForensicVM},
