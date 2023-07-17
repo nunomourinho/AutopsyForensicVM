@@ -1,3 +1,5 @@
+RequestExecutionLevel user
+
 !include "MUI2.nsh"
 
 !define PRODUCT_NAME "ForensicVM"
