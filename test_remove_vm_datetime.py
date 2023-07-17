@@ -1,6 +1,6 @@
 import pytest
 import requests_mock
-from forensicVMClient import remove_vm_datetime
+from forensicVmClient import remove_vm_datetime
 
 def test_remove_vm_datetime_success():
     base_url = 'http://example.com'
