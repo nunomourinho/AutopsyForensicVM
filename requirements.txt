@@ -5,3 +5,4 @@ PySimpleGUI==4.60.4
 PySimpleGUIDesigner==0.1.4.7
 requests==2.31.0
 requests-toolbelt==1.0.0
+requests-mock>=1.11.0
