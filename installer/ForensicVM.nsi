@@ -43,19 +43,19 @@ Section "ForensicVM Client" SEC01
     File /r "..\dist\forensicVMProd.py"    
 
     ; Create a shortcut on the Start menu
-    CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_DIR}\forensicVmClient.exe"
+    CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}.lnk" "$INSTDIR\forensicVmClient.exe"
 	
     ; Write the uninstall keys for Windows
-    WriteUninstaller "$INSTDIR\${PRODUCT_DIR}\Uninstall.exe"
+    WriteUninstaller "$INSTDIR\Uninstall.exe"
     WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "DisplayName" "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-    WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString" "$INSTDIR\${PRODUCT_DIR}\Uninstall.exe"
+    WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}" "UninstallString" "$INSTDIR\Uninstall.exe"
 
 SectionEnd
 
 Section "Uninstall"
-    Delete "$INSTDIR\${PRODUCT_DIR}\Uninstall.exe"
-    Delete "$INSTDIR\${PRODUCT_DIR}\forensicVmClient.exe"
-    Delete "$INSTDIR\${PRODUCT_DIR}\forensicVMProd.py"    
+    Delete "$INSTDIR\Uninstall.exe"
+    Delete "$INSTDIR\forensicVmClient.exe"
+    Delete "$INSTDIR\forensicVMProd.py"    
     Delete "$SMPROGRAMS\${PRODUCT_NAME}.lnk"
 
     ; Remove the uninstall keys for Windows
