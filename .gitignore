@@ -4,3 +4,5 @@ mykey.pub
 case-config.json
 delete/public
 delete/putty.ppk
+.idea/workspace.xml
+config.json
