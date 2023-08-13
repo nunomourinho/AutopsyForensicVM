@@ -60,7 +60,7 @@ ForensicVM can be utilized in various scenarios, including but not limited to:
 
 In each of these scenarios, ForensicVM contributes to the analysis and understanding of digital evidence, aiding in investigations, incident mitigation, training, and maintaining a secure work environment.
 
-Documentation and manuals: [ForensicVM Server and Client Documentation](https://forensicvm-server-and-client-documentation.readthedocs.io/)
+Documentation and manuals: [ForensicVM Autopsy Client Documentation](https://forensicvm-autopsy-plugin-user-manual.readthedocs.io/en/latest/)
 
 
 ## 📖 Citation
