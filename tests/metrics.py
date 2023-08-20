@@ -303,7 +303,7 @@ def client_benchmark(forensic_image_path):
     upload_speed = ssh_speed_test(host, port, remote_path, local_path)
     # Remove the local file
     os.remove(local_path)        
-    forensic_stats.append(("shh_upload_speed_MBs", upload_speed/1024**2))    
+    forensic_stats.append(("ssh_upload_speed_MBs", upload_speed/1024**2))    
     print("Internet speedtest")
     forensic_stats.append(getInternetSpeed())
     print("Internet Provider")
