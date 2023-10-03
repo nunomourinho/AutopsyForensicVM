@@ -52,7 +52,7 @@ Twisted==22.10.0
 twisted-iocpsupport==1.0.2
 typing_extensions==4.4.0
 tzdata==2022.4
-urllib3==1.26.15
+urllib3==1.26.17
 vnc2flv-rec==0.2.0
 websockify==0.10.0
 whichcraft==0.6.1
