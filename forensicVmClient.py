@@ -18,6 +18,7 @@ try:
     import pyi_splash
 except:
     pass
+import tempfile
 
 def resource_path(relative_path):
     """
@@ -473,7 +474,43 @@ def rollback_snapshot(api_key, site_url, uuid, snapshot_name):
         print(f"Error: {e}")
 
     return None
-    
+
+def rollback_golden_snapshot(api_key, site_url, uuid):
+    """
+    Rolls back a resource identified by UUID to the inicial state or golden state using the API endpoint.
+
+    Args:
+        api_key (str): The API key required for authentication.
+        site_url (str): The URL of the site where the resource is located.
+        uuid (str): The UUID of the resource to rollback.
+
+    Returns:
+        str: A message indicating the success or failure of the snapshot rollback.
+
+    Raises:
+        None
+
+    Example:
+        >>> rollback_golden_snapshot('your_api_key', 'https://example.com', 'resource_uuid')
+        'Snapshot snapshot_1 rolled back successfully'
+    """
+    url = f"{site_url}/api/rollback-golden-snapshot/{uuid}/"
+    headers = {'X-API-KEY': api_key}
+    data = {}
+
+    try:
+        response = requests.post(url, headers=headers, data=data)
+        if response.status_code == 200:
+            data = response.json()
+            message = data.get('message')
+            return message
+        else:
+            print(f"Error: {response.status_code} - {response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+    return None
+
+
 def create_snapshot(api_key, uuid_path, base_url):
     """
     Creates a snapshot for a resource identified by UUID path using the API endpoint.
@@ -2061,6 +2098,43 @@ def run_snap(server_address, server_port, windows_share,
 
 
 
+def sftp_upload_speed_test(server_address, server_port, private_key_path,
+                           remote_path="/remote/dir/", file_size_mb = 10):
+    # Create a test file of a specific size (e.g., 10MB)
+
+    file_path = os.path.join(tempfile.gettempdir(), "test_file.txt")
+    # alert remote path
+    try:
+        with open(file_path, "wb") as f:
+            f.write(b"\0" * file_size_mb * 1024 * 1024)
+
+        # Establish the SFTP connection
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(server_address, username='forensicinvestigator', key_filename=private_key_path, port=server_port)
+
+        sftp = ssh.open_sftp()
+
+        # Start timing the upload
+        start_time = time.time()
+        #sftp.put(file_path, remote_path + os.path.basename(file_path))
+        upload_duration = time.time() - start_time
+        if upload_duration == 0:
+            upload_duration = 1
+
+        # Close the SFTP connection
+        sftp.close()
+        ssh.close()
+    except Exception as e:
+        print("ERROR IN sftp_upload_speed_test")
+        print(str(e))
+
+
+
+    # Calculate the upload speed
+    upload_speed_mbps = (file_size_mb * 8) / upload_duration  # in Mbps
+    return upload_speed_mbps
+
 def run_openssh(server_address, server_port, windows_share,
             share_login, share_password, replacement_share,
             forensic_image_path, uuid_folder, copy):
@@ -2103,6 +2177,10 @@ def run_openssh(server_address, server_port, windows_share,
 
 
         private_key_path = os.path.expanduser(executable_path("mykey"))
+
+        upload_speed = sftp_upload_speed_test(server_address, server_port, private_key_path,
+                                              remote_path="/forensicVM/mnt/tmp/", file_size_mb = 100)
+        print(f"Upload Speed: {upload_speed} Mbps")
 
         # Connect to remote host using SSH key authentication
         ssh = paramiko.SSHClient()
@@ -2845,7 +2923,8 @@ def ForensicVMForm():
     snapshots_frame = sg.Frame('Snapshot management', [
         [sg.Button('List Remote Snapshots', key='-LIST SNAPSHOTS-', disabled=False),
         sg.Button('Create new', key='-CREATE SNAPSHOT-', disabled=False),
-        sg.Button('Rollback', key='-ROLLBACK SNAPSHOT-', disabled=False)],
+        sg.Button('Rollback', key='-ROLLBACK SNAPSHOT-', disabled=False),
+        sg.Button('Golden', key='-ROLLBACK GOLDEN-', disabled=False, button_color=('yellow', 'black'))]
     ])
 
     # Create a frame for snapshot deletion (Danger Zone!)
@@ -3356,7 +3435,29 @@ def ForensicVMForm():
                 print(str(e))
                 # Print the error message to the console          
 
+        elif event == '-ROLLBACK GOLDEN-':
+            try:
+                # Attempt to execute the following code block
 
+                # Retrieve the necessary values from the form
+                forensic_image_path = values["forensic_image_path"]
+                uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                web_server_address = values["server_address"]
+                forensic_api = values["forensic_api"]
+
+                rollback_golden_snapshot(forensic_api, web_server_address, uuid_folder)
+
+                # Update the snapshot list after rollback
+                snapshot_info_list = list_snapshots(forensic_api, uuid_folder, web_server_address)
+                window['-SNAPSHOT-LIST-'].update(snapshot_info_list)
+
+                # Display a popup message indicating the successful rollback to the snapshot
+                sg.popup(f"Reverted to GOLDEN SNAPSHOT - INITIAL FORENSICVM STATE")
+
+            except Exception as e:
+                # Catch any exceptions that occur during the execution of the code block
+                print(str(e))
+                # Print the error message to the console
         elif event == '-ROLLBACK SNAPSHOT-':
             # Check if the event is the "-ROLLBACK SNAPSHOT-" button event
             # The event variable is checked against the string value '-ROLLBACK SNAPSHOT-'
