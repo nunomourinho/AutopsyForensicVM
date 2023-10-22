@@ -20,6 +20,30 @@ except:
     pass
 import tempfile
 
+def insert_vm_metrics(base_url, uuid, api_key):
+    """
+    Inserts metrics for a virtual machine specified by UUID.
+
+    Args:
+        base_url (str): The base URL of the API.
+        uuid (str): The UUID of the virtual machine.
+        api_key (str): The API key for authentication.
+
+    Returns:
+        bool: True if the metrics were successfully inserted, False otherwise.
+    """
+    url = f"{base_url}/api/insertmetrics/{uuid}/"
+    headers = {'X-API-KEY': api_key}
+
+    response = requests.post(url, headers=headers)
+
+    if response.status_code == 200:
+        print('Metrics inserted successfully!')
+        return True
+    else:
+        print('Failed to insert metrics. Response:', response.text)
+        return False
+
 def resource_path(relative_path):
     """
     Get the absolute path to a resource, suitable for both development and PyInstaller environments.
@@ -4379,6 +4403,12 @@ def ForensicVMForm():
                                 uuid_folder,
                                 copy)
 
+                    uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                    web_server_address = values["server_address"]
+                    forensic_api = values["forensic_api"]
+
+                    insert_vm_metrics(web_server_address, uuid_folder, forensic_api)
+
                     print("Convert")
                     sg.popup("Forensic Image converted sucessfully to a ForensicVM")
                     # Display a popup message to indicate that the forensic image has been converted
@@ -4452,7 +4482,13 @@ def ForensicVMForm():
                                         forensic_image_path,
                                         uuid_folder,
                                         copy)
-                            
+
+                            uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
+                            web_server_address = values["server_address"]
+                            forensic_api = values["forensic_api"]
+
+                            insert_vm_metrics(web_server_address, uuid_folder, forensic_api)
+
                             sg.popup("Forensic Image linked sucessfully to the a new VM")
                             # Display a popup message to indicate that the forensic image has been linked
 
