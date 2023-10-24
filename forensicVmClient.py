@@ -4747,12 +4747,15 @@ def ForensicVMForm():
             try:
                 # Get the values from the PySimpleGUI window
                 new_equivalence = os.path.dirname(os.path.realpath(image_path_arg))
+                uuid_folder = str(string_to_uuid(forensic_image_path + case_name_arg))
+                #new_equivalence = uuid_folder
 
                 # Update the value of the 'equivalence' input field in the window with the new equivalence value        
                 window.Element('equivalence').update(value=new_equivalence)
 
                 # Create the Windows share folder path using the new equivalence value        
-                new_share_folder = "\\\\127.0.0.1\\" + os.path.basename(new_equivalence)
+                new_share_folder = "\\\\127.0.0.1\\" + uuid_folder
+                                   #os.path.basename(new_equivalence)
 
                 # Update the value of the 'folder_share_server' input field in the window with the new share folder path        
                 window.Element('folder_share_server').update(value=new_share_folder)
@@ -4770,6 +4773,7 @@ def ForensicVMForm():
 
             try:
                 # Get the values from the PySimpleGUI window
+                uuid_folder = str(string_to_uuid(forensic_image_path + case_name_arg))
                 new_equivalence=os.path.dirname(os.path.realpath(image_path_arg))
 
                 username = values['share_login']
