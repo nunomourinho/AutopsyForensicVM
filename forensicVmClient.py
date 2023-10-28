@@ -20,6 +20,35 @@ except:
     pass
 import tempfile
 
+def insert_comment(base_url, uuid, api_key, comment_text):
+    """
+    Inserts a comment for a chain of custody specified by UUID.
+
+    Args:
+        base_url (str): The base URL of the API.
+        uuid (str): The UUID for the chain of custody.
+        api_key (str): The API key for authentication.
+        comment_text (str): The text of the comment to insert.
+
+    Returns:
+        bool: True if the comment was successfully inserted, False otherwise.
+    """
+    url = f"{base_url}/api/record_comment/"  # Replace with the actual API endpoint for inserting comments
+    headers = {'X-API-KEY': api_key}
+    payload = {
+        'comment': comment_text,
+        'uuid': uuid
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+
+    if response.status_code == 200:
+        print('Comment inserted successfully!')
+        return True
+    else:
+        print('Failed to insert comment. Response:', response.text)
+        return False
+
 def insert_vm_metrics(base_url, uuid, api_key):
     """
     Inserts metrics for a virtual machine specified by UUID.
@@ -2637,6 +2666,24 @@ def validate_date(date_str):
     except ValueError:
         return False
 
+
+def update_and_create_share(image_path_arg, forensic_image_path, case_name_arg, values, window):
+    new_equivalence = os.path.dirname(os.path.realpath(image_path_arg))
+    uuid_folder = str(string_to_uuid(forensic_image_path + case_name_arg))
+
+    # Assuming 'window' and 'string_to_uuid' are defined elsewhere
+    window.Element('equivalence').update(value=new_equivalence)
+    new_share_folder = "\\\\127.0.0.1\\" + uuid_folder
+    window.Element('folder_share_server').update(value=new_share_folder)
+
+    username = values['share_login']
+    password = values['share_password']
+    sharename = str(values['folder_share_server']).replace(" ", "")
+    values['folder_share_server'] = sharename
+    folderpath = new_equivalence
+
+    create_login_and_share(username, password, sharename, folderpath)
+
 def formInit(values, window, folders_created = False, case_tags = {}):
     """
     Initialize the form window by populating various elements with data retrieved from the forensic API.
@@ -4312,6 +4359,8 @@ def ForensicVMForm():
                     copy = "copy"
                     replacement_share = values["equivalence"]
 
+                    insert_comment(web_server_address, str(uuid_folder), forensic_api, "Start machine in snapshot mode")
+
                     # Run ForensicVM in snapshot mode
                     run_snap(server_address,
                             server_port,
@@ -4390,7 +4439,8 @@ def ForensicVMForm():
 
             try:
                 # Try to execute the code block within the try block
-
+                update_and_create_share(image_path_arg, forensic_image_path, case_name_arg, values, window)
+                time.sleep(10)
                 if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):  
                     # Run the remote openssh command to copy and convert the forensic image        
                     run_openssh(server_address,
@@ -4468,7 +4518,8 @@ def ForensicVMForm():
 
                     else:
                         # Run the remote openssh command to convert the image to a VM
-                        
+                        update_and_create_share(image_path_arg, forensic_image_path, case_name_arg, values, window)
+                        time.sleep(10)
                         if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):  
                             # Check if the windows share exists and is accessible
                             

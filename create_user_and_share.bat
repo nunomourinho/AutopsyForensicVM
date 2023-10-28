@@ -40,5 +40,5 @@ net share "%sharename%"="%folderpath%"  /cache:none /grant:"%username%",read
 echo Share created successfully.
 
 endlocal
-pause
+timeout /t 5
 
