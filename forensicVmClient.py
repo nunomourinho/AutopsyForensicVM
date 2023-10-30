@@ -2951,6 +2951,16 @@ def ForensicVMForm():
     ])
 
 
+    # Create a frame for Help
+    vm_help_frame = sg.Frame("Help", [
+        [sg.Button("Read The Docs", key="open_help_button",
+                   size=(25, 2),
+                   visible=True,
+                   disabled=False,
+                   button_color=('white', '#00A000'))]
+    ])
+
+
     tools_frame = sg.Frame("Tools", [
         [sg.Button("Import Evidence Disk", key="import_evidence_button", size=(25, 1), visible=True,
                    disabled=True)],
@@ -3046,7 +3056,7 @@ def ForensicVMForm():
 
     # Define the layout for the virtualize tab
     virtualize_layout = [
-        [sg.Column([[convert_frame], [vm_control_frame]],
+        [sg.Column([[convert_frame], [vm_control_frame], [vm_help_frame]],
                    element_justification='left',
                    vertical_alignment='top'),
         sg.Column([[tab_group]],
@@ -4585,6 +4595,17 @@ def ForensicVMForm():
                 # Display a popup error message indicating that the forensic image conversion failed
                     
             
+
+        elif event == "open_help_button":
+            try:
+                # get server address value
+                print("Open Read the docs website...")
+                webbrowser.open("https://forensicvm-autopsy-plugin-user-manual.readthedocs.io/en/latest/")
+            except Exception as e:
+                # If an exception occurs during the execution of the code block, display an error popup
+
+                print(str(e))
+                sg.popup_error(f"Error opening browser {str(e)}")
 
         elif event == "open_forensic_vm_button":
             # Check if the event is the "open_forensic_vm_button" event
