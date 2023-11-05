@@ -2671,14 +2671,14 @@ def update_and_create_share(image_path_arg, forensic_image_path, case_name_arg, 
     new_equivalence = os.path.dirname(os.path.realpath(image_path_arg))
     uuid_folder = str(string_to_uuid(forensic_image_path + case_name_arg))
 
-    # Assuming 'window' and 'string_to_uuid' are defined elsewhere
     window.Element('equivalence').update(value=new_equivalence)
     new_share_folder = "\\\\127.0.0.1\\" + uuid_folder
     window.Element('folder_share_server').update(value=new_share_folder)
 
     username = values['share_login']
     password = values['share_password']
-    sharename = str(values['folder_share_server']).replace(" ", "")
+    sharename = new_share_folder.replace(" ", "")
+    #sharename = str(values['folder_share_server']).replace(" ", "")
     values['folder_share_server'] = sharename
     folderpath = new_equivalence
 
@@ -3212,7 +3212,6 @@ def ForensicVMForm():
     # Create the main application window
     window = sg.Window("Autopsy ForensicVM Client", layout, element_justification="center", icon=icon_path)
 
-
     # Event loop
     while True:
         # Read events from the window with a timeout of 1000 milliseconds (1 second)
@@ -3270,6 +3269,27 @@ def ForensicVMForm():
 
                     # Perform the initial setup of the form
                     formInit(values, window, folders_created, case_tags)
+                    try:
+                        # Get the values from the PySimpleGUI window
+                        new_equivalence = os.path.dirname(os.path.realpath(image_path_arg))
+                        uuid_folder = str(string_to_uuid(forensic_image_path + case_name_arg))
+                        # new_equivalence = uuid_folder
+
+                        # Update the value of the 'equivalence' input field in the window with the new equivalence value
+                        window.Element('equivalence').update(value=new_equivalence)
+
+                        # Create the Windows share folder path using the new equivalence value
+                        new_share_folder = "\\\\127.0.0.1\\" + uuid_folder
+                        # os.path.basename(new_equivalence)
+
+                        # Update the value of the 'folder_share_server' input field in the window with the new share folder path
+                        window.Element('folder_share_server').update(value=new_share_folder)
+
+                    except Exception as e:
+                        # If an exception occurs during the execution of the code block, display an error popup
+
+                        print(str(e))
+
                     first_run = False
                 
                 window["alert_server_off"].update(visible=False)
@@ -4446,16 +4466,17 @@ def ForensicVMForm():
             uuid_folder = string_to_uuid(forensic_image_path + case_name_arg)
             copy = "copy"
             replacement_share = values["equivalence"]
+            new_share_folder = "\\\\127.0.0.1\\" + str(uuid_folder)
 
             try:
                 # Try to execute the code block within the try block
                 update_and_create_share(image_path_arg, forensic_image_path, case_name_arg, values, window)
                 time.sleep(10)
-                if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):  
+                if test_windows_share(new_share_folder, values['share_login'], values['share_password']):
                     # Run the remote openssh command to copy and convert the forensic image        
                     run_openssh(server_address,
                                 server_port,
-                                windows_share,
+                                new_share_folder,
                                 share_login,
                                 share_password,
                                 replacement_share,
@@ -4516,6 +4537,7 @@ def ForensicVMForm():
                 replacement_share = values["equivalence"]
                 web_server_address = values["server_address"]
                 forensic_api = values["forensic_api"]
+                new_share_folder = "\\\\127.0.0.1\\" + str(uuid_folder)
 
                 return_code, vm_status = get_forensic_image_info(forensic_api, uuid_folder, web_server_address)
                 # Call the get_forensic_image_info function to retrieve information about the forensic image
@@ -4530,13 +4552,13 @@ def ForensicVMForm():
                         # Run the remote openssh command to convert the image to a VM
                         update_and_create_share(image_path_arg, forensic_image_path, case_name_arg, values, window)
                         time.sleep(10)
-                        if test_windows_share(values['folder_share_server'], values['share_login'], values['share_password']):  
+                        if test_windows_share(new_share_folder, values['share_login'], values['share_password']):
                             # Check if the windows share exists and is accessible
                             
                             # Run the remote openssh command to convert the image to a VM                       
                             run_openssh(server_address,
                                         server_port,
-                                        windows_share,
+                                        new_share_folder,
                                         share_login,
                                         share_password,
                                         replacement_share,
